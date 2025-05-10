@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.6" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.6" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.6">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+
+
+	<ItemGroup>
+		<Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+		<Content Remove="Assets\Assets.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Appdata\*" CopyToOutputDirectory="PreserveNewest" />
+		<Content Remove="Appdata\Appdata.cs" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <None Remove="UI\Containers\1i5lavz3.zv4~" />
+	</ItemGroup>
+
+
+	<PropertyGroup>
+		<ApplicationIcon>Assets/Icone/Icone.ico</ApplicationIcon>
+		<!-- Set the .exe icon -->
+	</PropertyGroup>
+	
+</Project>

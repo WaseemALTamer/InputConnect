@@ -1,0 +1,81 @@
+﻿using System;
+using System.Threading;
+using NAudio.CoreAudioApi;
+using NAudio.Wave;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Starting audio capture from loopback (what you hear)...");
+        
+        // Set up loopback capture
+        var capture = new WasapiLoopbackCapture(); // Captures output audio
+
+        capture.DataAvailable += (s, e) =>
+        {
+            for (int i = 0; i < 1; i++) {
+                Console.WriteLine($"{e.Buffer[50]}");
+            }
+            
+            // You could stream, save, or process this buffer here: e.Buffer
+        };
+
+        capture.RecordingStopped += (s, e) =>
+        {
+            Console.WriteLine("Recording stopped.");
+            capture.Dispose();
+        };
+
+        capture.StartRecording();
+        Console.WriteLine("Press Enter to stop...");
+        Console.ReadLine();
+        capture.StopRecording();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+using SharpHook;
+
+
+class Program
+{
+
+    private static int lastX = 0;
+    private static int lastY = 0;
+
+
+    static void Main()
+    {
+        // Create a new HookManager to manage input hooks
+        var hook = new TaskPoolGlobalHook();
+
+
+        hook.MouseMoved += OnMouseMoved;
+
+
+        hook.Run(); // use async later alright bud
+    }
+
+    public static void OnMouseMoved(object s, MouseHookEventArgs e) {
+
+        int currentX = e.Data.X;
+        int currentY = e.Data.Y;
+
+        int offsetX = currentX - lastX;
+        int offsetY = currentY - lastY;
+
+        lastX = currentX;
+        lastY = currentY;
+
+        Console.WriteLine($"Offset: ({offsetX}, {offsetY})");
+    }
+}

@@ -1,0 +1,53 @@
+﻿
+
+
+
+
+namespace InputConnect.Setting
+{
+    static public class Config{
+
+        // No IpAdressNeeded as it will be  dinamically graped
+        // Grap the ip using the Device.cs file with the class
+
+        public static string? DeviceName = Network.Device.DeviceName; // this is a Device name  that you set your  self from
+                                                                      // setting if there is no Name then we take the device
+                                                                      // name
+
+        public static string ApplicationName = "InputConnect"; // this is just the name of the application
+                                                               // nothing more nothing less
+
+        public static string BroadCastAddress = "255.255.255.255"; // incase you are not aware this is a boardcast address
+                                                                   // that you can only send a  message to it once and all
+                                                                   // the devices will use recieve the message this doesnt
+                                                                   // need to change underneath  any  circumstances  other
+                                                                   // than if the address was changed to something else by
+                                                                   // universally
+
+        public static int Port = 39393; // the port number should be the same for all devices
+                                        // other wise the  application  wont communicate with
+                                        // other devices on the network
+
+        public static int Tick = 8;     // this is used for animations  each tick will occure
+                                        // every 8ms apart
+
+        public static int AdvertisementInterval = 3000; // this is used to tell  the function that advertise the
+                                                        // device to advertise it  every <AdvertisementInterval>
+                                                        // the number is in milliseconds
+        
+        public static int AdvertiseTimeSpan = 10;       // this  is  used  to tell the app that all  the  devices
+                                                        // that  had  an  advertisement that is  10s old  is  not
+                                                        // relievent and should be removed the time is in seconds
+
+        public static int TransitionDuration = 200;     // this is  used  for  Transitioning for  one  holder to
+                                                        // the value is in ms
+
+        public static int CornerRadius = 10;     // this value is used for the Holder corner Radius
+                                                 // this is a generic var that anycontainer can use
+
+        public static int TransitionHover = 100; // this is used for a hover  effect  duration,
+                                                 // the time is in ms
+
+        public static int FontSize = 20;  // this is for all the text font size of the application
+    }
+}
