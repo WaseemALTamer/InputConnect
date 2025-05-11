@@ -22,14 +22,12 @@ namespace InputConnect.UI.Containers
 
 
         private Action? _Trigger;
-        public Action? Trigger
-        {
+        public Action? Trigger{
             get { return _Trigger; }
             set { _Trigger = value; }
         }
 
-        public SettingButton(Canvas? master = null)
-        {
+        public SettingButton(Canvas? master = null){
             Master = master;
 
             //Background = Themes.Buttons;
@@ -58,8 +56,7 @@ namespace InputConnect.UI.Containers
 
 
 
-            ButtonImage = new Image
-            {
+            ButtonImage = new Image{
                 Stretch = Stretch.Uniform,
             };
             Assets.AddAwaitedActions(() => {
@@ -84,12 +81,10 @@ namespace InputConnect.UI.Containers
 
 
 
-        public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null)
-        {
+        public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null){
             if (Master != null){
                 if (ShowHideTransation != null &&
-                    ShowHideTransation.FunctionRunning == false)
-                {
+                    ShowHideTransation.FunctionRunning == false){
                     if (IsShowing){
                         Canvas.SetLeft(this, Master.Width - Width);
                         Canvas.SetTop(this, Master.Height - Height - 15);
@@ -105,42 +100,35 @@ namespace InputConnect.UI.Containers
 
 
         bool IsShowing = false;
-        public void Show()
-        {
+        public void Show(){
             if (ShowHideTransation == null) return;
             IsShowing = true;
             ShowHideTransation.TranslateForward();
         }
 
-        public void Hide()
-        {
+        public void Hide(){
             if (ShowHideTransation == null) return;
             IsShowing = false;
             ShowHideTransation.TranslateBackward();
         }
 
-        public void ShowHideTrigger(double Value)
-        {
+        public void ShowHideTrigger(double Value){
             if (Master == null) return;
             Canvas.SetLeft(this, Master.Width - ((Width) * Value));
             IsVisible = Value != 0;
         }
 
-        public void SetOpacity(double Value)
-        {
+        public void SetOpacity(double Value){
             Opacity = Value;
             IsVisible = Value != 0;
         }
 
 
-        private void OnClick(object? sender, PointerReleasedEventArgs e)
-        {
+        private void OnClick(object? sender, PointerReleasedEventArgs e){
 
             e.Handled = true;
-            if (e.GetCurrentPoint(null).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonReleased)
-            {
-                if (sender is Control control)
-                {
+            if (e.GetCurrentPoint(null).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonReleased){
+                if (sender is Control control){
                     var pointerPosition = e.GetPosition(control);
                     if (pointerPosition.X < 0 || pointerPosition.Y < 0) return;
                     if (pointerPosition.X > Width || pointerPosition.Y > Height) return;

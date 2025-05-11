@@ -4,7 +4,6 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Input;
 using Avalonia;
-using System;
 
 
 
@@ -106,7 +105,7 @@ namespace InputConnect.UI.Containers
             if (Data == null) return;
             if (Message != null){
                 var ad = (MessageUDP)Message; // we cast it because it did not take it for somereason
-                Data.Text = $"Name: {ad.Text ?? "None"}  \n\n" +
+                Data.Text = $"Name: {ad.DeviceName ?? "None"}  \n\n" +
                             $"IP: {ad.IP ?? "None"}  \n" +
                             $"MacAddress: {ad.MacAddress ?? "None"}  \n" +
                             $"Time: {ad.Time}";
@@ -221,7 +220,7 @@ namespace InputConnect.UI.Containers
                     
                     // Add the date to the TargetedDevice
                     SharedData.TargetedDevice.IP = _message.IP;
-                    SharedData.TargetedDevice.MACAddress = _message.MacAddress;
+                    SharedData.TargetedDevice.MacAddress = _message.MacAddress;
                     SharedData.TargetedDevice.DeviceName = _message.Text;
                     SharedData.TargetedDevice.Port = _message.Port;
 

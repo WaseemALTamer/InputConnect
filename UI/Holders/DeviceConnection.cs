@@ -1,14 +1,10 @@
-﻿
-using InputConnect.Network.Constants;
-using Avalonia.Controls.Primitives;
+﻿using Avalonia.Controls.Primitives;
 using InputConnect.UI.Animations;
 using InputConnect.Structures;
 using Avalonia.Interactivity;
 using InputConnect.Setting;
-using InputConnect.Network;
 using Avalonia.Controls;
 using Avalonia;
-using System;
 
 
 
@@ -122,15 +118,6 @@ namespace InputConnect.UI.Holders
 
 
 
-            MessageManager.OnConnect += (Message) =>{
-                Console.WriteLine(Message.IP);
-                Console.WriteLine(Message.Text);
-                if (Message.Text == null) return;
-                Console.WriteLine(Encryptor.Decrypt(Message.Text, "RandomToken"));
-            };
-
-
-
             if (Master != null)
             {
                 OnResize(); // trigger the function to set the sizes
@@ -197,21 +184,10 @@ namespace InputConnect.UI.Holders
 
         private void OnClickConnectButton(object? sender = null, RoutedEventArgs? e = null) {
 
-            string text = Encryptor.Encrypt($"hello there my name is waseem and i am a 19 yeras old student in the universtiy of surry and here a a var that might change everything", "RandomToken");
-
-            //string v = Encryptor.Decrypt(text, "RandomToken");
-
-            //Console.WriteLine(v);
-
-            MessageUDP message = new MessageUDP { 
-                MessageType = MessageTypes.Connect,
-                Text = text,
-                IsEncrypted = true,
-            };
-
-            if (SharedData.TargetedDevice.IP != null)
-                ConnectionUDP.SendUDP(SharedData.TargetedDevice.IP, message);
-        
+            if (SharedData.TargetedDevice.IP != null) {
+                Connections.Manager.EstablishConnection(SharedData.TargetedDevice.IP, "<Token>");
+            }
         }
+
     }
 }

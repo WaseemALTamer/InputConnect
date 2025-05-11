@@ -7,28 +7,31 @@ using System;
 
 namespace InputConnect.UI.Containers
 {
-    public class BackButton : Border
+    public class CloseButton : Border
     {
 
         private Canvas? Master;
         private Image? ButtonImage;
-        
+
         private Animations.Transations.Uniform? HoverTranstion;
         private Animations.Transations.EaseOut? ShowHideTransation;
 
 
         private Action? _Trigger;
-        public Action? Trigger{
+        public Action? Trigger
+        {
             get { return _Trigger; }
             set { _Trigger = value; }
         }
 
-        public BackButton(Canvas? master = null) {
+        public CloseButton(Canvas? master = null)
+        {
             Master = master;
 
             //Background = Themes.Buttons;
 
-            ShowHideTransation = new Animations.Transations.EaseOut {
+            ShowHideTransation = new Animations.Transations.EaseOut
+            {
                 StartingValue = 0,
                 EndingValue = 1,
                 Duration = Config.TransitionDuration,
@@ -36,28 +39,31 @@ namespace InputConnect.UI.Containers
                 Trigger = ShowHideTrigger
             };
 
-            HoverTranstion = new Animations.Transations.Uniform{
-                StartingValue=1,
-                EndingValue=0.5,
+            HoverTranstion = new Animations.Transations.Uniform
+            {
+                StartingValue = 1,
+                EndingValue = 0.5,
                 Duration = Config.TransitionHover,
                 Trigger = SetOpacity
             };
 
-            ButtonImage = new Image { 
+            ButtonImage = new Image
+            {
                 Stretch = Avalonia.Media.Stretch.Uniform,
             };
             Assets.AddAwaitedActions(() => {
-                ButtonImage.Source = Assets.BackButtonBitmap;
+                ButtonImage.Source = Assets.CloseButtonBitmap;
             });
 
+
+            Width = 55; Height = 30; // the Size is static
             Child = ButtonImage;
-            Width = 55; Height = 85 / 2; // the Size is static
+            
 
 
 
-            if (Master != null) {
-                Canvas.SetLeft(this, Master.Width - Width);
-                Canvas.SetTop(this, Height / 2);
+            if (Master != null){
+                OnSizeChanged();
                 Master.SizeChanged += OnSizeChanged;
             }
 
@@ -72,39 +78,42 @@ namespace InputConnect.UI.Containers
         public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null){
             if (Master != null){
                 if (ShowHideTransation != null &&
-                    ShowHideTransation.FunctionRunning == false){
+                    ShowHideTransation.FunctionRunning == false)
+                {
                     if (IsShowing){
-                        Canvas.SetLeft(this, Master.Width - Width);
+                        Canvas.SetLeft(this, (Master.Width - Width));
+                        Canvas.SetTop(this, 15);
                     }
-                    else {
+                    else{
                         Canvas.SetLeft(this, Master.Width);
+                        Canvas.SetTop(this, 15);
                     }
-                }   
+                }
             }
         }
 
 
 
         private bool IsShowing = false;
-        public void Show() {
+        public void Show(){
             if (ShowHideTransation == null) return;
             IsShowing = true;
             ShowHideTransation.TranslateForward();
         }
 
-        public void Hide() {
+        public void Hide(){
             if (ShowHideTransation == null) return;
             IsShowing = false;
             ShowHideTransation.TranslateBackward();
         }
 
-        public void ShowHideTrigger(double Value) {
+        public void ShowHideTrigger(double Value){
             if (Master == null) return;
             Canvas.SetLeft(this, Master.Width - (Width * Value));
             IsVisible = Value != 0;
         }
 
-        public void SetOpacity(double Value) { 
+        public void SetOpacity(double Value){
             Opacity = Value;
             IsVisible = Value != 0;
         }
@@ -122,12 +131,12 @@ namespace InputConnect.UI.Containers
                     if (ShowHideTransation != null && ShowHideTransation.FunctionRunning == true) return;
                     if (Trigger != null) Trigger();
 
-                    HideShowAnimation();
+                    //HideShowAnimation();
                 }
             }
         }
 
-        public async void HideShowAnimation() {
+        public async void HideShowAnimation(){
             Hide();
             await Task.Delay(Config.TransitionDuration);
             Show();

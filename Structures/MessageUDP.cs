@@ -13,6 +13,9 @@ namespace InputConnect.Structures
         [JsonPropertyName("MacAdress")]
         public string? MacAddress { get; set; }
 
+        [JsonPropertyName("DeviceName")]
+        public string? DeviceName { get; set; }
+
         [JsonPropertyName("Text")]
         public string? Text { get; set; }
 

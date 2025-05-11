@@ -163,8 +163,7 @@ namespace InputConnect.UI.Holders
             IsVisible = Opacity != 0; // reducndency line for the Avoilonia Thread to ignore the window when not needed
         }
 
-        private void SmoothVerticalScrollerTrigger(double Value)
-        {
+        private void SmoothVerticalScrollerTrigger(double Value){
             if (_ScrollViewer != null){
                 _ScrollViewer.Offset = new Vector(_ScrollViewer.Offset.X, _ScrollViewer.Offset.Y + Value);
                 PlaceAds();
@@ -174,6 +173,8 @@ namespace InputConnect.UI.Holders
 
         public void AdsManager(object? sender = null, object? e = null){
             if (Advertisements == null) return;
+            if(!IsDisplayed) return; // iti s not displayed there is nothing to do then
+
             Advertisements.RemoveAll(item => item == null); // Remove null values
             bool _isAdded = false;
             DateTime time;

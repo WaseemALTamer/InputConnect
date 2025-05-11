@@ -24,7 +24,9 @@ namespace InputConnect
         // we load all the assents as a public
         public static WindowIcon? Icone;
         public static Bitmap? BackButtonBitmap;
+        public static Bitmap? CloseButtonBitmap;
         public static Bitmap? SettingButtonBitmap;
+        
 
 
         public static bool AssetsLoaded = false;
@@ -48,9 +50,12 @@ namespace InputConnect
             AssetsLoaded = false;
             // we load all the assets here
 
+
             Icone = new WindowIcon("Assets/Icone/Icone.ico");
             BackButtonBitmap = new Bitmap("Assets/Images/BackButton.png");
+            CloseButtonBitmap = new Bitmap("Assets/Images/CloseButton.png");
             SettingButtonBitmap = new Bitmap("Assets/Images/SettingButton.png");
+            
 
             // we finnish loading the assests here
             AssetsLoaded = true;

@@ -42,7 +42,9 @@ namespace InputConnect.Network
                     message.IP = Device.IP;
                     message.Port = Config.Port;
                     message.MacAddress = Device.MacAdress;
+                    message.DeviceName = Config.DeviceName;
                     message.Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    
                     
                     if (message.IsEncrypted == null) message.IsEncrypted = false; // this ensures we dont give a null in the encrypted bool to other devices
 

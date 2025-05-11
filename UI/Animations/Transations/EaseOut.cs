@@ -33,22 +33,19 @@ namespace InputConnect.UI.Animations.Transations
         public bool FunctionRunning = false;
 
 
-        public EaseOut()
-        {
-            Transition = new Uniform
-            {
+        public EaseOut(){
+            Transition = new Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
+                CurrentValue = CurrentValue / (EndingValue + StartingValue),
                 Duration = Duration,
                 Trigger = _Trigger,
             };
-
         }
 
 
 
-        public void TranslateForward()
-        {
+        public void TranslateForward(){
             if (Transition == null) return;
 
             Transition.Duration = Duration;
@@ -57,8 +54,7 @@ namespace InputConnect.UI.Animations.Transations
             Transition.TranslateForward();
         }
 
-        public void TranslateBackward()
-        {
+        public void TranslateBackward(){
             if (Transition == null) return;
 
             Transition.Duration = Duration;
@@ -66,15 +62,13 @@ namespace InputConnect.UI.Animations.Transations
             Transition.TranslateBackward();
         }
 
-        public void Reset(object? sender = null, object? e = null)
-        { // does not need to be async function
+        public void Reset(object? sender = null, object? e = null){ // does not need to be async function
             if (Transition == null) return;
             FunctionRunning = false;
             Transition.Reset();
         }
 
-        private void _Trigger(double Value)
-        {
+        private void _Trigger(double Value){
             if (Transition == null) return;
             FunctionRunning = Transition.FunctionRunning;
             double _delta = (1 - Math.Pow(1 - Value, Damping)) * (EndingValue - StartingValue);

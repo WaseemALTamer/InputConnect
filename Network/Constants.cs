@@ -17,11 +17,13 @@ namespace InputConnect.Network.Constants
 
         public static string Disconnect = "Disconnect"; // used to disconnect a connection
 
+        public static string Accept = "Accept"; // this will be used to reply to incoming device that try to connect
+
+        public static string Decline = "Decline";  // this will be used to reply to incoming device that try to connect
+
         public static string Command = "Command"; // this message is a command messge which tells the other devices to excuate a mouse momvent, keyboard
                                                   // keypress and more, this need to be encreapted and each message needs  a special  pattern it is only
                                                   // used after astaplishing a secur UDP protocol
-
-
 
     }
 }

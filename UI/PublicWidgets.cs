@@ -9,6 +9,7 @@ using Avalonia;
 using System;
 using Metsys.Bson;
 using InputConnect.Structures;
+using InputConnect.UI.InWindowPopup;
 
 
 
@@ -21,7 +22,11 @@ namespace InputConnect.UI
         // this also keeps track of the history of what was on screen
 
 
-
+        // one rule that must be kept for structure  perposes  and  must
+        // must not be broken is UI  classes  can  connect  back  to the
+        // PublicWidgets class but the  backend  like  ConnectionMangaer
+        // should not connect back to here rather the UI  should  map  a
+        // function to it instead
 
 
         // We use a singlton  methode to create the  AdvertisedDevices 
@@ -41,11 +46,18 @@ namespace InputConnect.UI
 
 
         private static DeviceSetting? _UIDeviceSetting;
-        public static DeviceSetting? UIDeviceSetting
-        {
+        public static DeviceSetting? UIDeviceSetting{
             get { return _UIDeviceSetting; }
             set { _UIDeviceSetting = value; }
         }
+
+
+        private static DimOverlay? _UIDimOverlay;
+        public static DimOverlay? UIDimOverlay{
+            get { return _UIDimOverlay; }
+            set { _UIDimOverlay = value; }
+        }
+
 
         private static BackButton? _BackButton;
         public static BackButton? BackButton{
@@ -57,6 +69,17 @@ namespace InputConnect.UI
         public static SettingButton? SettingButton{
             get { return _SettingButton; }
             set { _SettingButton = value; }
+        }
+
+
+
+
+
+        private static ConnectionReplay? _UIConnectionReplayInPop;
+        public static ConnectionReplay? UIConnectionReplayInPop
+        {
+            get { return _UIConnectionReplayInPop; }
+            set { _UIConnectionReplayInPop = value; }
         }
 
 
@@ -91,7 +114,7 @@ namespace InputConnect.UI
 
 
 
-            // <Holders START>
+            // <HOLDERS START>
 
             // this creates the AdvertisedDevice Holder
             UIAdvertisedDevices = new AdvertisedDevices(Master);
@@ -108,8 +131,24 @@ namespace InputConnect.UI
             Master.Children.Add(UIDeviceSetting);
             Holders.Add(UIDeviceSetting);
 
+
+
+
+
+
+            // this creates the DimOverlay Holder
+            UIDimOverlay = new DimOverlay(Master); // it is considered as a holder
+            Master.Children.Add(UIDimOverlay);
+            Holders.Add(UIDimOverlay);
+
+
             // <HOLDERS END>
 
+
+            // <IN_POPUPS START>
+            UIConnectionReplayInPop = new ConnectionReplay(Master);
+            Master.Children.Add(UIConnectionReplayInPop);
+            // <IN_POPUPS END>
 
             BackButton.Show();
             SettingButton.Show();
@@ -121,7 +160,7 @@ namespace InputConnect.UI
 
 
 
-        private static bool _TransitionForwardRunning = false;
+        private static bool _TransitionForwardRunning = false; // for thread safty
         public static async void TransitionForward(IDisplayable Holder) {
             if (_TransitionForwardRunning) return;
             _TransitionForwardRunning = true;
@@ -136,7 +175,7 @@ namespace InputConnect.UI
             _TransitionForwardRunning = false;
         }
 
-        private static bool _TransitionBackRunning = false;
+        private static bool _TransitionBackRunning = false; // for thread safty
         public static async void TransitionBack()
         {
             if (_TransitionBackRunning) return;

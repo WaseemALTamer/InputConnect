@@ -91,6 +91,7 @@ namespace InputConnect.UI.Containers
                 Height = 40,
                 FontSize = Config.FontSize,
                 CornerRadius = new CornerRadius(Config.CornerRadius),
+                Background = Themes.Entry,
             };
 
 

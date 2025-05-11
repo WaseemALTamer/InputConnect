@@ -10,9 +10,9 @@ namespace InputConnect.Setting
         // No IpAdressNeeded as it will be  dinamically graped
         // Grap the ip using the Device.cs file with the class
 
-        public static string? DeviceName = Network.Device.DeviceName; // this is a Device name  that you set your  self from
-                                                                      // setting if there is no Name then we take the device
-                                                                      // name
+        public static string? DeviceName = SharedData.Device.DeviceName; // this is a Device name  that you set your  self from
+                                                                         // setting if there is no Name then we take the device
+                                                                         // name
 
         public static string ApplicationName = "InputConnect"; // this is just the name of the application
                                                                // nothing more nothing less
