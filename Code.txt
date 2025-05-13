@@ -43,6 +43,7 @@ class Program
 
 
 
+
 using SharpHook;
 
 
@@ -79,3 +80,26 @@ class Program
         Console.WriteLine($"Offset: ({offsetX}, {offsetY})");
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+//<summery> 
+//
+// this is just a simple abbsorber Window
+//
+//var Test = new Window{
+//    WindowState = WindowState.FullScreen,
+//    Background = new SolidColorBrush(Avalonia.Media.Color.FromUInt32(0x00ffffff)),
+//    ShowInTaskbar = false,
+//    Title = "Abbsorber",
+//};
+//Test.Show();

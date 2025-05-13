@@ -1,15 +1,13 @@
-﻿using InputConnect.UI.Containers;
+﻿using InputConnect.UI.WindowPopup;
+using InputConnect.UI.Containers;
 using System.Collections.Generic;
-using InputConnect.UI.Holders;
 using System.Threading.Tasks;
-
+using InputConnect.UI.Pages;
 using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
-using System;
-using Metsys.Bson;
-using InputConnect.Structures;
-using InputConnect.UI.InWindowPopup;
+
+
 
 
 
@@ -31,29 +29,29 @@ namespace InputConnect.UI
 
         // We use a singlton  methode to create the  AdvertisedDevices 
         // instance  then we can  access it  using its public  pointer
-        private static AdvertisedDevices? _UIAdvertisedDevices;
-        public static AdvertisedDevices? UIAdvertisedDevices{
+        private static Advertisements? _UIAdvertisedDevices;
+        public static Advertisements? UIAdvertisedDevices{
             get { return _UIAdvertisedDevices; }
             set { _UIAdvertisedDevices = value;}
         }
 
 
-        private static DeviceConnection? _UIDeviceConnection;
-        public static DeviceConnection? UIDeviceConnection{
+        private static Pages.Connection? _UIDeviceConnection;
+        public static Pages.Connection? UIDeviceConnection{
             get { return _UIDeviceConnection; }
             set { _UIDeviceConnection = value; }
         }
 
 
-        private static DeviceSetting? _UIDeviceSetting;
-        public static DeviceSetting? UIDeviceSetting{
+        private static Pages.Setting? _UIDeviceSetting;
+        public static Pages.Setting? UIDeviceSetting{
             get { return _UIDeviceSetting; }
             set { _UIDeviceSetting = value; }
         }
 
 
-        private static DimOverlay? _UIDimOverlay;
-        public static DimOverlay? UIDimOverlay{
+        private static Overlay? _UIDimOverlay;
+        public static Overlay? UIDimOverlay{
             get { return _UIDimOverlay; }
             set { _UIDimOverlay = value; }
         }
@@ -83,10 +81,10 @@ namespace InputConnect.UI
         }
 
 
-        private static List<IDisplayable> Holders = new List<IDisplayable>(); // a list of all the holders this is legacy code not used for recent code
-        private static List<IDisplayable> HoldersHistory = new List<IDisplayable>(); // this will be used with the back button to go back from where we came from
+        private static List<Pages.Base> Pages = new List<Pages.Base>(); // a list of all the holders this is legacy code not used for recent code
+        private static List<Pages.Base> PagesHistory = new List<Pages.Base>(); // this will be used with the back button to go back from where we came from
 
-        private static IDisplayable? DisplayedHolder;
+        private static Pages.Base? DisplayedHolder;
 
         public static void Initialize(AvaloniaObject master) {
             var Master = master as Canvas;
@@ -114,45 +112,33 @@ namespace InputConnect.UI
 
 
 
-            // <HOLDERS START>
+            // <PAGES START>
 
-            // this creates the AdvertisedDevice Holder
-            UIAdvertisedDevices = new AdvertisedDevices(Master);
-            Master.Children.Add(UIAdvertisedDevices);
-            Holders.Add(UIAdvertisedDevices);
+            // this creates the AdvertisedDevice Page
+            UIAdvertisedDevices = new Advertisements(Master);
+            Pages.Add(UIAdvertisedDevices);
 
-            // this creates the ConnectionDevice Holder
-            UIDeviceConnection = new DeviceConnection(Master);
-            Master.Children.Add(UIDeviceConnection);
-            Holders.Add(UIDeviceConnection);
+            // this creates the ConnectionDevice Page
+            UIDeviceConnection = new Pages.Connection(Master);
+            Pages.Add(UIDeviceConnection);
 
-            // this creates the DeviceSetting Holder
-            UIDeviceSetting = new DeviceSetting(Master);
-            Master.Children.Add(UIDeviceSetting);
-            Holders.Add(UIDeviceSetting);
-
-
-
-
-
-
-            // this creates the DimOverlay Holder
-            UIDimOverlay = new DimOverlay(Master); // it is considered as a holder
-            Master.Children.Add(UIDimOverlay);
-            Holders.Add(UIDimOverlay);
-
-
-            // <HOLDERS END>
+            // this creates the DeviceSetting Page
+            UIDeviceSetting = new Pages.Setting(Master);
+            Pages.Add(UIDeviceSetting);
+            // <PAGES END>
 
 
             // <IN_POPUPS START>
+
+            // this creates the popup for when people try to connect to you
             UIConnectionReplayInPop = new ConnectionReplay(Master);
-            Master.Children.Add(UIConnectionReplayInPop);
+
+            
             // <IN_POPUPS END>
+
 
             BackButton.Show();
             SettingButton.Show();
-
             TransitionForward(UIAdvertisedDevices);
         }
 
@@ -161,11 +147,11 @@ namespace InputConnect.UI
 
 
         private static bool _TransitionForwardRunning = false; // for thread safty
-        public static async void TransitionForward(IDisplayable Holder) {
+        public static async void TransitionForward(Pages.Base Holder) {
             if (_TransitionForwardRunning) return;
             _TransitionForwardRunning = true;
             if (DisplayedHolder != null) {
-                HoldersHistory.Add(DisplayedHolder);
+                PagesHistory.Add(DisplayedHolder);
                 DisplayedHolder.Hide();
                 DisplayedHolder = Holder; // redundency
                 await Task.Delay(Config.TransitionDuration / 2); // wait for at bit to give ot a smoother feel
@@ -180,11 +166,11 @@ namespace InputConnect.UI
         {
             if (_TransitionBackRunning) return;
             _TransitionBackRunning = true;
-            if (HoldersHistory.Count > 0 &&
+            if (PagesHistory.Count > 0 &&
                 DisplayedHolder != null)
             {
-                var lastHolder = HoldersHistory[HoldersHistory.Count - 1];
-                HoldersHistory.RemoveAt(HoldersHistory.Count - 1);
+                var lastHolder = PagesHistory[PagesHistory.Count - 1];
+                PagesHistory.RemoveAt(PagesHistory.Count - 1);
 
 
                 DisplayedHolder.Hide();

@@ -55,7 +55,7 @@ namespace InputConnect.UI.Containers
                 ButtonImage.Source = Assets.CloseButtonBitmap;
             });
 
-
+            IsHitTestVisible = true;
             Width = 55; Height = 30; // the Size is static
             Child = ButtonImage;
             

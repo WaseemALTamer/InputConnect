@@ -49,5 +49,6 @@ namespace InputConnect.Setting
                                                  // the time is in ms
 
         public static int FontSize = 20;  // this is for all the text font size of the application
+
     }
 }
