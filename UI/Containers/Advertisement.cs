@@ -225,8 +225,8 @@ namespace InputConnect.UI.Containers
                     SharedData.TargetedDevice.Port = _message.Port;
 
                     // Transition to the next window
-                    if (PublicWidgets.UIDeviceConnection != null) {
-                        PublicWidgets.TransitionForward(PublicWidgets.UIDeviceConnection);
+                    if (PublicWidgets.UIDevice != null) {
+                        PublicWidgets.TransitionForward(PublicWidgets.UIDevice);
                     }
                 }
             }

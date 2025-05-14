@@ -204,8 +204,8 @@ namespace InputConnect.UI.WindowPopup
                     Connections.Manager.AcceptIncomingConnection(SharedData.IncomingConnection.Message, // establish the connection
                                                                  SharedData.IncomingConnection.Token);
 
-                    if (PublicWidgets.UIDimOverlay != null){
-                        PublicWidgets.UIDimOverlay.Hide();
+                    if (Global.Overlay != null){
+                        Global.Overlay.Hide();
                     }
 
                 }
@@ -216,5 +216,9 @@ namespace InputConnect.UI.WindowPopup
                 }
             }
         }
+
+
+
+
     }
 }

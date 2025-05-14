@@ -29,31 +29,31 @@ namespace InputConnect.UI
 
         // We use a singlton  methode to create the  AdvertisedDevices 
         // instance  then we can  access it  using its public  pointer
-        private static Advertisements? _UIAdvertisedDevices;
-        public static Advertisements? UIAdvertisedDevices{
-            get { return _UIAdvertisedDevices; }
-            set { _UIAdvertisedDevices = value;}
+        private static Pages.Advertisements? _UIAdvertisements;
+        public static Advertisements? UIAdvertisements{
+            get { return _UIAdvertisements; }
+            set { _UIAdvertisements = value;}
         }
 
 
-        private static Pages.Connection? _UIDeviceConnection;
-        public static Pages.Connection? UIDeviceConnection{
-            get { return _UIDeviceConnection; }
-            set { _UIDeviceConnection = value; }
+        private static Pages.Connections? _UIConnections;
+        public static Pages.Connections? UIConnections{
+            get { return _UIConnections; }
+            set { _UIConnections = value; }
         }
 
 
-        private static Pages.Setting? _UIDeviceSetting;
+        private static Pages.Device? _UIDevice;
+        public static Pages.Device? UIDevice{
+            get { return _UIDevice; }
+            set { _UIDevice = value; }
+        }
+
+
+        private static Pages.Setting? _UISetting;
         public static Pages.Setting? UIDeviceSetting{
-            get { return _UIDeviceSetting; }
-            set { _UIDeviceSetting = value; }
-        }
-
-
-        private static Overlay? _UIDimOverlay;
-        public static Overlay? UIDimOverlay{
-            get { return _UIDimOverlay; }
-            set { _UIDimOverlay = value; }
+            get { return _UISetting; }
+            set { _UISetting = value; }
         }
 
 
@@ -62,6 +62,7 @@ namespace InputConnect.UI
             get { return _BackButton; }
             set { _BackButton = value; }
         }
+
 
         private static SettingButton? _SettingButton;
         public static SettingButton? SettingButton{
@@ -74,8 +75,7 @@ namespace InputConnect.UI
 
 
         private static ConnectionReplay? _UIConnectionReplayInPop;
-        public static ConnectionReplay? UIConnectionReplayInPop
-        {
+        public static ConnectionReplay? UIConnectionReplayInPop{
             get { return _UIConnectionReplayInPop; }
             set { _UIConnectionReplayInPop = value; }
         }
@@ -114,17 +114,24 @@ namespace InputConnect.UI
 
             // <PAGES START>
 
-            // this creates the AdvertisedDevice Page
-            UIAdvertisedDevices = new Advertisements(Master);
-            Pages.Add(UIAdvertisedDevices);
+            // this creates the Advertisements Page
+            UIAdvertisements = new Pages.Advertisements(Master);
+            Pages.Add(UIAdvertisements);
 
-            // this creates the ConnectionDevice Page
-            UIDeviceConnection = new Pages.Connection(Master);
-            Pages.Add(UIDeviceConnection);
+            // this creates the Device Page
+            UIDevice = new Pages.Device(Master);
+            Pages.Add(UIDevice);
 
             // this creates the DeviceSetting Page
             UIDeviceSetting = new Pages.Setting(Master);
             Pages.Add(UIDeviceSetting);
+            
+            
+            // this creates the Connections Page
+            UIConnections = new Pages.Connections(Master);
+            Pages.Add(UIConnections);
+
+            
             // <PAGES END>
 
 
@@ -133,13 +140,14 @@ namespace InputConnect.UI
             // this creates the popup for when people try to connect to you
             UIConnectionReplayInPop = new ConnectionReplay(Master);
 
-            
+
             // <IN_POPUPS END>
 
-
+            //UIConnections
+            //UIAdvertisements
             BackButton.Show();
             SettingButton.Show();
-            TransitionForward(UIAdvertisedDevices);
+            TransitionForward(UIAdvertisements);
         }
 
 
