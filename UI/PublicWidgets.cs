@@ -70,6 +70,11 @@ namespace InputConnect.UI
             set { _SettingButton = value; }
         }
 
+        private static PageSwitchSlider? _PageSwitchSlider;
+        public static PageSwitchSlider? PageSwitchSlider{
+            get { return _PageSwitchSlider; }
+            set { _PageSwitchSlider = value; }
+        }
 
 
 
@@ -107,6 +112,12 @@ namespace InputConnect.UI
             SettingButton = new SettingButton(Master);
             Master.Children.Add(SettingButton);
             SettingButton.Trigger = SettingButtonFunction;
+
+            // this creats and attachs the function to the slider button
+            PageSwitchSlider = new PageSwitchSlider(Master);
+            Master.Children.Add(PageSwitchSlider);
+
+
 
             // <ASSETS END>
 

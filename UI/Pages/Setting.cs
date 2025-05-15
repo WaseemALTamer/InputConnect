@@ -150,6 +150,7 @@ namespace InputConnect.UI.Pages
             AppendSettingProperties();
             foreach (var Propertie in Properties){
                 await Task.Delay(50); // this ensures everything loads up smoothly the first time round
+                if (IsDisplayed == false) return;
                 Propertie.Show();
             }
         }

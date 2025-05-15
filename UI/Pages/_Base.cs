@@ -30,8 +30,7 @@ namespace InputConnect.UI.Pages
 
 
         private bool _IsDisplayed = false;
-        public bool IsDisplayed
-        {
+        public bool IsDisplayed{
             get { return _IsDisplayed; }
             set { _IsDisplayed = value; }
         }

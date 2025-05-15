@@ -35,7 +35,7 @@ namespace InputConnect
 
 
             if (Tray.ApplicationTray != null){ // redundancy if statment
-                Tray.ApplicationTray.Clicked += OnTrayClick;
+                Tray.OnClickTrigger += OnTrayClick;
                 Tray.TrayMenuItem_Exit.Click += OnClickExit;
                 Tray.TrayMenuItem_Show.Click += OnClickShow;
             }
@@ -81,10 +81,12 @@ namespace InputConnect
                 // this helps complete the animation for windows so it smoothly get minimised
                 Dispatcher.UIThread.Post(async () => {
                     await Task.Delay(300);
-                    Hide();
+                    ShowInTaskbar = false;
                 });
 
-                if (Tray.ApplicationTray != null) Tray.ApplicationTray.IsVisible = true;
+                Tray.InitTray(); // intialise it before we use it
+                if (Tray.ApplicationTray != null)
+                    Tray.ApplicationTray.IsVisible = true;
             }
         }
 
@@ -93,7 +95,7 @@ namespace InputConnect
                 Tray.ApplicationTray.IsVisible = false;
             }
 
-            Show();
+            ShowInTaskbar = true;
             // this helps complete the animation for windows so it smoothly appears on screen
             Dispatcher.UIThread.Post(async () =>{
                 await Task.Delay(100);
@@ -109,7 +111,8 @@ namespace InputConnect
                 Tray.ApplicationTray.IsVisible = false;
             }
 
-            Show();
+
+            ShowInTaskbar = true;
             // this helps complete the animation for windows so it smoothly appears on screen
             Dispatcher.UIThread.Post(async () => {
                 await Task.Delay(100);

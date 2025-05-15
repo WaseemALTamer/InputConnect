@@ -1,10 +1,8 @@
-﻿using Avalonia.Controls;
+﻿using InputConnect.UI.Containers.Common;
+using Avalonia.Controls;
 using InputConnect.UI.Containers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+
 
 namespace InputConnect.UI.Pages
 {
@@ -12,13 +10,13 @@ namespace InputConnect.UI.Pages
     {
 
 
-        private SlideButton? Test;
+        private PageSwitchSlider? Test;
 
         public Connections(Canvas master) : base(master) 
         {
             if (MainCanvas == null || Master == null) return;
 
-            Test = new SlideButton();
+            Test = new PageSwitchSlider(MainCanvas);
             MainCanvas.Children.Add(Test);
 
 
@@ -32,8 +30,8 @@ namespace InputConnect.UI.Pages
             {
 
                 if (Test != null) {
-                    Canvas.SetLeft(Test, (MainCanvas.Width - Test.Width) / 2);
-                    Canvas.SetTop(Test, (MainCanvas.Height - Test.Height) / 2);
+                    //Canvas.SetLeft(Test, (MainCanvas.Width - Test.Width) / 2);
+                    //Canvas.SetTop(Test, (MainCanvas.Height - Test.Height) / 2);
                 }
 
                 

@@ -10,7 +10,7 @@ namespace InputConnect.UI.Animations.Transations
     class EaseInOut{
 
         // this function is based on the unfirom transition function but applies mathmatical equation
-        // f(x) = (1 − (1 − x)^d) * (b−a)
+        // f(x) = ...
         // b = ending value
         // a = Starting value
         // d = damping

@@ -26,6 +26,9 @@ namespace InputConnect
         public static Bitmap? BackButtonBitmap;
         public static Bitmap? CloseButtonBitmap;
         public static Bitmap? SettingButtonBitmap;
+        public static Bitmap? WifiBitmap;
+        public static Bitmap? SearchBitmap;
+        public static Bitmap? ChainsBitmap;
         
 
 
@@ -55,7 +58,10 @@ namespace InputConnect
             BackButtonBitmap = new Bitmap("Assets/Images/BackButton.png");
             CloseButtonBitmap = new Bitmap("Assets/Images/CloseButton.png");
             SettingButtonBitmap = new Bitmap("Assets/Images/SettingButton.png");
-            
+            WifiBitmap = new Bitmap("Assets/Images/Wifi.png");
+            SearchBitmap = new Bitmap("Assets/Images/Search.png");
+            ChainsBitmap = new Bitmap("Assets/Images/Chains.png");
+
 
             // we finnish loading the assests here
             AssetsLoaded = true;

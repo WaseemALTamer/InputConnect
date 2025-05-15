@@ -11,14 +11,6 @@ namespace InputConnect
     {
         public override void Initialize(){
             AvaloniaXamlLoader.Load(this);
-
-
-            // those two lines are used to tell the system we need to prepare the static classes
-
-            Appdata.ApplyConfig(Appdata.Config);
-            var __ = Assets.AssetsLoaded; 
-            var ___ = Tray.ApplicationTray;
-            var ____ = ConnectionUDP.Client;
         }
 
         public override void OnFrameworkInitializationCompleted(){
@@ -26,7 +18,15 @@ namespace InputConnect
                 desktop.MainWindow = new MainWindow();
             }
 
+            
             base.OnFrameworkInitializationCompleted();
+
+
+            // those lines are used to tell the system we need to prepare the static classes
+            Appdata.ApplyConfig(Appdata.Config);
+            var _ = Assets.AssetsLoaded;
+            var __ = Tray.ApplicationTray;
+            var ___ = ConnectionUDP.Client;
         }
     }
 }

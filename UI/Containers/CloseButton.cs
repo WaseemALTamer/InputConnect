@@ -18,8 +18,7 @@ namespace InputConnect.UI.Containers
 
 
         private Action? _Trigger;
-        public Action? Trigger
-        {
+        public Action? Trigger{
             get { return _Trigger; }
             set { _Trigger = value; }
         }

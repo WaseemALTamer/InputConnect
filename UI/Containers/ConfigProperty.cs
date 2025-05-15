@@ -155,16 +155,14 @@ namespace InputConnect.UI.Containers
 
         }
 
-        public void Show()
-        {
+        public void Show(){
             if (Opacity == 1) return;
 
             if (ShowHideTransition != null)
                 ShowHideTransition.TranslateForward();
         }
 
-        public void Hide()
-        {
+        public void Hide(){
             if (Opacity == 0) return;
             if (ShowHideTransition != null)
                 ShowHideTransition.TranslateBackward();
