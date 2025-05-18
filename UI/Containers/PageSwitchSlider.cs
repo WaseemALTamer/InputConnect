@@ -27,8 +27,8 @@ namespace InputConnect.UI.Containers
             set { _MainCanvas = value; }
         }
 
-        private Action? _Trigger;
-        public Action? Trigger{
+        private Action<bool>? _Trigger;
+        public Action<bool>? Trigger{
             get { return _Trigger; }
             set { _Trigger = value; }
         }
@@ -113,7 +113,14 @@ namespace InputConnect.UI.Containers
         }
 
         private void TriggerMap() { 
-            if (Trigger != null) Trigger.Invoke();
+            if (Trigger != null && Button != null) Trigger.Invoke(Button.State);
+        }
+
+
+        public void SetState(bool state) { // this function will just pass the bool to the button
+            if (Button != null) {
+                Button.SetState(state);
+            }
         }
 
 

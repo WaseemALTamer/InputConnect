@@ -6,6 +6,7 @@ using InputConnect.UI.Pages;
 using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
+using System;
 
 
 
@@ -26,9 +27,33 @@ namespace InputConnect.UI
         // should not connect back to here rather the UI  should  map  a
         // function to it instead
 
+        // We use a singlton methode to create the Objects instance this
+        // allows us to access it using its public pointer
 
-        // We use a singlton  methode to create the  AdvertisedDevices 
-        // instance  then we can  access it  using its public  pointer
+
+
+        // <ASSETS>
+        private static BackButton? _BackButton;
+        public static BackButton? BackButton{
+            get { return _BackButton; }
+            set { _BackButton = value; }
+        }
+
+        private static SettingButton? _SettingButton;
+        public static SettingButton? SettingButton{
+            get { return _SettingButton; }
+            set { _SettingButton = value; }
+        }
+
+        private static PageSwitchSlider? _PageSwitchSlider;
+        public static PageSwitchSlider? PageSwitchSlider{
+            get { return _PageSwitchSlider; }
+            set { _PageSwitchSlider = value; }
+        }
+
+
+
+        // <PAGES>
         private static Pages.Advertisements? _UIAdvertisements;
         public static Advertisements? UIAdvertisements{
             get { return _UIAdvertisements; }
@@ -57,39 +82,31 @@ namespace InputConnect.UI
         }
 
 
-        private static BackButton? _BackButton;
-        public static BackButton? BackButton{
-            get { return _BackButton; }
-            set { _BackButton = value; }
-        }
-
-
-        private static SettingButton? _SettingButton;
-        public static SettingButton? SettingButton{
-            get { return _SettingButton; }
-            set { _SettingButton = value; }
-        }
-
-        private static PageSwitchSlider? _PageSwitchSlider;
-        public static PageSwitchSlider? PageSwitchSlider{
-            get { return _PageSwitchSlider; }
-            set { _PageSwitchSlider = value; }
-        }
 
 
 
 
+        // <POPUPS>
         private static ConnectionReplay? _UIConnectionReplayInPop;
-        public static ConnectionReplay? UIConnectionReplayInPop{
+        public static ConnectionReplay? UIConnectionReplayInPop
+        {
             get { return _UIConnectionReplayInPop; }
             set { _UIConnectionReplayInPop = value; }
         }
 
 
+
+
+
+
+
+
+
+
         private static List<Pages.Base> Pages = new List<Pages.Base>(); // a list of all the holders this is legacy code not used for recent code
         private static List<Pages.Base> PagesHistory = new List<Pages.Base>(); // this will be used with the back button to go back from where we came from
 
-        private static Pages.Base? DisplayedHolder;
+        private static Pages.Base? DisplayedPage;
 
         public static void Initialize(AvaloniaObject master) {
             var Master = master as Canvas;
@@ -116,6 +133,7 @@ namespace InputConnect.UI
             // this creats and attachs the function to the slider button
             PageSwitchSlider = new PageSwitchSlider(Master);
             Master.Children.Add(PageSwitchSlider);
+            PageSwitchSlider.Trigger = PageSwitchSliderFunction;
 
 
 
@@ -169,13 +187,13 @@ namespace InputConnect.UI
         public static async void TransitionForward(Pages.Base Holder) {
             if (_TransitionForwardRunning) return;
             _TransitionForwardRunning = true;
-            if (DisplayedHolder != null) {
-                PagesHistory.Add(DisplayedHolder);
-                DisplayedHolder.Hide();
-                DisplayedHolder = Holder; // redundency
+            if (DisplayedPage != null) {
+                PagesHistory.Add(DisplayedPage);
+                DisplayedPage.Hide();
+                DisplayedPage = Holder; // redundency
                 await Task.Delay(Config.TransitionDuration / 2); // wait for at bit to give ot a smoother feel
             }
-            DisplayedHolder = Holder;
+            DisplayedPage = Holder;
             Holder.Show();
             _TransitionForwardRunning = false;
         }
@@ -186,16 +204,16 @@ namespace InputConnect.UI
             if (_TransitionBackRunning) return;
             _TransitionBackRunning = true;
             if (PagesHistory.Count > 0 &&
-                DisplayedHolder != null)
+                DisplayedPage != null)
             {
                 var lastHolder = PagesHistory[PagesHistory.Count - 1];
                 PagesHistory.RemoveAt(PagesHistory.Count - 1);
 
 
-                DisplayedHolder.Hide();
-                DisplayedHolder = lastHolder;
+                DisplayedPage.Hide();
+                DisplayedPage = lastHolder;
                 await Task.Delay(Config.TransitionDuration / 2);
-                DisplayedHolder.Show();
+                DisplayedPage.Show();
             }
             _TransitionBackRunning = false;
         }
@@ -213,13 +231,26 @@ namespace InputConnect.UI
                 return;
             }
 
+
             TransitionBack(); // Transision backward
+
+            // after transitioning back we check if the Page is on addvertisment or connection so we
+            // can set the switch slider at the right state
+
+            if (PageSwitchSlider != null) {
+                if (DisplayedPage == UIConnections){
+                    PageSwitchSlider.SetState(true);
+                }
+                if (DisplayedPage == UIAdvertisements){
+                    PageSwitchSlider.SetState(false);
+                }
+            }
+
         }
 
 
 
-        public static void SettingButtonFunction()
-        {
+        public static void SettingButtonFunction(){
             if (_TransitionForwardRunning || _TransitionBackRunning) return;
             if (UIDeviceSetting != null &&
                 !UIDeviceSetting.IsDisplayed) // if we dont have the setting displayed
@@ -237,6 +268,28 @@ namespace InputConnect.UI
             }
 
         }
+
+
+        public static void PageSwitchSliderFunction(bool state) {
+            
+            
+            if (state == true && 
+                UIConnections != null &&
+                DisplayedPage != UIConnections) 
+            { 
+                TransitionForward(UIConnections);
+            }
+
+            if (state == false &&
+                UIAdvertisements != null &&
+                DisplayedPage != UIAdvertisements)
+            {
+                TransitionForward(UIAdvertisements);
+            }
+
+
+        }
+
 
     }
 }

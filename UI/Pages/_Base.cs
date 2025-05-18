@@ -112,7 +112,7 @@ namespace InputConnect.UI.Pages
         private void OnResize(object? sender = null, SizeChangedEventArgs? e = null){
             if (Master != null){
                 Width = Master.Width * 0.85;
-                Height = Master.Height * 0.85;
+                Height = Master.Height - 100;
 
                 if (MainCanvas != null){
                     MainCanvas.Width = Width;
@@ -130,7 +130,7 @@ namespace InputConnect.UI.Pages
                 }
 
                 Canvas.SetRight(this, (Master.Width - Width) / 2);
-                Canvas.SetTop(this, (Master.Height - Height) - 30);
+                Canvas.SetTop(this, 80);
             }
         }
 

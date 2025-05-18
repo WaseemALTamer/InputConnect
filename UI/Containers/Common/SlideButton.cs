@@ -143,6 +143,17 @@ namespace InputConnect.UI.Containers.Common
         }
 
 
+        public void SetState(bool state) { // we dont invoke the Trigger for this function because we already know the
+                                           // state so we let the user trigger whatever they trying to run
+            
+            if (State == state) return;
 
+            if (BallTrnasition != null){
+                if (state == true) BallTrnasition.TranslateForward();
+                if (state == false) BallTrnasition.TranslateBackward(); // fix transtion back when you try to transition back and you are at the start
+                                                                        // then the ball will move to the end and then transtion back
+            }
+            State = state;
+        }
     }
 }

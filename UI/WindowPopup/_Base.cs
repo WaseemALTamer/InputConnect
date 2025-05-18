@@ -31,7 +31,7 @@ namespace InputConnect.UI.WindowPopup
             set { _IsDisplayed = value; }
         }
 
-        private Animations.Transations.EaseOut? PostionTranslation;
+        private Animations.Transations.EaseInOut? PostionTranslation;
         private CloseButton? CloseButton;
 
 
@@ -154,7 +154,7 @@ namespace InputConnect.UI.WindowPopup
             if (PostionTranslation != null) PostionTranslation.Reset();
 
 
-            PostionTranslation = new Animations.Transations.EaseOut{
+            PostionTranslation = new Animations.Transations.EaseInOut{
                 StartingValue = 0,
                 EndingValue = 1,
                 Duration = Config.TransitionDuration * 2,
