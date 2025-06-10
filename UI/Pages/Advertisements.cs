@@ -1,15 +1,13 @@
-﻿using Avalonia.Controls.Primitives;
-using InputConnect.UI.Containers;
+﻿using InputConnect.UI.Containers;
 using System.Collections.Generic;
 using InputConnect.Structures;
-using Avalonia.Interactivity;
 using InputConnect.Setting;
 using InputConnect.Network;
 using Avalonia.Threading;
 using Avalonia.Controls;
-using Avalonia;
 using System;
-using InputConnect.UI.Animations;
+using System.Net.Mail;
+using Tmds.DBus.Protocol;
 
 
 
@@ -22,13 +20,21 @@ namespace InputConnect.UI.Pages
 
     // this file ended also running the logic as well
 
+
+    // update this file instead of running it on a dispach timer  you can just simply
+    // sub to the new Advertisements and then only update your current displayed list
+    // based on what you will be feed, you simply dont  need  to  update every second
+    // simply update when there is a new message  that  comes in, if there is message
+    // that is more than 10 seconds old just leave it  there as  long as  there is no
+    // messages, good luck
+
     public class Advertisements : Base
     {
 
 
 
-        private List<Advertisement>? _Devices = new List<Advertisement>();
-        public List<Advertisement>? Devices { 
+        private List<Advertisement> _Devices = new List<Advertisement>();
+        public List<Advertisement> Devices { 
             get { return _Devices; } 
             set { _Devices = value; } 
         }
@@ -36,24 +42,12 @@ namespace InputConnect.UI.Pages
         private int AdsPaddyY = 10;
 
 
-        private DispatcherTimer? Ticktimer;
-        private int _Tick = 1000;
-        public int Tick{
-            get { return _Tick; }
-            set { _Tick = value; }
-        }
+
 
         public Advertisements(Canvas? master) : base(master)
         {
-            if (MainCanvas == null) return;
-
-            Ticktimer = new DispatcherTimer{
-                Interval = TimeSpan.FromMilliseconds(Tick) // 
-            };
-            Ticktimer.Tick += AdsManager;
-            Ticktimer.Start();
-
-            MessageManager.OnAdvertisement += () => { Dispatcher.UIThread.Post(() => AdsManager()); };
+            // we ensure that it runs on the main thread because we are working with the ui
+            MessageManager.OnAdvertisement += () => { Dispatcher.UIThread.Post(() => AdsUpdate()); };
         }
 
 
@@ -66,53 +60,47 @@ namespace InputConnect.UI.Pages
 
 
 
-        public void AdsManager(object? sender = null, object? e = null){
-            if (Devices == null) return;
-            if(!IsDisplayed) return; // iti s not displayed there is nothing to do then
+        public void AdsUpdate(object? sender = null, object? e = null){
+            
+            
+            for (int i = 0; i < MessageManager.Advertisements.Count; i++) {
 
-            Devices.RemoveAll(item => item == null); // Remove null values
-            bool _isAdded = false;
-            DateTime time;
-            for (int i = MessageManager.Advertisements.Count - 1; i >= 0; i--){
+                var _found = false; // this will be used to indecated if we found the device responsible for the message
                 var message = MessageManager.Advertisements[i];
-                if (message.Time == null) continue;
-                time = DateTime.Parse(message.Time);
-
-                if ((DateTime.Now - time) > TimeSpan.FromSeconds(Config.AdvertiseTimeSpan)){
-                    MessageManager.Advertisements.Remove(message);
-                    continue;
-                }
-
-                for (int j = Devices.Count - 1; j >= 0; j--){
-                    var UiAd = Devices[j];
-                    if (UiAd.Message == null) continue;
-
-                    if (message.IP == ((MessageUDP)UiAd.Message).IP){
-                        UiAd.Message = message;
-                        UiAd.Update();
-                        _isAdded = true;
+                for (int j = 0; j < Devices.Count; j++) {
+                    var device = Devices[j];
+                    if (device == null || device.Message == null) continue;
+                    if (device.Message != null && message.MacAddress == device.Message.MacAddress) { 
+                        device.Message = message;
+                        device.Update(); // update it for values inside of it
+                        _found = true;
                         break;
                     }
                 }
-                if (!_isAdded){
-                    Add(message);
-                }
+                if (_found) continue;
 
-                _isAdded = false;
+                Add(message);
             }
 
-            for (int j = Devices.Count - 1; j >= 0; j--){
-                var UiAd = Devices[j];
-                if (UiAd.Message != null && ((MessageUDP)UiAd.Message).Time != null && MainCanvas != null) {
-                    time = DateTime.Parse(((MessageUDP)UiAd.Message).Time);
-                    if ((DateTime.Now - time) > TimeSpan.FromSeconds(Config.AdvertiseTimeSpan)){
-                        Devices.Remove(UiAd);
-                        UiAd.Kill();
-                        PlaceAds();
-                        continue;
+            // now we can check for any devices that we have that are not in the advertisement
+            for (int i = Devices.Count - 1; i >= 0; i--){
+                
+                var _found = false;
+                var device = Devices[i];
+                if (device == null || device.Message == null) continue;
+                for (int j = 0; j < MessageManager.Advertisements.Count; j++){
+                    var message = MessageManager.Advertisements[j];
+                    if (device.Message == message) {
+                        _found = true;
+                        break;
                     }
                 }
+                if (_found) continue;
+                device.Kill();
+                Devices.Remove(device);
+                PlaceAds();
             }
+
         }
 
 
@@ -149,6 +137,9 @@ namespace InputConnect.UI.Pages
         }
 
 
+
+        // this function sill needs more work as of now it shows everything that is in the array
+        // you should later on make it only show ones that are displayed on screen
         private void ShowOnlyVissibleAds() {
             if (Devices == null) return;
 

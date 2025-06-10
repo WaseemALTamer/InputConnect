@@ -1,8 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
+using System.IO;
+using System;
+
+
+
 
 namespace InputConnect.Network
 {
@@ -12,7 +14,7 @@ namespace InputConnect.Network
         private const int IvSize = 16;  // 128-bit IV
         private const int SaltSize = 16;
         private const int HmacSize = 32;
-        private const int Iterations = 100_000;
+        private const int Iterations = 100000;
 
         public static string Encrypt(string plainText, string password)
         {

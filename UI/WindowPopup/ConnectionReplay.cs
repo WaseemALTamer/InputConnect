@@ -92,6 +92,7 @@ namespace InputConnect.UI.WindowPopup
 
             MainCanvas.SizeChanged += OnResize;
 
+            CloseButtonTrigger += OnCloseButton;
 
             Child = MainCanvas;
 
@@ -214,6 +215,16 @@ namespace InputConnect.UI.WindowPopup
                         WrongTokenTranstion.TranslateForward();
                     }
                 }
+            }
+        }
+
+        private void OnCloseButton() {
+
+            // this function is going to be wrapped around and feed into the popup base
+
+            if (SharedData.IncomingConnection.Message != null){
+                Connections.Manager.RejectIncomingConnection(SharedData.IncomingConnection.Message, "Decline"); // Decline the Connection
+                SharedData.IncomingConnection.Clear(); // remove the the message
             }
         }
 

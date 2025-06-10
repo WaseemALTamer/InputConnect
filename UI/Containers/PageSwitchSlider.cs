@@ -1,10 +1,7 @@
-﻿using Avalonia.Controls;
-using InputConnect.UI.Containers.Common;
+﻿using InputConnect.UI.Containers.Common;
+using Avalonia.Controls;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace InputConnect.UI.Containers
 {
@@ -114,6 +111,13 @@ namespace InputConnect.UI.Containers
 
         private void TriggerMap() { 
             if (Trigger != null && Button != null) Trigger.Invoke(Button.State);
+
+            for (int i = 0; i < Connections.Devices.ConnectionList.Count; i++){
+                var device = Connections.Devices.ConnectionList[i];
+
+                Console.WriteLine(device.DeviceName);
+                Console.WriteLine(device.State);
+            }
         }
 
 

@@ -3,6 +3,7 @@ using InputConnect.Network;
 using System;
 
 
+
 namespace InputConnect.Connections
 {
     public static class Manager
@@ -24,15 +25,41 @@ namespace InputConnect.Connections
 
 
         // this function is to be used to make a connection with another device on the network
-        public static void EstablishConnection(string IP, string Token){ // we only need the ip to make the connections with a device on the network and is listening
-                                                                         // the token is not shared and is only used to send the message over
+        public static void EstablishConnection(string IP, string Token, string? MacAdress, string? Devicename=null){ 
+            // we only need the ip to make the connections with a device on the network and is listening
+            // the token is not shared and is only used to send the  message over  this will  be used to
+            // send a connection request nothing more nothing less, it will also  add the  connection to
+            // the connection list but with a <pending> state waiting for response
 
             MessageUDP messageUDP = new MessageUDP { 
                 MessageType = Network.Constants.MessageTypes.Connect,
                 Text = Encryptor.Encrypt(Constants.PassPhase, Token), // encreapt the text for the other device to try to decreapt it
                 IsEncrypted = true,
             };
-            ConnectionUDP.SendUDP(IP, messageUDP);
+
+
+            var newConnection = new Connection{
+                State = Constants.StatePending,
+                DeviceName = Devicename,
+                MacAdress = MacAdress,
+                SequenceNumber = 0,
+                Token = Token,
+            };
+
+            var deviceExist = false; // this is there to check if the device is already in the list
+            for (int i = 0; i < Devices.ConnectionList.Count; i++) {
+                var device = Devices.ConnectionList[i];
+                if (device.MacAdress == MacAdress) {
+                    device = newConnection;
+                    deviceExist = true;
+                }
+            }
+
+            if (deviceExist == false) {
+                Devices.ConnectionList.Add(newConnection);
+            }
+
+            ConnectionUDP.Send(IP, messageUDP);
         }
 
 
@@ -58,10 +85,11 @@ namespace InputConnect.Connections
 
         // this function only trys one to decreapt it if you want to try more than once then write the code your self
         // I actually did check the UI -> ConnectionReplay.cs file for refrence on how to do so 
-        public static void AcceptIncomingConnection(MessageUDP Message, string Token) { // the token is only there to check if it works no more no less
-                                                                                        // we will also check if the token work with  the  UI, we  will
-                                                                                        // also check it again but this time it is  one time  and if it 
-                                                                                        // wrong then we reject is straight away
+        public static void AcceptIncomingConnection(MessageUDP Message, string Token) { 
+            // the token is only there to check if it works no more no less
+            // we will also check if the token work with  the  UI, we  will
+            // also check it again but this time it is  one time  and if it 
+            // wrong then we reject is straight away
 
             if (Message == null || Message.Text == null) { 
                 return; 
@@ -78,13 +106,14 @@ namespace InputConnect.Connections
                 IsEncrypted = true,
             };
             if (Message != null && Message.IP != null){
-                ConnectionUDP.SendUDP(Message.IP, messageUDP); // notify the other device to add the connection now
+                ConnectionUDP.Send(Message.IP, messageUDP); // notify the other device to add the connection now
             }
 
             // now we can Check the message and add the connection to the list
             if (Message == null) return;
 
             var newConnection = new Connection{
+                State = Constants.StateConnected,
                 DeviceName = Message.DeviceName,
                 MacAdress = Message.MacAddress,
                 SequenceNumber = 0,
@@ -92,19 +121,17 @@ namespace InputConnect.Connections
             };
 
             for (int i = 0; i < Devices.ConnectionList.Count; i++){ // check if connection already exists
-                if (Devices.ConnectionList[i].MacAdress != Message.MacAddress){ // if it does then we will overwrite it with the new connection
-                    Devices.ConnectionList[i] = newConnection;
-                    SharedData.IncomingConnection.Message = null; // remove the message
+                var device = Devices.ConnectionList[i];
+                if (device.MacAdress == Message.MacAddress){ // if it does then we will overwrite it with the new connection
+                    device = newConnection;
+                    SharedData.IncomingConnection.Clear(); // remove the message
                     return;
                 }
             }
 
 
-
-
             Devices.ConnectionList.Add(newConnection); // added the new connection
-
-            SharedData.IncomingConnection.Message = null; // remove the the message
+            SharedData.IncomingConnection.Clear();
         }
 
         public static void RejectIncomingConnection(MessageUDP Message, string? Reason = null) {
@@ -114,7 +141,7 @@ namespace InputConnect.Connections
                 Text = Reason,
             };
             if (Message != null && Message.IP != null) {
-                ConnectionUDP.SendUDP(Message.IP, messageUDP);
+                ConnectionUDP.Send(Message.IP, messageUDP);
             }
         }
     }

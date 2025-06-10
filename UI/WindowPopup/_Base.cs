@@ -1,8 +1,10 @@
 ﻿using InputConnect.UI.Containers;
-using Avalonia.Controls;
-using Avalonia;
 using InputConnect.Setting;
+using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia;
+using System;
+
 
 
 namespace InputConnect.UI.WindowPopup
@@ -22,6 +24,12 @@ namespace InputConnect.UI.WindowPopup
         public Canvas? MainCanvas{
             get { return _MainCanvas; }
             set { _MainCanvas = value; }
+        }
+
+        private Action? _CloseButtonTrigger;
+        public Action? CloseButtonTrigger{
+            get { return _CloseButtonTrigger; }
+            set { _CloseButtonTrigger = value; }
         }
 
 
@@ -234,10 +242,9 @@ namespace InputConnect.UI.WindowPopup
 
         public void OnClickClosingButton(){
             Hide();
-            if (SharedData.IncomingConnection.Message != null){
-                Connections.Manager.RejectIncomingConnection(SharedData.IncomingConnection.Message, "Decline"); // Decline the Connection
-                SharedData.IncomingConnection.Clear(); // remove the the message
-            }
+            
+            if (CloseButtonTrigger != null) 
+                CloseButtonTrigger.Invoke();
         }
 
 

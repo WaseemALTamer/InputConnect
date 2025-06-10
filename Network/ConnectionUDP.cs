@@ -7,8 +7,7 @@ using System.Text.Json;
 using System.Text;
 using System.Net;
 using System;
-using System.Net.Mail;
-using Tmds.DBus.Protocol;
+
 
 
 
@@ -35,7 +34,7 @@ namespace InputConnect.Network
 
 
 
-        public static void SendUDP(string targetIP, MessageUDP message){
+        public static void Send(string targetIP, MessageUDP message){
             try{
                 if (Client != null){
                     
@@ -116,7 +115,7 @@ namespace InputConnect.Network
 
 
                 try{
-                    SendUDP(Config.BroadCastAddress, AdvertismentMessage);
+                    Send(Config.BroadCastAddress, AdvertismentMessage);
                 }
                 catch (Exception ex){
                     Console.WriteLine($"Failed to send to {Config.BroadCastAddress}: {ex.Message}");

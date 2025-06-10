@@ -1,11 +1,10 @@
 ﻿using InputConnect.UI.Animations;
-using InputConnect.Structures;
 using Avalonia.Interactivity;
 using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
 using System;
-using InputConnect.UI.WindowPopup;
+
 
 
 

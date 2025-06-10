@@ -1,10 +1,8 @@
-﻿using InputConnect.Structures;
-using InputConnect.Setting;
+﻿using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.Input;
 using Avalonia;
-using System;
+
 
 
 

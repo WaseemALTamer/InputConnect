@@ -21,8 +21,8 @@ namespace InputConnect.UI.Containers
         private Canvas? Master;
         private TextBlock? Data;
 
+        private Animations.Transations.EaseInOut? PostionTranslation;
         private Animations.Transations.Uniform? ShowHideTransition;
-        private Animations.Transations.Uniform? PostionTranslation;
         private Animations.Transations.Uniform? HoverTranslation;
 
         private MessageUDP? _Message;
@@ -180,7 +180,7 @@ namespace InputConnect.UI.Containers
 
             if (PostionTranslation != null) PostionTranslation.FunctionRunning = false;
 
-            PostionTranslation = new Animations.Transations.Uniform{
+            PostionTranslation = new Animations.Transations.EaseInOut{
                 StartingValue = 0,
                 EndingValue = 1,
                 Duration = Config.TransitionDuration,

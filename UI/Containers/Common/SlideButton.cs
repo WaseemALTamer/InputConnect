@@ -1,13 +1,10 @@
-﻿using Avalonia;
+﻿using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
-using InputConnect.Setting;
+using Avalonia;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace InputConnect.UI.Containers.Common
 {

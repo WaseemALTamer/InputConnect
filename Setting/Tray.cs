@@ -7,7 +7,7 @@ namespace InputConnect.Setting
 {
     static class Tray{
 
-        public static bool TrayEnabled = true;
+        public static bool TrayEnabled = false;
 
         public static TrayIcon? ApplicationTray;
         public static NativeMenu TrayMenu = new NativeMenu();

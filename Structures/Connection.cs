@@ -8,7 +8,7 @@ namespace InputConnect.Structures
         // connections only need to be made for commands to be sent over all the other message types
         // doesnt not need encreaption, there is more than one type of command message
 
-
+        public string? State { get; set; } // used to indecate the state of the connection <pending, connected, rejected>
 
         public string? DeviceName { get; set; }
 
@@ -22,7 +22,7 @@ namespace InputConnect.Structures
                                                        // if anyone breaks the application that way, cheers bro  never  thought
                                                        // my application will run on a quantum computer
 
-
+        
 
         public string? Token { get; set; } // token to dechyper the message
 

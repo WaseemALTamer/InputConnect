@@ -1,7 +1,8 @@
-﻿using System;
+﻿using NAudio.CoreAudioApi;
 using System.Threading;
-using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using System;
+
 
 class Program
 {

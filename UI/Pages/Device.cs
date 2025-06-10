@@ -76,7 +76,14 @@ namespace InputConnect.UI.Pages
         private void OnClickConnectButton(object? sender = null, RoutedEventArgs? e = null) {
 
             if (SharedData.TargetedDevice.IP != null) {
-                InputConnect.Connections.Manager.EstablishConnection(SharedData.TargetedDevice.IP, "<Token>");
+                // only the ip address and the token are needed  MacAdress IP address  and also the token
+                // the MacAddress is a must and ip address is used to send message, in thory you can have
+                // the MacAddress anything but we  wont be  gettinga response  for the  message since the
+                // user is going to resposnd with there own mac address
+                InputConnect.Connections.Manager.EstablishConnection(SharedData.TargetedDevice.IP, 
+                                                                    "<Token>", 
+                                                                    SharedData.TargetedDevice.MacAddress,
+                                                                    SharedData.TargetedDevice.DeviceName);
             }
         }
 

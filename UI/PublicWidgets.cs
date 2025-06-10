@@ -6,7 +6,6 @@ using InputConnect.UI.Pages;
 using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
-using System;
 
 
 

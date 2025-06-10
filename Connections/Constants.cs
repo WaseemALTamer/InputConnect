@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace InputConnect.Connections
 {
@@ -13,7 +9,11 @@ namespace InputConnect.Connections
                                                 // if the other device decreaption matches this then we have the same
                                                 // token and we can move forward in establishing a squre connenection
                                                 // other wise a connection is responded to as invalid token
-        
+
+
+        public static string StatePending = "Pending"; // this state is when we are waiting for there acceptance
+        public static string StateConnected = "Connected"; // this state is when they replay with with acceptance
+        public static string StateRejection = "Rejection"; // this state is when you are rejected rarly used
 
 
 
