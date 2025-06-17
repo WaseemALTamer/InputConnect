@@ -40,6 +40,7 @@ namespace InputConnect.UI.Containers
             Width = 200;
             Height = 80;
 
+            Focusable = true;
 
             MainCanvas = new Canvas{
                 IsHitTestVisible = true,
@@ -111,13 +112,6 @@ namespace InputConnect.UI.Containers
 
         private void TriggerMap() { 
             if (Trigger != null && Button != null) Trigger.Invoke(Button.State);
-
-            for (int i = 0; i < Connections.Devices.ConnectionList.Count; i++){
-                var device = Connections.Devices.ConnectionList[i];
-
-                Console.WriteLine(device.DeviceName);
-                Console.WriteLine(device.State);
-            }
         }
 
 

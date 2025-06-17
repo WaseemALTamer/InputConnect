@@ -51,6 +51,7 @@ namespace InputConnect
                 Width = Width,
                 Height = Height,
                 Background = Themes.Backgruond,
+                Focusable = true,
             };
 
 

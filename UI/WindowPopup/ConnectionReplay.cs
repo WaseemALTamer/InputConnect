@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia;
+using System;
 
 
 
@@ -38,15 +39,8 @@ namespace InputConnect.UI.WindowPopup
 
             // CloseButton.Trigger  // attach the trigger on the function
 
-            WrongTokenTranstion = new Animations.Transations.Uniform{
-                StartingValue = 0,
-                EndingValue = 1,
-                Duration = Config.TransitionDuration,
-                Trigger = TriggerWrongToken,
-            };
-
             Connections.Manager.ActionOnIncomingConnection += OnIncomingConnection;
-
+            
 
             DeviceData = new TextBlock { // this is only going to hold the device name and the device ip and the time of the message
                                          // text will only be pushed in when we start to show this popup
@@ -71,8 +65,6 @@ namespace InputConnect.UI.WindowPopup
                 Background = Themes.Entry,
             };
             MainCanvas.Children.Add(Entry);
-
-
             
 
             AcceptButton = new Button{
@@ -88,6 +80,16 @@ namespace InputConnect.UI.WindowPopup
             MainCanvas.Children.Add(AcceptButton);
 
             AcceptButton.Click += OnClickAcceptButton;
+
+
+            WrongTokenTranstion = new Animations.Transations.Uniform
+            {
+                StartingValue = 0,
+                EndingValue = 1,
+                Duration = Config.TransitionDuration,
+                Trigger = TriggerWrongToken,
+            };
+
 
 
             MainCanvas.SizeChanged += OnResize;
@@ -216,6 +218,9 @@ namespace InputConnect.UI.WindowPopup
                     }
                 }
             }
+
+            if (PublicWidgets.UIConnections != null)
+                PublicWidgets.UIConnections.Update();
         }
 
         private void OnCloseButton() {
@@ -226,6 +231,9 @@ namespace InputConnect.UI.WindowPopup
                 Connections.Manager.RejectIncomingConnection(SharedData.IncomingConnection.Message, "Decline"); // Decline the Connection
                 SharedData.IncomingConnection.Clear(); // remove the the message
             }
+
+            if (PublicWidgets.UIConnections != null)
+                PublicWidgets.UIConnections.Update();
         }
 
 

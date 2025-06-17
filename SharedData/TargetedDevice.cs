@@ -1,4 +1,7 @@
-﻿
+﻿using Avalonia.Controls;
+using InputConnect.Structures;
+
+
 
 
 namespace InputConnect.SharedData
@@ -11,16 +14,28 @@ namespace InputConnect.SharedData
         // nothing more and mothing less at least not anymore
 
 
-        // the next 3 var are data on the device
+
         public static string? IP;
-        public static int? Port;
         public static string? MacAddress;
         public static string? DeviceName;
+        public static string? State;
 
+
+
+        public static Connection? Connection; // this will hold our current connection
 
 
 
         public static string? Token;
+
+        public static void Clear() {
+            IP = null; 
+            MacAddress = null; 
+            DeviceName = null; 
+            State = null; 
+            Connection = null;
+            Token = null;
+        }
 
     }
 }

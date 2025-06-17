@@ -1,7 +1,7 @@
-﻿using Avalonia.Interactivity;
-using InputConnect.Setting;
+﻿using InputConnect.UI.Containers;
 using Avalonia.Controls;
-using Avalonia;
+
+
 
 
 
@@ -17,12 +17,11 @@ namespace InputConnect.UI.Pages
 
     // this file ended also running the logic as well
 
-    public class Device : Base
-    {
-
-
-
-        private Button? ConnectButton;
+    public class Device : Base{
+        // this is responsible for sending the connection request
+        // it will also be responsible for disconnecting and also
+        // telling you
+        private Connector? connector; 
 
         public Device(Canvas? master) : base(master)
         {
@@ -30,24 +29,11 @@ namespace InputConnect.UI.Pages
             if (MainCanvas == null) return;
 
 
-            // here where all the children should be
-
-            ConnectButton = new Button
-            {
-                Content = "Connect",
-                Width = 150,
-                Height = 50,
-                Background = Themes.Button,
-                HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-                VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius)
-            };
-            MainCanvas.Children.Add(ConnectButton);
-            ConnectButton.Click += OnClickConnectButton;
+            connector = new Connector(MainCanvas);
+            MainCanvas.Children.Add(connector);
 
 
-
+            OnShow += Update; // this will ensure that it updates evertime we display this page
 
 
             OnResize(); // trigger the function to set the sizes
@@ -57,6 +43,14 @@ namespace InputConnect.UI.Pages
             }
         }
 
+                   
+        public void Update() { 
+            // update the data that we need to work with
+
+
+
+        }
+
 
         public void OnResize(object? sender = null, SizeChangedEventArgs? e = null){
 
@@ -64,28 +58,18 @@ namespace InputConnect.UI.Pages
                 MainCanvas.Width = Width; 
                 MainCanvas.Height = Height;
 
-                if (ConnectButton != null) {
-                    Canvas.SetLeft(ConnectButton, (MainCanvas.Width - ConnectButton.Width) - 10);
-                    Canvas.SetTop(ConnectButton, (MainCanvas.Height - ConnectButton.Height) - 10);
+
+                if (connector != null) {
+                    Canvas.SetLeft(connector, MainCanvas.Width - connector.Width - 10);
+                    Canvas.SetTop(connector, MainCanvas.Height - connector.Height - 10);
                 }
             }
         }
 
 
 
-        private void OnClickConnectButton(object? sender = null, RoutedEventArgs? e = null) {
 
-            if (SharedData.TargetedDevice.IP != null) {
-                // only the ip address and the token are needed  MacAdress IP address  and also the token
-                // the MacAddress is a must and ip address is used to send message, in thory you can have
-                // the MacAddress anything but we  wont be  gettinga response  for the  message since the
-                // user is going to resposnd with there own mac address
-                InputConnect.Connections.Manager.EstablishConnection(SharedData.TargetedDevice.IP, 
-                                                                    "<Token>", 
-                                                                    SharedData.TargetedDevice.MacAddress,
-                                                                    SharedData.TargetedDevice.DeviceName);
-            }
-        }
+       
 
     }
 }

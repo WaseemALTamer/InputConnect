@@ -26,6 +26,7 @@ namespace InputConnect.UI.Containers
         public CloseButton(Canvas? master = null)
         {
             Master = master;
+            Focusable = true;
 
             //Background = Themes.Buttons;
 

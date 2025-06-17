@@ -25,7 +25,7 @@ namespace InputConnect.UI.Containers
 
         public BackButton(Canvas? master = null) {
             Master = master;
-
+            Focusable = true;
             //Background = Themes.Buttons;
 
             ShowHideTransation = new Animations.Transations.EaseOut {

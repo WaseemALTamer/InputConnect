@@ -17,5 +17,11 @@ namespace InputConnect.Connections
 
 
 
+        public static string Transmitter = "Transmitter";
+        public static string Receiver = "Receiver";
+        
+
+
+
     }
 }

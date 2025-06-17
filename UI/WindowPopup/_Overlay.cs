@@ -36,6 +36,7 @@ namespace InputConnect.UI.WindowPopup
         {
 
             Master = master;
+            Focusable = true;
 
             if (Master != null) { 
                 Master.Children.Add(this);

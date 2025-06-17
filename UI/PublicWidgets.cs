@@ -183,17 +183,25 @@ namespace InputConnect.UI
 
 
         private static bool _TransitionForwardRunning = false; // for thread safty
-        public static async void TransitionForward(Pages.Base Holder) {
+        public static async void TransitionForward(Pages.Base Page) {
             if (_TransitionForwardRunning) return;
             _TransitionForwardRunning = true;
             if (DisplayedPage != null) {
-                PagesHistory.Add(DisplayedPage);
+
+
+                if (DisplayedPage != UIDevice) 
+                    // exculde the UIDevice holder because we simply just cant
+                    // go back to it because of how  we share the  data, it is
+                    // possible but not recommended since it wont be universal
+                    // methode on how we handel the shared data
+                    PagesHistory.Add(DisplayedPage);
+                
                 DisplayedPage.Hide();
-                DisplayedPage = Holder; // redundency
+                DisplayedPage = Page; // redundency
                 await Task.Delay(Config.TransitionDuration / 2); // wait for at bit to give ot a smoother feel
             }
-            DisplayedPage = Holder;
-            Holder.Show();
+            DisplayedPage = Page;
+            Page.Show();
             _TransitionForwardRunning = false;
         }
 
@@ -205,12 +213,12 @@ namespace InputConnect.UI
             if (PagesHistory.Count > 0 &&
                 DisplayedPage != null)
             {
-                var lastHolder = PagesHistory[PagesHistory.Count - 1];
+                var lastPage = PagesHistory[PagesHistory.Count - 1];
                 PagesHistory.RemoveAt(PagesHistory.Count - 1);
 
 
                 DisplayedPage.Hide();
-                DisplayedPage = lastHolder;
+                DisplayedPage = lastPage;
                 await Task.Delay(Config.TransitionDuration / 2);
                 DisplayedPage.Show();
             }

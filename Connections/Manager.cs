@@ -41,7 +41,7 @@ namespace InputConnect.Connections
             var newConnection = new Connection{
                 State = Constants.StatePending,
                 DeviceName = Devicename,
-                MacAdress = MacAdress,
+                MacAddress = MacAdress,
                 SequenceNumber = 0,
                 Token = Token,
             };
@@ -49,12 +49,14 @@ namespace InputConnect.Connections
             var deviceExist = false; // this is there to check if the device is already in the list
             for (int i = 0; i < Devices.ConnectionList.Count; i++) {
                 var device = Devices.ConnectionList[i];
-                if (device.MacAdress == MacAdress) {
+                if (device.MacAddress == MacAdress) {
                     device = newConnection;
                     deviceExist = true;
                 }
             }
-
+                
+            // it is advices that you add your connection manually rather than let this function add it for you
+            // this way you can move control over it later on on the device page
             if (deviceExist == false) {
                 Devices.ConnectionList.Add(newConnection);
             }
@@ -105,27 +107,25 @@ namespace InputConnect.Connections
                 Text = Encryptor.Encrypt(Constants.PassPhase, Token), // replay with the pass phase for absolutely no reason
                 IsEncrypted = true,
             };
-            if (Message != null && Message.IP != null){
+            if (Message.IP != null){
                 ConnectionUDP.Send(Message.IP, messageUDP); // notify the other device to add the connection now
             }
 
             // now we can Check the message and add the connection to the list
-            if (Message == null) return;
-
             var newConnection = new Connection{
                 State = Constants.StateConnected,
                 DeviceName = Message.DeviceName,
-                MacAdress = Message.MacAddress,
+                MacAddress = Message.MacAddress,
                 SequenceNumber = 0,
                 Token = Token,
             };
 
             for (int i = 0; i < Devices.ConnectionList.Count; i++){ // check if connection already exists
                 var device = Devices.ConnectionList[i];
-                if (device.MacAdress == Message.MacAddress){ // if it does then we will overwrite it with the new connection
+                if (device.MacAddress == Message.MacAddress){ // if it does then we will overwrite it with the new connection
                     device = newConnection;
                     SharedData.IncomingConnection.Clear(); // remove the message
-                    return;
+                    break;
                 }
             }
 
@@ -135,12 +135,27 @@ namespace InputConnect.Connections
         }
 
         public static void RejectIncomingConnection(MessageUDP Message, string? Reason = null) {
-            
+
+
+            if (Message == null) return;
+
             MessageUDP messageUDP = new MessageUDP{
                 MessageType = Network.Constants.MessageTypes.Decline,
                 Text = Reason,
             };
-            if (Message != null && Message.IP != null) {
+
+
+            for (int i = 0; i < Devices.ConnectionList.Count; i++){ 
+                // check if connection already exists
+                var device = Devices.ConnectionList[i];
+                if (device.MacAddress == Message.MacAddress)
+                { // if it does then we will overwrite it with the new connection
+                    Devices.ConnectionList.Remove(device);
+                    break;
+                }
+            }
+
+            if (Message.IP != null){
                 ConnectionUDP.Send(Message.IP, messageUDP);
             }
         }

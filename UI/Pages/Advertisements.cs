@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using System;
 using System.Net.Mail;
 using Tmds.DBus.Protocol;
+using InputConnect.UI.Containers.Common;
 
 
 
@@ -47,7 +48,8 @@ namespace InputConnect.UI.Pages
         public Advertisements(Canvas? master) : base(master)
         {
             // we ensure that it runs on the main thread because we are working with the ui
-            MessageManager.OnAdvertisement += () => { Dispatcher.UIThread.Post(() => AdsUpdate()); };
+            MessageManager.OnAdvertisement += () => { Dispatcher.UIThread.Post(() => Update()); };
+
         }
 
 
@@ -60,7 +62,7 @@ namespace InputConnect.UI.Pages
 
 
 
-        public void AdsUpdate(object? sender = null, object? e = null){
+        public void Update(object? sender = null, object? e = null){
             
             
             for (int i = 0; i < MessageManager.Advertisements.Count; i++) {

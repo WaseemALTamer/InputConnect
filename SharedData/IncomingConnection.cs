@@ -11,18 +11,13 @@ namespace InputConnect.SharedData
 
         public static MessageUDP? Message;
 
-
-
-
         public static string? Token;
 
 
 
         public static void Clear() {
-
             Message = null;
             Token = null;
-
         }
     }
 }

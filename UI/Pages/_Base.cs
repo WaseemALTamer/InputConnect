@@ -60,6 +60,7 @@ namespace InputConnect.UI.Pages
 
         public Base(Canvas? master){
             Master = master;
+            Focusable = true;
 
             if (Master != null){
                 Master.Children.Add(this);

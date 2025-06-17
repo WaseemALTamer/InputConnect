@@ -12,7 +12,7 @@ namespace InputConnect.Structures
 
         public string? DeviceName { get; set; }
 
-        public string? MacAdress { get; set; } // this will be used to identify the Connection and the  messages they send
+        public string? MacAddress { get; set; } // this will be used to identify the Connection and the  messages they send
                                                // simply  mimicking  someone  MacAdress  isn't  going  to cut  it  as  the
                                                // application has many layers of identification and filtring attackers for
                                                // replay attack, though if they decreapt the message then change the token
@@ -22,7 +22,15 @@ namespace InputConnect.Structures
                                                        // if anyone breaks the application that way, cheers bro  never  thought
                                                        // my application will run on a quantum computer
 
-        
+
+        public string? Logs { get; set; } // this will hold the logs for certain messages that are sent and
+                                          // data on the progress for the connection
+
+        public string? KeyboardState { get; set; } // this can be either a Reciver or a Transmitter
+
+        public string? MouseState { get; set; } // this can be either a Reciver or a Transmitter
+
+        public string? AudioState { get; set; } // this can be either a Reciver or a Transmitter
 
         public string? Token { get; set; } // token to dechyper the message
 
