@@ -65,6 +65,19 @@ namespace InputConnect.UI.Animations.Transations
             Transition.Reset();
         }
 
+
+        public void Pause(){
+            if (Transition == null) return;
+            Transition.Pause();
+        }
+
+        public void Resume() {
+            if (Transition == null) return;
+            Transition.Resume();
+        }
+
+
+
         private void _Trigger(double Value){
             if (Transition == null) return;
             FunctionRunning = Transition.FunctionRunning;

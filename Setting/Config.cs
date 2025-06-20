@@ -50,5 +50,8 @@ namespace InputConnect.Setting
 
         public static int FontSize = 20;  // this is for all the text font size of the application
 
+
+        public static int PopupTimeout = 10000; // this will be used for popus that use a timeout
+
     }
 }

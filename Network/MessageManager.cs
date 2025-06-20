@@ -30,14 +30,34 @@ namespace InputConnect.Network
 
         public static List<MessageUDP> Advertisements = new List<MessageUDP>(); // this is used to collect all the advertisement messages
 
+        public static Dictionary<string, string> MacToIP = new Dictionary<string, string>(); // this is a dictionary that will hold mac to
+                                                                                             // ips this elemnate the  dynamic ips problem
+
 
         public static void ProccessMessageUDP(string message) {
             MessageUDP? _message = JsonSerializer.Deserialize<MessageUDP>(message);
-            if (_message != null && _message.MessageType == Constants.MessageTypes.Advertisement) ProccessAdvertisement(_message);
-            if (_message != null && _message.MessageType == Constants.MessageTypes.Connect) ProccessConnect(_message);
-            if (_message != null && _message.MessageType == Constants.MessageTypes.Accept) ProccessAccepte(_message);
-            if (_message != null && _message.MessageType == Constants.MessageTypes.Decline) ProccessDecline(_message);
+            if (_message == null) return;
+
+            UpdateMacToIP(_message);
+
+            if (_message.MessageType == Constants.MessageTypes.Advertisement) ProccessAdvertisement(_message);
+            if (_message.MessageType == Constants.MessageTypes.Connect) ProccessConnect(_message);
+            if (_message.MessageType == Constants.MessageTypes.Accept) ProccessAccepte(_message);
+            if (_message.MessageType == Constants.MessageTypes.Decline) ProccessDecline(_message);
         }
+
+
+        public static void UpdateMacToIP(MessageUDP message) {
+            // this function main perpose is to link the macs to there ips
+
+            if (message == null ||
+                message.IP == null||
+                message.MacAddress == null)
+                return;
+
+            MacToIP[message.MacAddress] = message.IP;
+        }
+
 
         private static void ProccessAdvertisement(MessageUDP message){
             // this filters out the messages that we dont need and are too old

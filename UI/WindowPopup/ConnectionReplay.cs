@@ -5,6 +5,11 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia;
 using System;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using static System.Net.Mime.MediaTypeNames;
+using System.Threading;
+
 
 
 
@@ -27,6 +32,7 @@ namespace InputConnect.UI.WindowPopup
         private TextBlock? DeviceData;
         private TextBox? Entry;
         private Button? AcceptButton;
+        private Containers.Timer? TimeoutTimer; // this will help close the popup if it was not responded to
 
 
 
@@ -63,9 +69,12 @@ namespace InputConnect.UI.WindowPopup
                 Watermark = "Token",
                 PasswordChar = char.Parse("*"),
                 Background = Themes.Entry,
+                Foreground = Themes.Text
             };
             MainCanvas.Children.Add(Entry);
-            
+            Entry.KeyDown += OnEnetryKeyDown;
+
+
 
             AcceptButton = new Button{
                 Content = "Accept",
@@ -82,14 +91,29 @@ namespace InputConnect.UI.WindowPopup
             AcceptButton.Click += OnClickAcceptButton;
 
 
-            WrongTokenTranstion = new Animations.Transations.Uniform
-            {
+            WrongTokenTranstion = new Animations.Transations.Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
                 Duration = Config.TransitionDuration,
                 Trigger = TriggerWrongToken,
             };
 
+
+            TimeoutTimer = new Containers.Timer{
+                Width = 40,
+                Height = 40,
+                Thickness = 10,
+                Trigger = OnCloseButton, // this will simulate closing the popup when the time ends
+            };
+
+            MainCanvas.Children.Add(TimeoutTimer);
+            OnShowTrigger = OnShow; // now that we maped the function we can start the timer in it
+                                    // which will only start it exactly when the popup is shown
+            
+            OnHideTrigger = OnHide; // i used this approch so i dont have to send two decline messages
+                                    // one from the timer and one from clicking the  button  note that
+                                    // the issue only happens if you  click the  button so  we need to
+                                    // pause the timer before then
 
 
             MainCanvas.SizeChanged += OnResize;
@@ -100,7 +124,17 @@ namespace InputConnect.UI.WindowPopup
 
         }
 
+        public void OnShow() {
+            if (TimeoutTimer != null) {
+                TimeoutTimer.StartTimer(Config.PopupTimeout);
+            }
+        }
 
+        public void OnHide(){
+            if (TimeoutTimer != null){
+                TimeoutTimer.Pause();
+            }
+        }
 
         public void OnResize(object? sender = null, SizeChangedEventArgs? e = null)
         {
@@ -126,6 +160,11 @@ namespace InputConnect.UI.WindowPopup
                         Canvas.SetLeft(AcceptButton, MainCanvas.Width - AcceptButton.Width - 10);
                         Canvas.SetTop(AcceptButton, MainCanvas.Height - AcceptButton.Height - 10);
                     }
+
+                    if (TimeoutTimer != null){
+                        Canvas.SetLeft(TimeoutTimer, MainCanvas.Width - TimeoutTimer.Width - 10);
+                        Canvas.SetTop(TimeoutTimer, ((MainCanvas.Height - TimeoutTimer.Height) / 2) - 10);
+                    }
                 }
             }
         }
@@ -134,19 +173,34 @@ namespace InputConnect.UI.WindowPopup
 
         private void TriggerWrongToken(double value){
             if (Background is SolidColorBrush solidBrush){
-                var originalColor = Themes.Entry;
+                var originalColorEntry = Themes.Entry;
                 var targetColor = Themes.WrongToken;
 
-                byte Lerp(byte start, byte end) => (byte)(start + (end - start) * value); // mathmaticall function
+                byte Lerp(byte start, byte end) => (byte)(start + (end - start) * value);
 
-                var newColor = Color.FromArgb(
-                    Lerp(originalColor.Color.A, targetColor.Color.A),
-                    Lerp(originalColor.Color.R, targetColor.Color.R),
-                    Lerp(originalColor.Color.G, targetColor.Color.G),
-                    Lerp(originalColor.Color.B, targetColor.Color.B)
+                //var newColorEntry = Color.FromArgb(
+                //    Lerp(originalColorEntry.Color.A, targetColor.Color.A),
+                //    Lerp(originalColorEntry.Color.R, targetColor.Color.R),
+                //    Lerp(originalColorEntry.Color.G, targetColor.Color.G),
+                //    Lerp(originalColorEntry.Color.B, targetColor.Color.B)
+                //);
+
+                var originalColorText = Themes.Text;
+
+                var newColorText = Color.FromArgb(
+                    Lerp(originalColorText.Color.A, targetColor.Color.A),
+                    Lerp(originalColorText.Color.R, targetColor.Color.R),
+                    Lerp(originalColorText.Color.G, targetColor.Color.G),
+                    Lerp(originalColorText.Color.B, targetColor.Color.B)
                 );
+
                 if (Entry != null) {
-                    Entry.Background = new SolidColorBrush(newColor);
+                    // changing the color of the background is better but Avilonia doesnt document the c#
+                    // part of there code look into making your own text entry at  this point, prefarably
+                    // in the near future switch to the orginal sloution
+
+                    //Entry.Background = new SolidColorBrush(newColorEntry);
+                    Entry.Foreground = new SolidColorBrush(newColorText);
                 }
                 
                 if(WrongTokenTranstion != null && 
@@ -164,8 +218,8 @@ namespace InputConnect.UI.WindowPopup
         // this will be ran from a very far thread comming from the MessageManager
         // but the rule in the PublicWidgets.cs has not been broken as this is the
         // function that we put in it
-        public void OnIncomingConnection() { // coming from <MessageMangaer Thread>
-
+        public void OnIncomingConnection() { 
+            // coming from <MessageMangaer Thread>
 
             if (SharedData.IncomingConnection.Message != null){
                 // ensures that it is on the right thread before
@@ -188,8 +242,20 @@ namespace InputConnect.UI.WindowPopup
             }
         }
 
+        private void OnEnetryKeyDown(object? sender, KeyEventArgs? e){
+            // this will  detect when  a key  is pressed  for the entery
+            // this will be used to detect when the enter key is pressed
+            // to trigger the Accept function
 
-        private void OnClickAcceptButton(object? sender, Avalonia.Interactivity.RoutedEventArgs e){
+            if (e == null) return;
+
+            if (e.Key == Key.Enter){
+                OnClickAcceptButton(null, null); // simulate clicking the accept button
+            }
+        }
+
+
+        private void OnClickAcceptButton(object? sender, Avalonia.Interactivity.RoutedEventArgs? e){
 
             if (Entry != null && 
                 Entry.Text != null &&
@@ -202,6 +268,10 @@ namespace InputConnect.UI.WindowPopup
                 if (DecreaptedMessge == Connections.Constants.PassPhase){
 
                     SharedData.IncomingConnection.Token = Entry.Text;
+
+                    if (TimeoutTimer != null)
+                        TimeoutTimer.Pause();
+
                     HideRight();
 
                     Connections.Manager.AcceptIncomingConnection(SharedData.IncomingConnection.Message, // establish the connection
@@ -221,14 +291,16 @@ namespace InputConnect.UI.WindowPopup
 
             if (PublicWidgets.UIConnections != null)
                 PublicWidgets.UIConnections.Update();
+
+            
         }
 
         private void OnCloseButton() {
-
             // this function is going to be wrapped around and feed into the popup base
+            Hide(); // hide it again for any other function that is trying to simulate the Closing button functionality
 
             if (SharedData.IncomingConnection.Message != null){
-                Connections.Manager.RejectIncomingConnection(SharedData.IncomingConnection.Message, "Decline"); // Decline the Connection
+                Connections.Manager.CloseIncomingConnection(SharedData.IncomingConnection.Message, "Decline"); // Decline the Connection
                 SharedData.IncomingConnection.Clear(); // remove the the message
             }
 

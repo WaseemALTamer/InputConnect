@@ -52,6 +52,20 @@ namespace InputConnect.UI.WindowPopup
 
 
 
+        private Action? _OnShowTrigger;
+        public Action? OnShowTrigger{
+            get { return _OnShowTrigger; }
+            set { _OnShowTrigger = value; }
+        }
+
+        private Action? _OnHideTrigger;
+        public Action? OnHideTrigger{
+            get { return _OnHideTrigger; }
+            set { _OnHideTrigger = value; }
+        }
+
+
+
 
 
         public Base(Canvas master) {
@@ -219,6 +233,10 @@ namespace InputConnect.UI.WindowPopup
             if (Global.Overlay != null){
                 Global.Overlay.Show();
             }
+
+            if (OnShowTrigger != null) {
+                OnShowTrigger.Invoke();
+            }
         }
 
         public void Hide(){
@@ -227,6 +245,10 @@ namespace InputConnect.UI.WindowPopup
             SetPostionTranslate(-Width, Canvas.GetTop(this));
             if (Global.Overlay != null){
                 Global.Overlay.Hide();
+            }
+
+            if (OnHideTrigger != null){
+                OnHideTrigger.Invoke();
             }
         }
 

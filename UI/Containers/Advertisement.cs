@@ -265,7 +265,6 @@ namespace InputConnect.UI.Containers
                     if (!_found) {
                         // Add the date to the TargetedDevice
                         SharedData.TargetedDevice.Clear();
-                        SharedData.TargetedDevice.IP = _message.IP;
                         SharedData.TargetedDevice.MacAddress = _message.MacAddress;
                         SharedData.TargetedDevice.DeviceName = _message.Text;
                     }

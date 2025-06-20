@@ -73,7 +73,7 @@ namespace InputConnect.Connections
             if (SharedData.IncomingConnection.Message != null) {
                 // this means we already got a conenction to deal with so that connection is rejected for now
 
-                RejectIncomingConnection(Message, "Busy trying to connect to another device try again later "); // reject
+                CloseIncomingConnection(Message, "Busy trying to connect to another device try again later "); // reject
                 return; // move on
             } 
 
@@ -97,7 +97,7 @@ namespace InputConnect.Connections
                 return; 
             }
             if (Encryptor.Decrypt(Message.Text, Token) != Constants.PassPhase) {
-                RejectIncomingConnection(Message, "Token mismatch"); // reject it
+                CloseIncomingConnection(Message, "Token mismatch"); // reject it
                 SharedData.IncomingConnection.Clear(); // remove the the message
                 return; // move on
             }
@@ -125,7 +125,7 @@ namespace InputConnect.Connections
                 if (device.MacAddress == Message.MacAddress){ // if it does then we will overwrite it with the new connection
                     device = newConnection;
                     SharedData.IncomingConnection.Clear(); // remove the message
-                    break;
+                    return;
                 }
             }
 
@@ -134,8 +134,8 @@ namespace InputConnect.Connections
             SharedData.IncomingConnection.Clear();
         }
 
-        public static void RejectIncomingConnection(MessageUDP Message, string? Reason = null) {
 
+        public static void CloseIncomingConnection(MessageUDP Message, string? Reason = null) {
 
             if (Message == null) return;
 
@@ -148,9 +148,16 @@ namespace InputConnect.Connections
             for (int i = 0; i < Devices.ConnectionList.Count; i++){ 
                 // check if connection already exists
                 var device = Devices.ConnectionList[i];
-                if (device.MacAddress == Message.MacAddress)
-                { // if it does then we will overwrite it with the new connection
+                if (device.MacAddress == Message.MacAddress){ 
+                    // if it does then we will overwrite it with the new connection
                     Devices.ConnectionList.Remove(device);
+
+                    // note that we dont break out because there is an issue  that causes
+                    // two connections i have no clue where it is but simply leaving this
+                    // function to not break out will fix this problem, the  problem have
+                    // been fixed through it might arrise again if you  try  to  add more
+                    // only add your connection once
+
                     break;
                 }
             }

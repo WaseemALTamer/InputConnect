@@ -28,6 +28,9 @@ namespace InputConnect.Setting{
         public static SolidColorBrush Entry = new SolidColorBrush(Color.FromUInt32(0xff000000));
         public static SolidColorBrush WrongToken = new SolidColorBrush(Color.FromUInt32(0xff990000));
         public static SolidColorBrush Connection = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));
+        public static SolidColorBrush Text = new SolidColorBrush(Color.FromUInt32(0xffffffff));
+        
+        public static SolidColorBrush Timer = new SolidColorBrush(Color.FromUInt32(0xffffffff));
 
     }
 }

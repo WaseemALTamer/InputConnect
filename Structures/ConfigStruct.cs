@@ -45,6 +45,9 @@ namespace InputConnect.Structures
         [JsonPropertyName("FontSize")]
         public int FontSize { get; set; } = 20;
 
+        [JsonPropertyName("PopupTimeout")]
+        public int PopupTimeout { get; set; } = 10000;
+
     }
 
 

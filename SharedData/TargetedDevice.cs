@@ -15,7 +15,11 @@ namespace InputConnect.SharedData
 
 
 
-        public static string? IP;
+        // ip address approch is not used rather use the  dictionary that
+        // contain the mac to ip address in MessageManager
+        
+        // public static string? IP; 
+
         public static string? MacAddress;
         public static string? DeviceName;
         public static string? State;
@@ -29,11 +33,10 @@ namespace InputConnect.SharedData
         public static string? Token;
 
         public static void Clear() {
-            IP = null; 
             MacAddress = null; 
-            DeviceName = null; 
-            State = null; 
+            DeviceName = null;
             Connection = null;
+            State = null;
             Token = null;
         }
 

@@ -84,10 +84,25 @@ namespace InputConnect.UI.Animations.Transations
         }
 
         bool _reset = false;
-        public void Reset(object? sender = null, object? e = null)
-        { // does not need to be async function 
+        public void Reset(object? sender = null, object? e = null){ 
+            // does not need to be async function 
             FunctionRunning = false;
             _reset = true;
+        }
+
+
+        bool _paused = false;
+        public void Pause() {
+            // does not need to be an async function
+            _stopwatch.Stop();
+            _paused = true;
+            FunctionRunning = false;
+        }
+
+        public async void Resume() {
+            _stopwatch.Start();
+            _paused = false;
+            await Transation();
         }
 
 
@@ -124,8 +139,16 @@ namespace InputConnect.UI.Animations.Transations
                     Trigger(CurrentValue);
             }
 
-            if (FunctionRunning == false && _reset)
-            { // this means we reseted
+
+            if (_paused) {
+                // we break out so we dong trigger the function when it is paused
+                return;
+            }
+
+            if (FunctionRunning == false && _reset){ 
+                // this means we reseted note that the trigger function is not
+                // triggered you can trigger it your self as  you already know
+                // when to run this function
                 CurrentValue = StartingValue;
                 _reset = false;
                 return;

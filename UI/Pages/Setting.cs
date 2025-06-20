@@ -115,6 +115,9 @@ namespace InputConnect.UI.Pages
             // CONFIG.PROPERTY <FontSize>
             AddConfigProperty("Font Size -> (Restart)", ref yPos);
 
+            // CONFIG.PROPERTY <FontSize>
+            AddConfigProperty("Popups Timeout (ms)", ref yPos);
+
 
 
             MainCanvas.Height = yPos + 20; // set the final height

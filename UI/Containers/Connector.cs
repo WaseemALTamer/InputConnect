@@ -5,6 +5,8 @@ using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
 using Avalonia.Media;
+using InputConnect.Network;
+using Avalonia.Input;
 
 
 
@@ -36,7 +38,7 @@ namespace InputConnect.UI.Containers
 
 
         private Button? ConnectButton;
-        private TextBox? TokenEntry;
+        private TextBox? Entry;
 
 
         private Animations.Transations.Uniform? WrongTokenTranstion;
@@ -53,10 +55,8 @@ namespace InputConnect.UI.Containers
             MaxHeight = 250; MaxWidth = 450;
 
 
-            MainCanvas = new Canvas
-            {
+            MainCanvas = new Canvas{
                 ClipToBounds=true,
-
             };
             Child = MainCanvas;
 
@@ -75,7 +75,7 @@ namespace InputConnect.UI.Containers
             ConnectButton.Click += OnClickConnectButton;
 
 
-            TokenEntry = new TextBox{
+            Entry = new TextBox{
                 Width = 300,
                 Height = 40,
                 FontSize = Config.FontSize,
@@ -84,8 +84,8 @@ namespace InputConnect.UI.Containers
                 PasswordChar = char.Parse("*"),
                 Background = Themes.Entry,
             };
-            MainCanvas.Children.Add(TokenEntry);
-
+            MainCanvas.Children.Add(Entry);
+            Entry.KeyDown += OnEnetryKeyDown;
 
 
             WrongTokenTranstion = new Animations.Transations.Uniform{
@@ -135,30 +135,47 @@ namespace InputConnect.UI.Containers
                 }
 
 
-                if (TokenEntry != null){
-                    Canvas.SetLeft(TokenEntry, 20);
-                    Canvas.SetTop(TokenEntry, (MainCanvas.Height - TokenEntry.Height) / 3);
+                if (Entry != null){
+                    Canvas.SetLeft(Entry, 20);
+                    Canvas.SetTop(Entry, (MainCanvas.Height - Entry.Height) / 3);
                 }
             }
         }
 
 
-        private void TriggerWrongToken(double value){
-            if (Background is SolidColorBrush solidBrush){
-                var originalColor = Themes.Entry;
+        private void TriggerWrongToken(double value)
+        {
+            if (Background is SolidColorBrush solidBrush)
+            {
+                var originalColorEntry = Themes.Entry;
                 var targetColor = Themes.WrongToken;
 
-                byte Lerp(byte start, byte end) => (byte)(start + (end - start) * value); // mathmaticall function
+                byte Lerp(byte start, byte end) => (byte)(start + (end - start) * value);
 
-                var newColor = Color.FromArgb(
-                    Lerp(originalColor.Color.A, targetColor.Color.A),
-                    Lerp(originalColor.Color.R, targetColor.Color.R),
-                    Lerp(originalColor.Color.G, targetColor.Color.G),
-                    Lerp(originalColor.Color.B, targetColor.Color.B)
+                //var newColorEntry = Color.FromArgb(
+                //    Lerp(originalColorEntry.Color.A, targetColor.Color.A),
+                //    Lerp(originalColorEntry.Color.R, targetColor.Color.R),
+                //    Lerp(originalColorEntry.Color.G, targetColor.Color.G),
+                //    Lerp(originalColorEntry.Color.B, targetColor.Color.B)
+                //);
+
+                var originalColorText = Themes.Text;
+
+                var newColorText = Color.FromArgb(
+                    Lerp(originalColorText.Color.A, targetColor.Color.A),
+                    Lerp(originalColorText.Color.R, targetColor.Color.R),
+                    Lerp(originalColorText.Color.G, targetColor.Color.G),
+                    Lerp(originalColorText.Color.B, targetColor.Color.B)
                 );
-                if (TokenEntry != null)
+
+                if (Entry != null)
                 {
-                    TokenEntry.Background = new SolidColorBrush(newColor);
+                    // changing the color of the background is better but Avilonia doesnt document the c#
+                    // part of there code look into making your own text entry at  this point, prefarably
+                    // in the near future switch to the orginal sloution
+
+                    //Entry.Background = new SolidColorBrush(newColorEntry);
+                    Entry.Foreground = new SolidColorBrush(newColorText);
                 }
 
                 if (WrongTokenTranstion != null &&
@@ -170,16 +187,29 @@ namespace InputConnect.UI.Containers
             }
         }
 
-        private void OnClickConnectButton(object? sender = null, RoutedEventArgs? e = null){
 
-            if (TargetedDevice.IP != null)
+        private void OnEnetryKeyDown(object? sender, KeyEventArgs? e){
+            // this will  detect when  a key  is pressed  for the entery
+            // this will be used to detect when the enter key is pressed
+            // to trigger the Accept function
+
+            if (e == null) return;
+
+            if (e.Key == Key.Enter){
+                OnClickConnectButton(null, null); // simulate clicking the accept button
+            }
+        }
+
+
+        private void OnClickConnectButton(object? sender = null, RoutedEventArgs? e = null){
+            if (TargetedDevice.MacAddress != null)
             {
                 // only the ip address and the token are needed  MacAdress IP address  and also the token
                 // the MacAddress is a must and ip address is used to send message, in thory you can have
                 // the MacAddress anything but we  wont be  gettinga response  for the  message since the
                 // user is going to resposnd with there own mac address
 
-                if (TokenEntry == null || TokenEntry.Text == null) {
+                if (Entry == null || Entry.Text == null || Entry.Text == "") {
                     
                     if (WrongTokenTranstion != null) 
                         WrongTokenTranstion.TranslateForward();
@@ -188,7 +218,7 @@ namespace InputConnect.UI.Containers
                 }
 
 
-                string token = TokenEntry.Text;
+                string token = Entry.Text;
                 var newConnection = new Connection
                 {
                     State = Connections.Constants.StatePending,
@@ -201,10 +231,11 @@ namespace InputConnect.UI.Containers
                 TargetedDevice.Connection = newConnection;
 
                 Connections.Devices.ConnectionList.Add(newConnection); // maually add the connection to the connection list to keep track of it
-                Connections.Manager.EstablishConnection(TargetedDevice.IP,
+                Connections.Manager.EstablishConnection(MessageManager.MacToIP[TargetedDevice.MacAddress],
                                                         token,
                                                         TargetedDevice.MacAddress,
                                                         TargetedDevice.DeviceName);
+
                 if (PublicWidgets.UIConnections != null)
                     PublicWidgets.UIConnections.Update();
 
