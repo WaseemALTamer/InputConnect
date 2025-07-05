@@ -62,8 +62,7 @@ namespace InputConnect
             }
         }
 
-        public static void SaveConfig(ConfigStruct config)
-        {
+        public static void SaveConfig(ConfigStruct config){
             // this function will simply just save the config file to disk
             var options = new JsonSerializerOptions { WriteIndented = true };
             string json = JsonSerializer.Serialize(config, options);

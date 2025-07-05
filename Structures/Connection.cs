@@ -26,11 +26,11 @@ namespace InputConnect.Structures
         public string? Logs { get; set; } // this will hold the logs for certain messages that are sent and
                                           // data on the progress for the connection
 
-        public string? KeyboardState { get; set; } // this can be either a Reciver or a Transmitter
+        public string? KeyboardState { get; set; } // this can be either a Reciver, Transmitter or None
 
-        public string? MouseState { get; set; } // this can be either a Reciver or a Transmitter
+        public string? MouseState { get; set; } // this can be either a Reciver, Transmitter or None
 
-        public string? AudioState { get; set; } // this can be either a Reciver or a Transmitter
+        public string? AudioState { get; set; } // this can be either a Reciver, Transmitter or None
 
         public string? Token { get; set; } // token to dechyper the message
 

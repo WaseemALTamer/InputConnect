@@ -57,7 +57,7 @@ namespace InputConnect.UI.Containers
                 Stretch = Avalonia.Media.Stretch.Uniform,
                 Width = 50, Height = 50,
             };
-            Assets.AddAwaitedActions(() => {
+            Assets.AddAwaitedAction(() => {
                 Search.Source = Assets.SearchBitmap;
             });
             MainCanvas.Children.Add(Search);
@@ -67,7 +67,7 @@ namespace InputConnect.UI.Containers
                 Stretch = Avalonia.Media.Stretch.Uniform,
                 Width = 50, Height = 50,
             };
-            Assets.AddAwaitedActions(() => {
+            Assets.AddAwaitedAction(() => {
                 Chains.Source = Assets.ChainsBitmap;
             });
             MainCanvas.Children.Add(Chains);

@@ -27,6 +27,9 @@ namespace InputConnect
 
             SharedData.Device.Screens = Screens.All; // add the Screens data for the public varables for other
                                                      // parts of the code to use it
+
+
+            Console.WriteLine(SharedData.Device.Screens[1].Bounds);
         }
 
 
@@ -89,6 +92,9 @@ namespace InputConnect
                 if (Tray.ApplicationTray != null)
                     Tray.ApplicationTray.IsVisible = true;
             }
+            else {
+                OnClickExit(null, null); // Simulate closing window
+            }
         }
 
         private void OnTrayClick(object? sender, EventArgs e) {
@@ -124,6 +130,7 @@ namespace InputConnect
 
 
         private void OnClickExit(object? sender, object? e) {
+            Controllers.Mouse.Hook.Dispose();
             Environment.Exit(0);
         }
     }

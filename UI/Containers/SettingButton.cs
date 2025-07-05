@@ -57,7 +57,7 @@ namespace InputConnect.UI.Containers
             ButtonImage = new Image{
                 Stretch = Stretch.Uniform,
             };
-            Assets.AddAwaitedActions(() => {
+            Assets.AddAwaitedAction(() => {
                 ButtonImage.Source = Assets.SettingButtonBitmap;
             });
 

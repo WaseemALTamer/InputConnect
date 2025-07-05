@@ -51,7 +51,7 @@ namespace InputConnect.UI.Containers
             {
                 Stretch = Avalonia.Media.Stretch.Uniform,
             };
-            Assets.AddAwaitedActions(() => {
+            Assets.AddAwaitedAction(() => {
                 ButtonImage.Source = Assets.CloseButtonBitmap;
             });
 

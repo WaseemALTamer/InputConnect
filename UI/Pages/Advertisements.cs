@@ -45,13 +45,9 @@ namespace InputConnect.UI.Pages
 
 
 
-        public Advertisements(Canvas? master) : base(master)
-        {
+        public Advertisements(Canvas? master) : base(master){
             // we ensure that it runs on the main thread because we are working with the ui
             MessageManager.OnAdvertisement += () => { Dispatcher.UIThread.Post(() => Update()); };
-
-            if (MainCanvas == null) return;
-
         }
 
 

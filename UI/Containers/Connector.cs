@@ -49,7 +49,7 @@ namespace InputConnect.UI.Containers
 
             Opacity = 1;
             ClipToBounds = true;
-            Background = Themes.Holders;
+            Background = Themes.Holder;
             CornerRadius = new CornerRadius(Config.CornerRadius);
             MinHeight = 150; MinWidth = 350;
             MaxHeight = 250; MaxWidth = 450;
@@ -101,12 +101,26 @@ namespace InputConnect.UI.Containers
             OnSizeChanged();
 
             if (Master != null){
-                Master.SizeChanged += OnSizeChanged;
+                Master.PropertyChanged += OnSizeChanged;
             }
 
         }
 
-        public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null){
+        public void Update() {
+            if (Entry == null) return; 
+
+            if (TargetedDevice.Connection != null) {
+                Entry.Text = TargetedDevice.Connection.Token;
+
+            }
+            else{
+                Entry.Text = "";
+            }
+        
+        }
+
+
+        public void OnSizeChanged(object? sender = null, object? e = null){
 
             if (Master == null) return;
 
@@ -219,22 +233,12 @@ namespace InputConnect.UI.Containers
 
 
                 string token = Entry.Text;
-                var newConnection = new Connection
-                {
-                    State = Connections.Constants.StatePending,
-                    DeviceName = TargetedDevice.DeviceName,
-                    MacAddress = TargetedDevice.MacAddress,
-                    SequenceNumber = 0,
-                    Token = token,
-                };
-
-                TargetedDevice.Connection = newConnection;
-
-                Connections.Devices.ConnectionList.Add(newConnection); // maually add the connection to the connection list to keep track of it
-                Connections.Manager.EstablishConnection(MessageManager.MacToIP[TargetedDevice.MacAddress],
+                var newConnection = Connections.Manager.EstablishConnection(MessageManager.MacToIP[TargetedDevice.MacAddress],
                                                         token,
                                                         TargetedDevice.MacAddress,
                                                         TargetedDevice.DeviceName);
+
+                TargetedDevice.Connection = newConnection;
 
                 if (PublicWidgets.UIConnections != null)
                     PublicWidgets.UIConnections.Update();

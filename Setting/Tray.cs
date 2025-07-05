@@ -50,7 +50,7 @@ namespace InputConnect.Setting
             
             
 
-            Assets.AddAwaitedActions(() => {
+            Assets.AddAwaitedAction(() => {
                 ApplicationTray.IsVisible = true;
                 ApplicationTray.Icon = Assets.Icone;
                 ApplicationTray.IsVisible = false;

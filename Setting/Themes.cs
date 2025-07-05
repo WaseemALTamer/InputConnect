@@ -18,7 +18,8 @@ namespace InputConnect.Setting{
             }
         };
 
-        public static SolidColorBrush Holders = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));
+        public static SolidColorBrush Page = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));
+        public static SolidColorBrush Holder = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));
         public static SolidColorBrush DimOverlay = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));
         public static SolidColorBrush InWindowPopup = new SolidColorBrush(Color.FromUInt32(0xff1a1a1a));
         public static SolidColorBrush Advertisement = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));

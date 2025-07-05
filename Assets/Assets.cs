@@ -29,6 +29,9 @@ namespace InputConnect
         public static Bitmap? WifiBitmap;
         public static Bitmap? SearchBitmap;
         public static Bitmap? ChainsBitmap;
+        public static Bitmap? MouseBitmap;
+        public static Bitmap? KeyboardBitmap;
+        public static Bitmap? AudioBitmap;
         
 
 
@@ -40,7 +43,7 @@ namespace InputConnect
         }
 
 
-        public static void AddAwaitedActions(Action action) {
+        public static void AddAwaitedAction(Action action) {
             if (AssetsLoaded){
                 action();
             }
@@ -61,6 +64,9 @@ namespace InputConnect
             WifiBitmap = new Bitmap("Assets/Images/Wifi.png");
             SearchBitmap = new Bitmap("Assets/Images/Search.png");
             ChainsBitmap = new Bitmap("Assets/Images/Chains.png");
+            MouseBitmap = new Bitmap("Assets/Images/Mouse.png");
+            KeyboardBitmap = new Bitmap("Assets/Images/Keyboard.png");
+            AudioBitmap = new Bitmap("Assets/Images/Audio.png");
 
 
             // we finnish loading the assests here

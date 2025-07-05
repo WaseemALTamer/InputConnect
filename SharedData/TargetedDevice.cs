@@ -22,7 +22,6 @@ namespace InputConnect.SharedData
 
         public static string? MacAddress;
         public static string? DeviceName;
-        public static string? State;
 
 
 
@@ -36,7 +35,6 @@ namespace InputConnect.SharedData
             MacAddress = null; 
             DeviceName = null;
             Connection = null;
-            State = null;
             Token = null;
         }
 

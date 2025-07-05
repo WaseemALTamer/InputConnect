@@ -50,7 +50,23 @@ namespace InputConnect.UI.Containers.Common
         {
 
             Background = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));
-            //BorderBrush = new SolidColorBrush(Color.FromUInt32(0xff1f1f1f));
+
+
+            BorderBrush = new LinearGradientBrush
+            {
+                StartPoint = new RelativePoint(0, 0.5, RelativeUnit.Relative),
+                EndPoint = new RelativePoint(1, 0.5, RelativeUnit.Relative),
+                GradientStops = new GradientStops
+                {
+                    new GradientStop(Colors.Transparent, 0),
+                    new GradientStop(Color.FromUInt32(0x7f1f1f1f), 0.5),
+                    new GradientStop(Colors.Transparent, 1)
+                }
+            };
+
+
+
+            BorderThickness = new Thickness(3);
 
             CornerRadius = new CornerRadius(100);
             //BorderThickness = new Thickness(1);
@@ -84,8 +100,7 @@ namespace InputConnect.UI.Containers.Common
 
 
 
-            OnHover = new Animations.Transations.Uniform
-            {
+            OnHover = new Animations.Transations.Uniform{
                 StartingValue = 1,
                 EndingValue = 0.5,
                 Duration = Config.TransitionHover,
@@ -108,6 +123,10 @@ namespace InputConnect.UI.Containers.Common
             BallPressed = true;
             var pointerPosition = e.GetPosition(Ball);
             InitialMousePosX = pointerPosition.X;
+            if (BallPostionTranslation != null){
+                BallPostionTranslation.Pause();
+                BallPostionTranslation.Reset();
+            }
         }
 
         
@@ -156,7 +175,8 @@ namespace InputConnect.UI.Containers.Common
         private Vector FinalPos;
         public void SetBallPostionTranslate(double Xpos, double Ypos){
             if (Ball == null) return;
-            if (BallPostionTranslation != null) { 
+            if (BallPostionTranslation != null) {
+                BallPostionTranslation.Pause();
                 BallPostionTranslation.Reset();
             }
 
@@ -203,7 +223,8 @@ namespace InputConnect.UI.Containers.Common
             // we dont invoke the Trigger for this function because we already know the
             // state so we let the user trigger whatever they trying to run if the user
             // clicked the button then  the  <OnPointerReleased>  is  responsiable  for
-            // triggering the state
+            // triggering the state this also avoid a infinite looping in some cases
+
 
             if (state > 2 || state < 0) return;
             

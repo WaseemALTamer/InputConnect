@@ -263,10 +263,11 @@ namespace InputConnect.UI.Containers
 
                     SharedData.TargetedDevice.Clear();
                     // Add the date to the TargetedDevice
+                    SharedData.TargetedDevice.Connection = Device;
                     SharedData.TargetedDevice.MacAddress = Device.MacAddress;
                     SharedData.TargetedDevice.DeviceName = Device.DeviceName;
                     SharedData.TargetedDevice.Token = Device.Token;
-                    SharedData.TargetedDevice.State = Device.State;
+                    
 
                     // Transition to the next window
                     if (PublicWidgets.UIDevice != null){

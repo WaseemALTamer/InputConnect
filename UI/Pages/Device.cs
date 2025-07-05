@@ -21,7 +21,10 @@ namespace InputConnect.UI.Pages
         // this is responsible for sending the connection request
         // it will also be responsible for disconnecting and also
         // telling you
-        private Connector? connector; 
+        private Connector? connector;
+
+        private ChannelModeTriToggles? channelModeTriToggles;
+
 
         public Device(Canvas? master) : base(master)
         {
@@ -32,6 +35,9 @@ namespace InputConnect.UI.Pages
             connector = new Connector(MainCanvas);
             MainCanvas.Children.Add(connector);
 
+            channelModeTriToggles = new ChannelModeTriToggles(MainCanvas);
+            MainCanvas.Children.Add(channelModeTriToggles);
+
 
             OnShow += Update; // this will ensure that it updates evertime we display this page
 
@@ -41,11 +47,23 @@ namespace InputConnect.UI.Pages
             if (Master != null) {
                 Master.SizeChanged += OnResize;
             }
+
+
+
+
         }
 
                    
-        public void Update() { 
+        public void Update() {
             // update the data that we need to work with
+
+            if (channelModeTriToggles != null) {
+                channelModeTriToggles.Update();
+            }
+
+            if (connector != null){
+                connector.Update();
+            }
 
 
 
@@ -62,6 +80,11 @@ namespace InputConnect.UI.Pages
                 if (connector != null) {
                     Canvas.SetLeft(connector, MainCanvas.Width - connector.Width - 10);
                     Canvas.SetTop(connector, MainCanvas.Height - connector.Height - 10);
+                }
+
+                if (channelModeTriToggles != null) {
+                    Canvas.SetLeft(channelModeTriToggles, 10);
+                    Canvas.SetTop(channelModeTriToggles, 10);
                 }
             }
         }

@@ -42,7 +42,7 @@ namespace InputConnect.Network
 
             if (_message.MessageType == Constants.MessageTypes.Advertisement) ProccessAdvertisement(_message);
             if (_message.MessageType == Constants.MessageTypes.Connect) ProccessConnect(_message);
-            if (_message.MessageType == Constants.MessageTypes.Accept) ProccessAccepte(_message);
+            if (_message.MessageType == Constants.MessageTypes.Accept) ProccessAccept(_message);
             if (_message.MessageType == Constants.MessageTypes.Decline) ProccessDecline(_message);
         }
 
@@ -89,7 +89,7 @@ namespace InputConnect.Network
             if (OnConnect != null) OnConnect.Invoke(message);
         }
 
-        private static void ProccessAccepte(MessageUDP message) {
+        private static void ProccessAccept(MessageUDP message) {
             // this function will run when the other device replay to your
             // connection  request  and they  accept your  connection this
             // function is will add  there connection  into the connection

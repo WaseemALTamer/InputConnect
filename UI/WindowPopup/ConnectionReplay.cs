@@ -3,12 +3,12 @@ using InputConnect.Setting;
 using Avalonia.Threading;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Input;
 using Avalonia;
 using System;
-using Avalonia.Input;
-using Avalonia.Interactivity;
-using static System.Net.Mime.MediaTypeNames;
-using System.Threading;
+
+
+
 
 
 
@@ -255,7 +255,7 @@ namespace InputConnect.UI.WindowPopup
         }
 
 
-        private void OnClickAcceptButton(object? sender, Avalonia.Interactivity.RoutedEventArgs? e){
+        private void OnClickAcceptButton(object? sender, object? e){
 
             if (Entry != null && 
                 Entry.Text != null &&
@@ -274,8 +274,24 @@ namespace InputConnect.UI.WindowPopup
 
                     HideRight();
 
-                    Connections.Manager.AcceptIncomingConnection(SharedData.IncomingConnection.Message, // establish the connection
-                                                                 SharedData.IncomingConnection.Token);
+                    var newConnection = Connections.Manager.AcceptIncomingConnection(SharedData.IncomingConnection.Message, // establish the connection
+                                                                                     SharedData.IncomingConnection.Token);
+                    
+
+
+
+                    if (PublicWidgets.UIDevice != null) {
+
+                        SharedData.TargetedDevice.Clear();
+                        SharedData.TargetedDevice.Connection = newConnection;
+
+                        SharedData.TargetedDevice.MacAddress = SharedData.IncomingConnection.Message.MacAddress;
+                        SharedData.TargetedDevice.DeviceName = SharedData.IncomingConnection.Message.DeviceName;
+
+                        PublicWidgets.TransitionForward(PublicWidgets.UIDevice);
+                    }
+
+                    SharedData.IncomingConnection.Clear();
 
                     if (Global.Overlay != null){
                         Global.Overlay.Hide();

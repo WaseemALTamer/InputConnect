@@ -4,9 +4,6 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Input;
 using Avalonia;
-using Tmds.DBus.Protocol;
-using System;
-
 
 
 
@@ -256,7 +253,6 @@ namespace InputConnect.UI.Containers
                             SharedData.TargetedDevice.MacAddress = device.MacAddress;
                             SharedData.TargetedDevice.DeviceName = device.DeviceName;
                             SharedData.TargetedDevice.Token = device.Token;
-                            SharedData.TargetedDevice.State = device.State;
                             break;
                         }
                     }

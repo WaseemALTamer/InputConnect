@@ -51,9 +51,7 @@ namespace InputConnect.UI.Pages
         {
 
 
-            for (int i = 0; i < InputConnect.Connections.Devices.ConnectionList.Count; i++)
-            {
-
+            for (int i = 0; i < InputConnect.Connections.Devices.ConnectionList.Count; i++){
                 var _found = false; // this will be used to indecated if we found the device responsible for the message
                 var device = InputConnect.Connections.Devices.ConnectionList[i];
                 for (int j = 0; j < Devices.Count; j++)

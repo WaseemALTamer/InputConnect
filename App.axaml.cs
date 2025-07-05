@@ -2,6 +2,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using InputConnect.Network;
 using InputConnect.Setting;
+using InputConnect.Commands;
 using Avalonia;
 
 
@@ -27,6 +28,7 @@ namespace InputConnect
             var _ = Assets.AssetsLoaded;
             var __ = Tray.ApplicationTray;
             var ___ = ConnectionUDP.Client;
+            var ____ = Controllers.Mouse.StartHook();
         }
     }
 }

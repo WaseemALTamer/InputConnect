@@ -46,7 +46,7 @@ namespace InputConnect.UI.Containers
             ButtonImage = new Image { 
                 Stretch = Avalonia.Media.Stretch.Uniform,
             };
-            Assets.AddAwaitedActions(() => {
+            Assets.AddAwaitedAction(() => {
                 ButtonImage.Source = Assets.BackButtonBitmap;
             });
 

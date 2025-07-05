@@ -72,7 +72,7 @@ namespace InputConnect.UI.Pages
             ClipToBounds = true;
             IsHitTestVisible = true;
             CornerRadius = new CornerRadius(Config.CornerRadius);
-            Background = Themes.Holders;
+            Background = Themes.Page;
 
 
             ShowHideTransition = new Animations.Transations.Uniform{
