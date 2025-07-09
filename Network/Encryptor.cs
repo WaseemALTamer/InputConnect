@@ -16,8 +16,10 @@ namespace InputConnect.Network
         private const int HmacSize = 32;
         private const int Iterations = 100000;
 
-        public static string Encrypt(string plainText, string password)
+        public static string Encrypt(string plainText, string? password)
         {
+            if (password == null) return plainText;
+
             byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
             byte[] key = DeriveKey(password, salt);
             byte[] iv = RandomNumberGenerator.GetBytes(IvSize);
@@ -53,8 +55,10 @@ namespace InputConnect.Network
             return Convert.ToBase64String(finalStream.ToArray());
         }
 
-        public static string? Decrypt(string encryptedBase64, string password)
+        public static string? Decrypt(string encryptedBase64, string? password)
         {
+            if (password == null) return null;
+
             try
             {
                 byte[] encryptedData = Convert.FromBase64String(encryptedBase64);

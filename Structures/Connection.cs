@@ -2,6 +2,11 @@
 
 
 
+
+
+using Avalonia;
+using Avalonia.Platform;
+
 namespace InputConnect.Structures
 {
     public class Connection{
@@ -21,6 +26,8 @@ namespace InputConnect.Structures
                                                        // gives us 19 quintillion messages before  our application  will  break
                                                        // if anyone breaks the application that way, cheers bro  never  thought
                                                        // my application will run on a quantum computer
+
+        public Bounds? Bounds { get; set; } // this is used to specify what part of your screen you want this application to work
 
 
         public string? Logs { get; set; } // this will hold the logs for certain messages that are sent and

@@ -2,6 +2,7 @@
 using InputConnect.Structures;
 using System.Text.Json;
 using System;
+using InputConnect.Commands;
 
 
 
@@ -26,6 +27,14 @@ namespace InputConnect.Network
 
         public static Action<MessageUDP>? OnDecline;
 
+        public static Action<MessageUDP>? OnCommand;
+
+        public static Action<Mouse>? OnCommandMouse;
+
+        public static Action<Keyboard>? OnCommandKeyboard;
+
+        public static Action<Audio>? OnCommandAudio;
+
 
 
         public static List<MessageUDP> Advertisements = new List<MessageUDP>(); // this is used to collect all the advertisement messages
@@ -44,6 +53,7 @@ namespace InputConnect.Network
             if (_message.MessageType == Constants.MessageTypes.Connect) ProccessConnect(_message);
             if (_message.MessageType == Constants.MessageTypes.Accept) ProccessAccept(_message);
             if (_message.MessageType == Constants.MessageTypes.Decline) ProccessDecline(_message);
+            if (_message.MessageType == Constants.MessageTypes.Command) ProccessCommand(_message);
         }
 
 
@@ -134,6 +144,45 @@ namespace InputConnect.Network
             if (OnDecline != null) OnDecline.Invoke(message);
 
 
+        }
+
+
+        private static void ProccessCommand(MessageUDP message) {
+
+            if (OnCommand != null) OnCommand.Invoke(message); // this will not ontain a proccessed message
+
+
+            if (message.Text != null) {
+                if (message.IsEncrypted == true) {
+                    // loop through the connections and get the password out
+                    foreach (var connection in Connections.Devices.ConnectionList){
+                        connection.MacAddress = message.MacAddress;
+                        var text = Encryptor.Decrypt(message.Text, connection.Token);
+                        message.Text = text;
+                        break;
+                    }
+                }
+
+                if (message.Text == null) return;
+                var commandMessage = JsonSerializer.Deserialize<MessageCommand>(message.Text);
+
+                if (commandMessage != null &&
+                    commandMessage.Type == Commands.Constants.CommandTypes.Mouse &&
+                    commandMessage.Command != null) 
+                {
+
+                    var Command = JsonSerializer.Deserialize<Commands.Mouse>(commandMessage.Command);
+
+                    if (OnCommandMouse != null && Command != null)
+                        OnCommandMouse.Invoke(Command);
+
+
+                }
+
+            }
+
+
+            
         }
 
 

@@ -25,11 +25,10 @@ namespace InputConnect
             Loaded += OnLoaded;
             Closing += OnWindowClosing;
 
-            SharedData.Device.Screens = Screens.All; // add the Screens data for the public varables for other
-                                                     // parts of the code to use it
 
 
-            Console.WriteLine(SharedData.Device.Screens[1].Bounds);
+
+            
         }
 
 
@@ -48,6 +47,11 @@ namespace InputConnect
             // asynchronously and it might run my code before which would create problems for me as i am  reliying 
             // on there code to run first
             while (double.IsNaN(Width) || double.IsNaN(Height)) await Task.Delay(1);
+
+
+            SharedData.Device.Screens = Screens.All; // add the Screens data for the public varables for other
+                                                     // parts of the code to use it
+            Console.WriteLine(SharedData.Device.Screens[1].Bounds);
 
 
             MainCanvas = new Canvas{ // now we create the canvase after we load up for preformece

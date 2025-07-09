@@ -1,4 +1,4 @@
-﻿using InputConnect.UI.WindowPopup;
+﻿using InputConnect.UI.InWindowPopup;
 using InputConnect.UI.Containers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,6 +6,7 @@ using InputConnect.UI.Pages;
 using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
+using InputConnect.UI.OutWindowPopup;
 
 
 
@@ -85,16 +86,20 @@ namespace InputConnect.UI
 
 
 
-        // <POPUPS>
+        // <POPUPS INWINDOW>
         private static ConnectionReplay? _UIConnectionReplayInPop;
-        public static ConnectionReplay? UIConnectionReplayInPop
-        {
+        public static ConnectionReplay? UIConnectionReplayInPop{
             get { return _UIConnectionReplayInPop; }
             set { _UIConnectionReplayInPop = value; }
         }
 
 
-
+        // <POPUPS OUTWINDOW>
+        private static InvisiableOverlay? _UIInvisiableOverlayOutPop;
+        public static InvisiableOverlay? UIInvisiableOverlayOutPop{
+            get { return _UIInvisiableOverlayOutPop; }
+            set { _UIInvisiableOverlayOutPop = value; }
+        }
 
 
 
@@ -168,6 +173,15 @@ namespace InputConnect.UI
             // this creates the popup for when people try to connect to you
             UIConnectionReplayInPop = new ConnectionReplay(Master);
 
+
+            // <OUT_POPUPS END>
+
+
+
+            // <OUT_POPUPS START>
+
+            // this creates the absorber popup
+            UIInvisiableOverlayOutPop = new InvisiableOverlay();
 
             // <IN_POPUPS END>
 

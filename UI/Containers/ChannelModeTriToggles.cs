@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia;
 using InputConnect.SharedData;
 using System;
+using InputConnect.Structures;
 
 
 
@@ -260,6 +261,21 @@ namespace InputConnect.UI.Containers
                 }
                 if (code == 2){
                     TargetedDevice.Connection.MouseState = Connections.Constants.Transmit;
+                    if (TargetedDevice.Connection.Bounds == null) {
+
+                        if (Device.Screens != null && 
+                            Device.Screens.Count != 0) 
+                        {
+                            TargetedDevice.Connection.Bounds = new Bounds(Device.Screens[0].Bounds.X + Device.Screens[0].Bounds.Width,
+                                                                          Device.Screens[0].Bounds.Y,
+                                                                          Device.Screens[0].Bounds.Width,
+                                                                          Device.Screens[0].Bounds.Height);
+
+                        }
+
+
+                    }
+
                 }
             }
             else{
