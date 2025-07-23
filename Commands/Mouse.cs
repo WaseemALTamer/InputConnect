@@ -20,5 +20,13 @@ namespace InputConnect.Commands
 
         [JsonPropertyName("MouseHide")]
         public bool? MouseHide { get; set; } // this is used to tell the other deivces if there mouse should be hidden
+
+        [JsonPropertyName("MousePress")]
+        public int? MouseButtonPress { get; set; }
+
+
+        [JsonPropertyName("MouseRelease")]
+        public int? MouseButtonRelease { get; set; }
+
     }
 }

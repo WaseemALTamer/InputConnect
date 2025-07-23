@@ -3,7 +3,6 @@ using System.Text.Json;
 using SharpHook;
 using System;
 using InputConnect.Network;
-using Avalonia.Input;
 using System.Threading;
 
 
@@ -27,7 +26,7 @@ namespace InputConnect.Controllers
         public static Action<double, double>? OnMove; // => <x, y>
         public static Action<int>? OnMousePress; // => 0:None -> 1:Left -> 2:Right -> 3:Middle -> 4:Back -> 5:Forward
         public static Action<int>? OnMouseRealse; // => 0:None -> 1:Left -> 2:Right -> 3:Middle -> 4:Back -> 5:Forward
-        public static Action<double>? OnScroll; // => <delta>
+        public static Action<double>? OnMouseScroll; // => <delta>
 
 
         public static double? CurrentPositionX;
@@ -46,6 +45,10 @@ namespace InputConnect.Controllers
         public static double CursorThrow = 1;
         public static bool OnVirtualDisplay = false;
         public static Bounds? CurrentScreenBounds;
+
+
+        public static Action? OnVirtualMointorEnter;
+        public static Action? OnVirtualMointorExit;
 
 
 
@@ -73,16 +76,14 @@ namespace InputConnect.Controllers
                 DeltaX = (e.Data.X - CurrentPositionX) ?? 0;
                 DeltaY = (e.Data.Y - CurrentPositionY) ?? 0;
 
-                if ((Math.Abs(DeltaX) >= 720 || Math.Abs(DeltaY) >= 720) && !BorderHit)
-                {
+                if ((Math.Abs(DeltaX) >= 720 || Math.Abs(DeltaY) >= 720) && !BorderHit) {
                     DeltaX = 0; DeltaY = 0;
                     if (CurrentPositionX != null && CurrentPositionY != null)
                         MoveMouse((double)CurrentPositionX, (double)CurrentPositionY);
-                        BorderHit = true;
                     return;
                 }
 
-                
+                BorderHit = false;
                 CurrentPositionX = e.Data.X;
                 CurrentPositionY = e.Data.Y;
                 OnMove?.Invoke(e.Data.X, e.Data.Y);
@@ -99,11 +100,19 @@ namespace InputConnect.Controllers
             };
 
             Hook.MouseWheel += (_, e) =>{
-                OnScroll?.Invoke(e.Data.Delta * e.Data.Rotation / 360);
+                OnMouseScroll?.Invoke(e.Data.Delta * e.Data.Rotation / 360);
             };
 
 
             OnMove += TrackMouseVirtualBorders;
+            OnMove += TransmitMouseMovement;
+
+            OnMousePress += TransmitMousePressButtons;
+            OnMouseRealse += TransmitMouseReleaseButtons;
+            OnMouseScroll += TransmitMouseScroll;
+
+
+            MessageManager.OnCommandMouse += RecieveMouseCommnad;
 
             new Thread(() =>{
                 Hook.RunAsync();
@@ -130,7 +139,7 @@ namespace InputConnect.Controllers
         }
 
         public static void ScrollMouse(double delta) {
-            EventSimulator.SimulateMouseWheel((short)(delta/delta * 360));
+            EventSimulator.SimulateMouseWheel((short)(delta));
         }
 
 
@@ -140,7 +149,7 @@ namespace InputConnect.Controllers
             double PosX = x + OffsetPositionX;
             double PosY = y + OffsetPositionY;
 
-            Console.WriteLine($"{DeltaX} , {DeltaY}");
+            //Console.WriteLine($"{DeltaX} , {DeltaY}");
 
             // =============================
             // Virtual screens
@@ -164,12 +173,14 @@ namespace InputConnect.Controllers
                         if ((HasCrossedValue(PosX, DeltaX, (bounds.X - CriticalRegionSize), true)) &&
                             (bounds.Y <= PosY && PosY <= bounds.Y + bounds.Height))
                         {
-                            Console.WriteLine("TouchedBorder3");
-                            Console.WriteLine($" => {PosX} , {PosY}");
+                            //Console.WriteLine("TouchedBorder3");
+                            //Console.WriteLine($" => {PosX} , {PosY}");
                             OffsetPositionX = bounds.X;
                             CurrentScreenBounds = bounds;
                             OnVirtualDisplay = true;
                             BorderHit = true;
+
+                            if (OnVirtualMointorEnter != null) OnVirtualMointorEnter.Invoke();
                             MoveMouse(CriticalRegionSize + CursorThrow, y);
                             return;
                         }
@@ -178,12 +189,13 @@ namespace InputConnect.Controllers
                         if ((HasCrossedValue(PosX, DeltaX, (bounds.X + bounds.Width + CriticalRegionSize), false)) &&
                             (bounds.Y <= PosY && PosY <= bounds.Y + bounds.Height))
                         {
-                            Console.WriteLine("TouchedBorder4");
-                            Console.WriteLine($" => {PosX} , {PosY}");
+                            //Console.WriteLine("TouchedBorder4");
+                            //Console.WriteLine($" => {PosX} , {PosY}");
                             OffsetPositionX = bounds.X + bounds.Width;
                             CurrentScreenBounds = bounds;
                             OnVirtualDisplay = true;
                             BorderHit = true;
+                            if (OnVirtualMointorEnter != null) OnVirtualMointorEnter.Invoke();
                             MoveMouse(bounds.Width - CriticalRegionSize - CursorThrow, y);
                             return;
                         }
@@ -214,11 +226,11 @@ namespace InputConnect.Controllers
                     if ((HasCrossedValue(PosX, DeltaX, (bounds.X - CriticalRegionSize), true)) &&
                         (bounds.Y <= PosY && PosY <= bounds.Y + bounds.Height))
                     {
-                        Console.WriteLine("Touched physical left border");
                         CurrentScreenBounds = bounds;
                         OffsetPositionX = 0;
                         OnVirtualDisplay = false;
                         BorderHit = true;
+                        if (OnVirtualMointorExit != null) OnVirtualMointorExit.Invoke();
                         MoveMouse(CriticalRegionSize + CursorThrow, y);
                         return;
                     }
@@ -228,48 +240,20 @@ namespace InputConnect.Controllers
                         (bounds.Y <= PosY && PosY <= bounds.Y + bounds.Height))
                     {
                         //Console.WriteLine(bounds.X + bounds.Width + CriticalRegionSize);
-                        Console.WriteLine("Touched physical right border");
                         CurrentScreenBounds = bounds;
                         OffsetPositionX = 0;
                         OnVirtualDisplay = false;
                         BorderHit = true;
+                        if (OnVirtualMointorExit != null) OnVirtualMointorExit.Invoke();
                         MoveMouse(bounds.X + bounds.Width - CriticalRegionSize - CursorThrow, y);
-                        Console.WriteLine($"Moved to {bounds.X + bounds.Width - CriticalRegionSize - 2}");
                         return;
                     }
                 }
             }
-        }
 
 
 
-        public static void TransmitMouseMovement(double x, double y) {
-            foreach (var connection in Connections.Devices.ConnectionList) {
-                if (connection.MouseState == Connections.Constants.Transmit) {
 
-                    var _command = new Commands.Mouse { 
-                        X = x,
-                        Y = y,
-                    };
-
-                    var _commandMessage = new MessageCommand{
-                        Type = Commands.Constants.CommandTypes.Mouse,
-                        SequenceNumber = connection.SequenceNumber + 1,
-                        Command = JsonSerializer.Serialize(_command)
-                    };
-                    connection.SequenceNumber += 1;
-
-                    var messageudp = new MessageUDP{
-                        MessageType = Network.Constants.MessageTypes.Command,
-                        Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
-                        IsEncrypted = true
-                    };
-                    if (connection.MacAddress != null) {
-                        ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
-                    }
-                }
-            
-            }
 
         }
 
@@ -296,6 +280,238 @@ namespace InputConnect.Controllers
             }
 
             return false;
+        }
+
+
+
+        public static void TransmitMouseMovement(double x, double y) {
+            // this function will only ransmit the movment if you are at
+            // the right cordinates for the screen
+
+            var xPos = x + OffsetPositionX;
+            var yPos = y + OffsetPositionY;
+
+            if (OnVirtualDisplay == false) return;
+
+            foreach (var connection in Connections.Devices.ConnectionList) {
+                if (connection.MouseState == Connections.Constants.Transmit) {
+
+                    if (connection.Bounds == null) continue;
+
+                    if (connection.Bounds.X <= xPos && (connection.Bounds.X + connection.Bounds.Width) >= xPos &&
+                        connection.Bounds.Y <= yPos && (connection.Bounds.Y + connection.Bounds.Height) >= yPos)
+                    {
+                        var _command = new Commands.Mouse{
+                            X = x,
+                            Y = y,
+                        };
+
+                        var _commandMessage = new MessageCommand{
+                            Type = Commands.Constants.CommandTypes.Mouse,
+                            SequenceNumber = connection.SequenceNumber + 1,
+                            Command = JsonSerializer.Serialize(_command)
+                        };
+                        connection.SequenceNumber += 1;
+
+                        var messageudp = new MessageUDP{
+                            MessageType = Network.Constants.MessageTypes.Command,
+                            Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
+                            IsEncrypted = true
+                        };
+
+                        if (connection.MacAddress != null){
+                            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                        }
+
+
+                    }
+                }
+            }
+        }
+
+
+        public static void TransmitMousePressButtons(int Button) {
+            // x and y are there to check if you are on the right coordinates
+
+            var xPos = CurrentPositionX + OffsetPositionX;
+            var yPos = CurrentPositionY + OffsetPositionY;
+
+            if (OnVirtualDisplay == false) return;
+
+            foreach (var connection in Connections.Devices.ConnectionList)
+            {
+                if (connection.MouseState == Connections.Constants.Transmit)
+                {
+
+                    if (connection.Bounds == null) continue;
+
+                    if (connection.Bounds.X <= xPos && (connection.Bounds.X + connection.Bounds.Width) >= xPos &&
+                        connection.Bounds.Y <= yPos && (connection.Bounds.Y + connection.Bounds.Height) >= yPos)
+                    {
+                        var _command = new Commands.Mouse
+                        {
+                            MouseButtonPress = Button,
+                        };
+
+                        var _commandMessage = new MessageCommand
+                        {
+                            Type = Commands.Constants.CommandTypes.Mouse,
+                            SequenceNumber = connection.SequenceNumber + 1,
+                            Command = JsonSerializer.Serialize(_command)
+                        };
+                        connection.SequenceNumber += 1;
+
+                        var messageudp = new MessageUDP
+                        {
+                            MessageType = Network.Constants.MessageTypes.Command,
+                            Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
+                            IsEncrypted = true
+                        };
+
+                        if (connection.MacAddress != null)
+                        {
+                            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                        }
+
+
+                    }
+                }
+            }
+
+        }
+
+
+        public static void TransmitMouseReleaseButtons(int Button)
+        {
+            // x and y are there to check if you are on the right coordinates
+
+            var xPos = CurrentPositionX + OffsetPositionX;
+            var yPos = CurrentPositionY + OffsetPositionY;
+
+            if (OnVirtualDisplay == false) return;
+
+            foreach (var connection in Connections.Devices.ConnectionList)
+            {
+                if (connection.MouseState == Connections.Constants.Transmit)
+                {
+
+                    if (connection.Bounds == null) continue;
+
+                    if (connection.Bounds.X <= xPos && (connection.Bounds.X + connection.Bounds.Width) >= xPos &&
+                        connection.Bounds.Y <= yPos && (connection.Bounds.Y + connection.Bounds.Height) >= yPos)
+                    {
+                        var _command = new Commands.Mouse
+                        {
+                            MouseButtonRelease = Button,
+                        };
+
+                        var _commandMessage = new MessageCommand
+                        {
+                            Type = Commands.Constants.CommandTypes.Mouse,
+                            SequenceNumber = connection.SequenceNumber + 1,
+                            Command = JsonSerializer.Serialize(_command)
+                        };
+                        connection.SequenceNumber += 1;
+
+                        var messageudp = new MessageUDP
+                        {
+                            MessageType = Network.Constants.MessageTypes.Command,
+                            Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
+                            IsEncrypted = true
+                        };
+
+                        if (connection.MacAddress != null)
+                        {
+                            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                        }
+
+
+                    }
+                }
+            }
+
+        }
+
+
+
+        public static void TransmitMouseScroll(double delta){
+
+
+            // x and y are there to check if you are on the right coordinates
+
+
+            var xPos = CurrentPositionX + OffsetPositionX;
+            var yPos = CurrentPositionY + OffsetPositionY;
+
+            if (OnVirtualDisplay == false) return;
+
+            foreach (var connection in Connections.Devices.ConnectionList)
+            {
+                if (connection.MouseState == Connections.Constants.Transmit)
+                {
+
+                    if (connection.Bounds == null) continue;
+
+                    if (connection.Bounds.X <= xPos && (connection.Bounds.X + connection.Bounds.Width) >= xPos &&
+                        connection.Bounds.Y <= yPos && (connection.Bounds.Y + connection.Bounds.Height) >= yPos)
+                    {
+                        var _command = new Commands.Mouse
+                        {
+                            ScrollDelta = delta,
+                        };
+
+                        var _commandMessage = new MessageCommand
+                        {
+                            Type = Commands.Constants.CommandTypes.Mouse,
+                            SequenceNumber = connection.SequenceNumber + 1,
+                            Command = JsonSerializer.Serialize(_command)
+                        };
+                        connection.SequenceNumber += 1;
+
+                        var messageudp = new MessageUDP
+                        {
+                            MessageType = Network.Constants.MessageTypes.Command,
+                            Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
+                            IsEncrypted = true
+                        };
+
+                        if (connection.MacAddress != null)
+                        {
+                            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                        }
+
+
+                    }
+                }
+            }
+        }
+
+
+
+
+
+        public static void RecieveMouseCommnad(Commands.Mouse command) {
+
+            if (command == null) return;
+
+            if (command.X != null && command.Y != null){
+                MoveMouse((double)command.X, (double)command.Y);
+            }
+
+            if (command.MouseButtonPress != null) {
+                PressMouse((int)command.MouseButtonPress);
+            }
+
+
+            if (command.MouseButtonRelease != null){
+                ReleaseMouse((int)command.MouseButtonRelease);
+            }
+
+
+            if (command.ScrollDelta != null){
+                ScrollMouse((double)command.ScrollDelta);
+            }
+
         }
 
     }

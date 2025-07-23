@@ -2,6 +2,7 @@
 using System.Text;
 using System.IO;
 using System;
+using System.Linq;
 
 
 
@@ -10,8 +11,12 @@ namespace InputConnect.Network
 {
     public static class Encryptor
     {
-        private const int KeySize = 32; // 256 bits
-        private const int IvSize = 16;  // 128-bit IV
+        private static byte[]? _cachedKey = null;
+        private static byte[]? _cachedSalt = null;
+        private static string? _cachedPassword = null;
+
+        private const int KeySize = 32;
+        private const int IvSize = 16;
         private const int SaltSize = 16;
         private const int HmacSize = 32;
         private const int Iterations = 100000;
@@ -20,8 +25,23 @@ namespace InputConnect.Network
         {
             if (password == null) return plainText;
 
-            byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
-            byte[] key = DeriveKey(password, salt);
+            byte[] salt;
+            byte[] key;
+
+            if (password == _cachedPassword && _cachedKey != null && _cachedSalt != null)
+            {
+                salt = _cachedSalt;
+                key = _cachedKey;
+            }
+            else
+            {
+                salt = RandomNumberGenerator.GetBytes(SaltSize);
+                key = DeriveKey(password, salt);
+                _cachedSalt = salt;
+                _cachedKey = key;
+                _cachedPassword = password;
+            }
+
             byte[] iv = RandomNumberGenerator.GetBytes(IvSize);
             byte[] cipherBytes;
 
@@ -69,7 +89,18 @@ namespace InputConnect.Network
                 byte[] cipherBytes = encryptedData[(SaltSize + IvSize)..(SaltSize + IvSize + cipherLength)];
                 byte[] expectedHmac = encryptedData[^HmacSize..];
 
-                byte[] key = DeriveKey(password, salt);
+                byte[] key;
+                if (password == _cachedPassword && _cachedSalt != null && salt.SequenceEqual(_cachedSalt) && _cachedKey != null)
+                {
+                    key = _cachedKey;
+                }
+                else
+                {
+                    key = DeriveKey(password, salt);
+                    _cachedPassword = password;
+                    _cachedSalt = salt;
+                    _cachedKey = key;
+                }
 
                 // Verify HMAC
                 byte[] actualHmac = ComputeHmac(key, salt, iv, cipherBytes);
@@ -88,7 +119,8 @@ namespace InputConnect.Network
                 using var sr = new StreamReader(cryptoStream, Encoding.UTF8);
                 return sr.ReadToEnd();
             }
-            catch { 
+            catch
+            {
                 return null;
             }
         }

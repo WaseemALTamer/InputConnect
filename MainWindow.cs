@@ -51,7 +51,6 @@ namespace InputConnect
 
             SharedData.Device.Screens = Screens.All; // add the Screens data for the public varables for other
                                                      // parts of the code to use it
-            Console.WriteLine(SharedData.Device.Screens[1].Bounds);
 
 
             MainCanvas = new Canvas{ // now we create the canvase after we load up for preformece
