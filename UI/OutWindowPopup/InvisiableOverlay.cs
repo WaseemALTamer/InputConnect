@@ -1,9 +1,8 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia.Threading;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Threading;
-using InputConnect.Commands;
-using System;
+
 
 
 

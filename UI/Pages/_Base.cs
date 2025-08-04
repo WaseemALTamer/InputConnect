@@ -90,7 +90,7 @@ namespace InputConnect.UI.Pages
             ScrollingAnimation = new Animations.SmoothScrolling{
                 Trigger = SmoothVerticalScrollerTrigger
             };
-            ScrollViewer.AddHandler(PointerWheelChangedEvent, ScrollingAnimation.OnPointerWheelChanged, RoutingStrategies.Tunnel);
+            //ScrollViewer.AddHandler(PointerWheelChangedEvent, ScrollingAnimation.OnPointerWheelChanged, RoutingStrategies.Tunnel);
 
             MainCanvas = new Canvas{
                 IsHitTestVisible = true,

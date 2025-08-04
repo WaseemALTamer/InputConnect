@@ -2,7 +2,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using InputConnect.Network;
 using InputConnect.Setting;
-using InputConnect.Commands;
 using Avalonia;
 
 

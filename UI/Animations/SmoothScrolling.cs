@@ -65,8 +65,7 @@ namespace InputConnect.UI.Animations
             CurrentDirection = -(e.Delta.Y / Math.Abs(e.Delta.Y));
             CurrentVelocity += Math.Abs(ScrollingImpulseSpeed * e.Delta.Y);
 
-            if (!FunctionRunning)
-            {
+            if (!FunctionRunning){
                 await ApplySmoothScrolling();
             }
         }
