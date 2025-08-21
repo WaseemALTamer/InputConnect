@@ -14,7 +14,7 @@ namespace InputConnect.UI.Containers
     public class Timer : Border
     {
 
-        private Canvas? Master;
+        //private Canvas? Master;
         
         private CircleControl? circle;
         private Animations.Transations.Uniform? TimerAnimation;
@@ -263,4 +263,5 @@ namespace InputConnect.UI.Containers
             }
         }
     }
+
 }
