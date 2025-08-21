@@ -16,7 +16,7 @@ namespace InputConnect.UI.Containers
     {
 
 
-        private Canvas? Master;
+        //private Canvas? Master;
 
         private Canvas? _MainCanvas;
         public Canvas? MainCanvas{
@@ -325,3 +325,4 @@ namespace InputConnect.UI.Containers
 
     }
 }
+
