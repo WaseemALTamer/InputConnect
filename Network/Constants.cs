@@ -25,5 +25,8 @@ namespace InputConnect.Network.Constants
                                                   // keypress and more, this need to be encreapted and each message needs  a special  pattern it is only
                                                   // used after astaplishing a secur UDP protocol
 
+
+        public static string IntialDataRequest = "IntialDataRequest"; // this will request the intial data
+        public static string IntialData = "IntialData"; // this message will be used to grap data like screens and other specific data
     }
 }

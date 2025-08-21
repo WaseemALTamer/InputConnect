@@ -116,8 +116,14 @@ namespace InputConnect.UI.Pages
             // CONFIG.PROPERTY <FontSize>
             AddConfigProperty("Font Size -> (Restart)", ref yPos);
 
-            // CONFIG.PROPERTY <FontSize>
+            // CONFIG.PROPERTY <PopupsTimeout>
             AddConfigProperty("Popups Timeout (ms)", ref yPos);
+
+            // CONFIG.PROPERTY <TransitionReferenceDistance>
+            AddConfigProperty("Transition Reference Distance (ms)", ref yPos);
+
+            // CONFIG.PROPERTY <FontSize>
+            AddConfigProperty("TimeOutDuration (ms)", ref yPos);
 
 
 

@@ -32,7 +32,9 @@ namespace InputConnect
         public static Bitmap? MouseBitmap;
         public static Bitmap? KeyboardBitmap;
         public static Bitmap? AudioBitmap;
-        
+        public static Bitmap? LockBitmap;
+        public static Bitmap? MiniLockBitmap;
+
 
 
         public static bool AssetsLoaded = false;
@@ -67,7 +69,9 @@ namespace InputConnect
             MouseBitmap = new Bitmap("Assets/Images/Mouse.png");
             KeyboardBitmap = new Bitmap("Assets/Images/Keyboard.png");
             AudioBitmap = new Bitmap("Assets/Images/Audio.png");
-
+            LockBitmap = new Bitmap("Assets/Images/Lock.png");
+            MiniLockBitmap = new Bitmap("Assets/Images/MiniLock.png");
+            
 
             // we finnish loading the assests here
             AssetsLoaded = true;

@@ -34,6 +34,8 @@ namespace InputConnect.UI.Containers
         ///  None has a state of <int 1>
         ///  this applies to the three state toggle
         /// </summary>
+        /// 
+
         private TriStateToggle MouseChannelToggle = new TriStateToggle();
         private TriStateToggle KeyboardChannelToggle = new TriStateToggle();
         private TriStateToggle AudioChannelToggle = new TriStateToggle();
@@ -124,6 +126,8 @@ namespace InputConnect.UI.Containers
 
             OnSizeChanged();
 
+            Events.TargetDeviceConnectionChanged += Update;
+
             if (Master != null){
                 Master.SizeChanged += OnSizeChanged;
             }
@@ -199,7 +203,14 @@ namespace InputConnect.UI.Containers
             // this function will update and will set the state postion
             // based on the targed device in the Shared Data
 
-            if (TargetedDevice.Connection != null){
+            if (TargetedDevice.Connection != null && 
+                TargetedDevice.Connection.State == Connections.Constants.StateConnected)
+            {
+
+                MouseChannelToggle.SetLock(false);
+                KeyboardChannelToggle.SetLock(false);
+                AudioChannelToggle.SetLock(false);
+
                 if (TargetedDevice.Connection.MouseState == Connections.Constants.Transmit){
                     MouseChannelToggle.SetState(2);
                 }
@@ -241,6 +252,10 @@ namespace InputConnect.UI.Containers
 
             }
             else{
+                MouseChannelToggle.SetLock(true);
+                KeyboardChannelToggle.SetLock(true);
+                AudioChannelToggle.SetLock(true);
+
                 MouseChannelToggle.SetState(1);
                 KeyboardChannelToggle.SetState(1);
                 AudioChannelToggle.SetState(1);
@@ -252,7 +267,7 @@ namespace InputConnect.UI.Containers
             ///  Transmit has a state of <int 2>
             ///  Recieve has a state of <int 0>
             ///  None has a state of <int 1>
-            if (TargetedDevice.Connection != null){
+            if (TargetedDevice.Connection != null && TargetedDevice.Connection.State == Connections.Constants.StateConnected){
                 if (code == 0){
                     TargetedDevice.Connection.MouseState = Connections.Constants.Receive;
                 }
@@ -261,21 +276,6 @@ namespace InputConnect.UI.Containers
                 }
                 if (code == 2){
                     TargetedDevice.Connection.MouseState = Connections.Constants.Transmit;
-                    if (TargetedDevice.Connection.Bounds == null) {
-
-                        if (Device.Screens != null && 
-                            Device.Screens.Count != 0) 
-                        {
-                            TargetedDevice.Connection.Bounds = new Bounds(Device.Screens[0].Bounds.X + Device.Screens[0].Bounds.Width,
-                                                                          Device.Screens[0].Bounds.Y,
-                                                                          Device.Screens[0].Bounds.Width,
-                                                                          Device.Screens[0].Bounds.Height);
-
-                        }
-
-
-                    }
-
                 }
             }
             else{
@@ -287,7 +287,7 @@ namespace InputConnect.UI.Containers
             ///  Transmit has a state of <int 2>
             ///  Recieve has a state of <int 0>
             ///  None has a state of <int 1>
-            if (TargetedDevice.Connection != null){
+            if (TargetedDevice.Connection != null && TargetedDevice.Connection.State == Connections.Constants.StateConnected){
                 if (code == 0){
                     TargetedDevice.Connection.KeyboardState = Connections.Constants.Receive;
                 }
@@ -307,8 +307,7 @@ namespace InputConnect.UI.Containers
             ///  Transmit has a state of <int 2>
             ///  Recieve has a state of <int 0>
             ///  None has a state of <int 1>
-            if (TargetedDevice.Connection != null){
-
+            if (TargetedDevice.Connection != null && TargetedDevice.Connection.State == Connections.Constants.StateConnected){
                 if (code == 0) {
                     TargetedDevice.Connection.AudioState = Connections.Constants.Receive;
                 }

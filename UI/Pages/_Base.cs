@@ -72,7 +72,7 @@ namespace InputConnect.UI.Pages
             ClipToBounds = true;
             IsHitTestVisible = true;
             CornerRadius = new CornerRadius(Config.CornerRadius);
-            Background = Themes.Page;
+            
 
 
             ShowHideTransition = new Animations.Transations.Uniform{
@@ -94,7 +94,8 @@ namespace InputConnect.UI.Pages
 
             MainCanvas = new Canvas{
                 IsHitTestVisible = true,
-                ClipToBounds = true
+                ClipToBounds = true,
+                Background = Themes.Page,
             };
 
             ScrollViewer.Content = MainCanvas;

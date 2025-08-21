@@ -1,6 +1,8 @@
 ﻿using InputConnect.Structures;
 using InputConnect.Network;
 using System;
+using Avalonia.Controls;
+using System.Threading.Tasks;
 
 
 
@@ -17,7 +19,7 @@ namespace InputConnect.Connections
         // your EstablishConnection  varable  should  return  a  Connection  struct  linking back to the
         // connection list so you can keep track of it and then it is less work later on
 
-
+        public static Action? OnConnectedConnectionAdded; // this will only work if the connection is accespted
         public static Action? ActionOnIncomingConnection; // this will be used for the UI to act upone seeing connection
                                                           // incoming
 
@@ -49,6 +51,7 @@ namespace InputConnect.Connections
                 SequenceNumber = 0,
                 Token = Token,
             };
+
 
 
             for (int i = 0; i < Devices.ConnectionList.Count; i++) {
@@ -114,6 +117,7 @@ namespace InputConnect.Connections
                 Text = Encryptor.Encrypt(Constants.PassPhase, Token), // replay with the pass phase for absolutely no reason
                 IsEncrypted = true,
             };
+
             if (Message.IP != null){
                 ConnectionUDP.Send(Message.IP, messageUDP); // notify the other device to add the connection now
             }
@@ -137,6 +141,7 @@ namespace InputConnect.Connections
 
 
             Devices.ConnectionList.Add(newConnection); // added the new connection
+            if (OnConnectedConnectionAdded != null) OnConnectedConnectionAdded.Invoke();
             //SharedData.IncomingConnection.Clear();
             return newConnection;
         }
@@ -173,5 +178,32 @@ namespace InputConnect.Connections
                 ConnectionUDP.Send(Message.IP, messageUDP);
             }
         }
+
+
+        public static async Task RequestInitialData(Connection connection) {
+            // this function will block the function that your trigger this function 
+            // from until it get the data if  you want  to run  other  this function 
+            // works as follows:
+            // request_data -> wait_for_data -> get_data -> return
+
+            if (connection.MacAddress == null) return;
+
+            MessageUDP newMessage = new MessageUDP{
+                MessageType = Network.Constants.MessageTypes.IntialDataRequest,
+            };
+
+            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], newMessage);
+
+            var expiryTime = DateTime.Now.AddMilliseconds(3000); // 3 seconds
+
+            while (DateTime.Now < expiryTime){
+                if (connection.Screens != null) return;
+                await Task.Delay(1);
+            }
+
+            return;
+        }
+
+
     }
 }

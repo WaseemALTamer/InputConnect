@@ -1,14 +1,12 @@
-﻿using InputConnect.UI.Containers;
-using System.Collections.Generic;
-using InputConnect.Structures;
-using InputConnect.Setting;
-using InputConnect.Network;
+﻿using Avalonia.Controls;
 using Avalonia.Threading;
-using Avalonia.Controls;
-using System;
-using System.Net.Mail;
-using Tmds.DBus.Protocol;
+using InputConnect.Network;
+using InputConnect.Structures;
+using InputConnect.UI.Containers;
 using InputConnect.UI.Containers.Common;
+using System.Collections.Generic;
+
+
 
 
 
@@ -51,13 +49,6 @@ namespace InputConnect.UI.Pages
 
 
             if (MainCanvas == null) return;
-
-            Graph graph = new Graph();
-            MainCanvas.Children.Add(graph);
-            Canvas.SetTop(graph, 200);
-            Canvas.SetLeft(graph, 400);
-
-
         }
 
 

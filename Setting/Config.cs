@@ -54,8 +54,11 @@ namespace InputConnect.Setting
         public static int PopupTimeout = 10000; // this will be used for popus that use a timeout
 
 
-        //public static int TransitionReferenceDistance = 1000; // this will be used for animation that
+        public static int TransitionReferenceDistance = 1000; // this will be used for animation that
                                                                 // vary in distance
+
+        public static int TimeOutDuration = 3000; // this will control how long it takes to wait for another
+                                                  // device message before timming out and returning nothing
 
     }
 }

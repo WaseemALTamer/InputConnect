@@ -52,7 +52,10 @@ namespace InputConnect.UI.Containers
             Background = Themes.Holder;
             CornerRadius = new CornerRadius(Config.CornerRadius);
             MinHeight = 150; MinWidth = 350;
-            MaxHeight = 250; MaxWidth = 450;
+            MaxHeight = 150; MaxWidth = 350;
+
+            Width = 350;
+            Height = 150;
 
 
             MainCanvas = new Canvas{
@@ -122,10 +125,12 @@ namespace InputConnect.UI.Containers
 
         public void OnSizeChanged(object? sender = null, object? e = null){
 
+            
             if (Master == null) return;
 
-            Width = Master.Width * 0.35;
-            Height = Master.Height * 0.25;
+
+            //Width = Master.Width * 0.35;
+            //Height = Master.Height * 0.25;
 
             // check the boundries and ensure they dont go byoned
             if (Width < MinWidth)
@@ -154,6 +159,8 @@ namespace InputConnect.UI.Containers
                     Canvas.SetTop(Entry, (MainCanvas.Height - Entry.Height) / 3);
                 }
             }
+
+            
         }
 
 
@@ -239,6 +246,9 @@ namespace InputConnect.UI.Containers
                                                         TargetedDevice.DeviceName);
 
                 TargetedDevice.Connection = newConnection;
+
+                if(Events.TargetDeviceConnectionChanged != null)
+                    Events.TargetDeviceConnectionChanged.Invoke();
 
                 if (PublicWidgets.UIConnections != null)
                     PublicWidgets.UIConnections.Update();

@@ -6,6 +6,7 @@
 
 using Avalonia;
 using Avalonia.Platform;
+using System.Collections.Generic;
 
 namespace InputConnect.Structures
 {
@@ -27,8 +28,13 @@ namespace InputConnect.Structures
                                                        // if anyone breaks the application that way, cheers bro  never  thought
                                                        // my application will run on a quantum computer
 
+        // out outdated apporch used the screens approch
         public Bounds? Bounds { get; set; } // this is used to specify what part of your screen you want this application to work
 
+        public List<Bounds>? Screens { get; set; } // this is the acutal physical display of the other device with its actual bounds
+        public List<Bounds>? VirtualScreens { get; set; } // this will be the virtual screens created to go to the next device the bounds
+                                                          // are completely imagenery, and need to be converted back to the screen bounds
+                                                          // before being sent to the next device
 
         public string? Logs { get; set; } // this will hold the logs for certain messages that are sent and
                                           // data on the progress for the connection

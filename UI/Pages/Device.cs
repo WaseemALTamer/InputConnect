@@ -22,7 +22,7 @@ namespace InputConnect.UI.Pages
         // it will also be responsible for disconnecting and also
         // telling you
         private Connector? connector;
-
+        private MointorsGraph? mointorsGraph;
         private ChannelModeTriToggles? channelModeTriToggles;
 
 
@@ -37,6 +37,10 @@ namespace InputConnect.UI.Pages
 
             channelModeTriToggles = new ChannelModeTriToggles(MainCanvas);
             MainCanvas.Children.Add(channelModeTriToggles);
+
+
+            mointorsGraph = new MointorsGraph(MainCanvas);
+            MainCanvas.Children.Add(mointorsGraph);
 
 
             OnShow += Update; // this will ensure that it updates evertime we display this page
@@ -85,6 +89,11 @@ namespace InputConnect.UI.Pages
                 if (channelModeTriToggles != null) {
                     Canvas.SetLeft(channelModeTriToggles, 10);
                     Canvas.SetTop(channelModeTriToggles, 10);
+                }
+
+                if (mointorsGraph != null) {
+                    Canvas.SetLeft(mointorsGraph, MainCanvas.Width - mointorsGraph.Width - 10);
+                    Canvas.SetTop(mointorsGraph, 10);
                 }
             }
         }

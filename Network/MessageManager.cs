@@ -3,6 +3,7 @@ using InputConnect.Structures;
 using System.Text.Json;
 using System;
 using InputConnect.Commands;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 
@@ -35,6 +36,11 @@ namespace InputConnect.Network
 
         public static Action<Audio>? OnCommandAudio;
 
+        public static Action? OnIntailDataReuqest;
+
+        public static Action<IntialData>? OnIntailData;
+
+
 
 
         public static List<MessageUDP> Advertisements = new List<MessageUDP>(); // this is used to collect all the advertisement messages
@@ -50,10 +56,15 @@ namespace InputConnect.Network
             UpdateMacToIP(_message);
 
             if (_message.MessageType == Constants.MessageTypes.Advertisement) ProccessAdvertisement(_message);
+
             if (_message.MessageType == Constants.MessageTypes.Connect) ProccessConnect(_message);
             if (_message.MessageType == Constants.MessageTypes.Accept) ProccessAccept(_message);
             if (_message.MessageType == Constants.MessageTypes.Decline) ProccessDecline(_message);
+
             if (_message.MessageType == Constants.MessageTypes.Command) ProccessCommand(_message);
+
+            if (_message.MessageType == Constants.MessageTypes.IntialDataRequest) PorccessIntailDataReuqest(_message);
+            if (_message.MessageType == Constants.MessageTypes.IntialData) PorccessIntailData(_message);
         }
 
 
@@ -68,6 +79,13 @@ namespace InputConnect.Network
             MacToIP[message.MacAddress] = message.IP;
         }
 
+        public static Connection? MessageToConnection(MessageUDP message) {
+            foreach (var connection in Connections.Devices.ConnectionList){
+                if (connection.MacAddress == message.MacAddress)
+                    return connection;
+            }
+            return null;
+        }
 
         private static void ProccessAdvertisement(MessageUDP message){
             // this filters out the messages that we dont need and are too old
@@ -183,6 +201,70 @@ namespace InputConnect.Network
 
 
             
+        }
+
+
+        private static void PorccessIntailDataReuqest(MessageUDP message){
+            // find the connection
+            Connection? connection = MessageToConnection(message);
+            if (connection == null) return;
+
+
+            MessageUDP newMessage = new MessageUDP { 
+                MessageType = Constants.MessageTypes.IntialData,
+                MacAddress = message.MacAddress,
+                IsEncrypted = true,
+            };
+
+            IntialData data = new IntialData();
+            data.Screens = new List<Bounds>();
+
+            // add the data 
+            if (SharedData.Device.Screens != null) {
+                foreach (var screen in SharedData.Device.Screens){
+                    data.Screens.Add(new Bounds(screen.Bounds.X,
+                                                screen.Bounds.Y,
+                                                screen.Bounds.Width,
+                                                screen.Bounds.Height));
+                }
+            }
+
+            // finnished adding the data
+
+
+
+
+            var EncryptedData = Encryptor.Encrypt(JsonSerializer.Serialize<IntialData>(data), connection.Token);
+            newMessage.Text = EncryptedData;
+
+
+            if (message.IP != null)
+                ConnectionUDP.Send(message.IP, newMessage);
+
+            if (OnIntailDataReuqest != null) OnIntailDataReuqest.Invoke();
+        }
+
+        private static void PorccessIntailData(MessageUDP message)
+        {
+            if (message.Text == null) return;
+            Connection? connection = MessageToConnection(message);
+            if (connection == null) return;
+
+
+            if (message.IsEncrypted == true) {
+                message.Text = Encryptor.Decrypt(message.Text, connection.Token);
+                if (message.Text == null) return; // we return because token is incorrect
+            }
+
+            IntialData? data = JsonSerializer.Deserialize<IntialData>(message.Text);
+
+            if (data == null) return;
+
+            connection.Screens = data.Screens;
+
+
+
+            if (OnIntailData != null) OnIntailData.Invoke(data);
         }
 
 

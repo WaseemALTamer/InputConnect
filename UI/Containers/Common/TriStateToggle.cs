@@ -45,6 +45,15 @@ namespace InputConnect.UI.Containers.Common
 
         private Animations.Transations.Uniform? OnHover;
 
+        // this will only display the lock icone it is your responsiblity to not allow the button
+        // to go anywhere by setting it back to what it was this is done to  help you detect when
+        // the user is trying to change the state of the button
+        private bool IsLocked = false;
+        private Border? BorderLockImage;
+        private Image? LockImage;
+
+        private Animations.Transations.EaseInOut? LockShowHideAnimation;
+
 
         public TriStateToggle()
         {
@@ -52,12 +61,10 @@ namespace InputConnect.UI.Containers.Common
             Background = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));
 
 
-            BorderBrush = new LinearGradientBrush
-            {
+            BorderBrush = new LinearGradientBrush{
                 StartPoint = new RelativePoint(0, 0.5, RelativeUnit.Relative),
                 EndPoint = new RelativePoint(1, 0.5, RelativeUnit.Relative),
-                GradientStops = new GradientStops
-                {
+                GradientStops = new GradientStops{
                     new GradientStop(Colors.Transparent, 0),
                     new GradientStop(Color.FromUInt32(0x7f1f1f1f), 0.5),
                     new GradientStop(Colors.Transparent, 1)
@@ -83,13 +90,14 @@ namespace InputConnect.UI.Containers.Common
                 ClipToBounds = true,
             };
 
-            Ball = new Border
-            {
+            Ball = new Border{
                 CornerRadius = new CornerRadius(100),
                 Width = Height / 1.25,
                 Height = Height / 1.25,
                 Background = new SolidColorBrush(Colors.White)
             };
+
+
             MainCanvas.Children.Add(Ball);
 
             Canvas.SetLeft(Ball, (MainCanvas.Width - Ball.Width) / 2);
@@ -109,13 +117,57 @@ namespace InputConnect.UI.Containers.Common
 
 
             PointerReleased += OnPointerReleased;
-            PointerEntered += OnHover.TranslateForward;
-            PointerExited += OnHover.TranslateBackward;
+            PointerEntered += OnPointerEntered;
+            PointerExited += OnPointerExited;
+
+
+            BorderLockImage = new Border
+            {
+                CornerRadius = new CornerRadius(100),
+                Width = Height / 1.25,
+                Height = Height / 1.25,
+                Background = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0)),
+                Opacity = 0
+            };
+            Ball.Child = BorderLockImage;
+
+            LockImage = new Image{
+                Stretch = Stretch.Uniform,
+                Width = Ball.Width * 0.8,
+                Height = Ball.Height * 0.8,
+            };
+            BorderLockImage.Child = LockImage;
+            Assets.AddAwaitedAction(() => {
+                LockImage.Source = Assets.MiniLockBitmap;
+            });
+
+            LockShowHideAnimation = new Animations.Transations.EaseInOut
+            {
+                StartingValue = 0,
+                EndingValue = 1,
+                Duration = Config.TransitionDuration,
+                Trigger = SetLockOpacity
+            };
 
             Child = MainCanvas;
 
         }
 
+
+
+        private void OnPointerEntered(object? sender, PointerEventArgs e) {
+            if (IsLocked) return;
+
+            if (OnHover == null) return;
+            OnHover.TranslateForward();
+        }
+
+        private void OnPointerExited(object? sender, PointerEventArgs e){
+            if (IsLocked) return;
+
+            if (OnHover == null) return;
+            OnHover.TranslateBackward();
+        }
 
         private bool BallPressed = false;
         private double InitialMousePosX = 0; // this will be relitive to the ball
@@ -218,6 +270,23 @@ namespace InputConnect.UI.Containers.Common
             Ball.Opacity = value;
         }
 
+        private void SetLockOpacity(double value){
+            if (BorderLockImage == null || MainCanvas == null) return;
+            BorderLockImage.Opacity = value;
+        }
+
+
+        public void SetLock(bool state) {
+
+            IsLocked = state;
+
+            if (LockShowHideAnimation != null) {
+                if (state)
+                    LockShowHideAnimation.TranslateForward();
+                else 
+                    LockShowHideAnimation.TranslateBackward();
+            }
+        }
 
         public void SetState(int state){
             // we dont invoke the Trigger for this function because we already know the
