@@ -18,10 +18,7 @@ using System;
 
 namespace InputConnect.UI.Containers.Common
 {
-    public class Graph : Border
-    {
-
-
+    public class Graph : Border{
         private Canvas? _MasterCanvas;
         public Canvas? MasterCanvas{
             get { return _MasterCanvas; }

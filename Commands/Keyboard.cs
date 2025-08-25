@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using SharpHook.Data;
+using System.Text.Json.Serialization;
 
 
 
@@ -8,9 +9,15 @@ namespace InputConnect.Commands
 {
     public class Keyboard{
 
+        // the key matrix approch have been change to simple just sending the key events from before
 
-        [JsonPropertyName("KeyMatrix")]
-        public string? KeyMatrix { get; set; } // this needs to be changed later
+
+
+        [JsonPropertyName("KeyPress")]
+        public KeyCode? KeyPress { get; set; }
+
+        [JsonPropertyName("KeyRelease")]
+        public KeyCode? KeyRelease { get; set; }
 
     }
 }

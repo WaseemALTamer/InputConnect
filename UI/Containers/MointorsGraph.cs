@@ -6,6 +6,9 @@ using Avalonia;
 using System;
 using System.Text.Json;
 using InputConnect.SharedData;
+using Avalonia.Platform;
+using System.Collections.Generic;
+using InputConnect.Structures;
 
 
 
@@ -118,8 +121,20 @@ namespace InputConnect.UI.Containers
                         }
                     }
 
-                    if (device.VirtualScreens == null)
-                        device.VirtualScreens = device.Screens;
+                    if (device.VirtualScreens == null){
+                        device.VirtualScreens = new List<Bounds>();
+
+                        if (device.Screens != null){
+                            foreach (var s in device.Screens){
+                                device.VirtualScreens.Add(new Bounds{
+                                    X = s.X,
+                                    Y = s.Y,
+                                    Width = s.Width,
+                                    Height = s.Height
+                                });
+                            }
+                        }
+                    }
 
                     foreach (var screen in device.VirtualScreens) {
 

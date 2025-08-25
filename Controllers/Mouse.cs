@@ -4,6 +4,13 @@ using SharpHook;
 using System;
 using InputConnect.Network;
 using System.Threading;
+using Avalonia.Platform;
+using System.Reflection.Metadata.Ecma335;
+using Avalonia.Rendering.Composition;
+using System.Security.Cryptography.X509Certificates;
+using Avalonia;
+using Tmds.DBus.Protocol;
+using Avalonia.Controls;
 
 
 
@@ -19,8 +26,9 @@ namespace InputConnect.Controllers
         // to the relivent devices
 
 
-        public static TaskPoolGlobalHook Hook = new TaskPoolGlobalHook();
-        public static EventSimulator EventSimulator = new EventSimulator();
+        // this will make a refrence of the GlobalHook The global hook
+        public static TaskPoolGlobalHook Hook = Controllers.Hook.GlobalHook;
+        public static EventSimulator EventSimulator = Controllers.Hook.GlobalEventSimulator;
 
 
         public static Action<double, double>? OnMove; // => <x, y>
@@ -29,69 +37,46 @@ namespace InputConnect.Controllers
         public static Action<double>? OnMouseScroll; // => <delta>
 
 
+        public static double? VirtualPositionX;
+        public static double? VirtualPositionY;
+
+
         public static double? CurrentPositionX;
         public static double? CurrentPositionY;
-        public static double DeltaX = 0;
-        public static double DeltaY = 0;
+        public static double? DeltaX;
+        public static double? DeltaY;
 
-        public static bool BorderHit = false;
-
-        // those will be used to create something like a virtual screen
-        // so you can control connected other screens
-        public static double OffsetPositionX = 0;
-        public static double OffsetPositionY = 0;
 
         public static double CriticalRegionSize = 1;
-        public static double CursorThrow = 1;
-        public static bool OnVirtualDisplay = false;
+        public static double CursorThrow = CriticalRegionSize * 2;
+        public static bool IsVirtualCoordinates = false;
         public static Bounds? CurrentScreenBounds;
 
 
         public static Action? OnVirtualMointorEnter;
         public static Action? OnVirtualMointorExit;
 
+        public static bool MouseLock = false;
+
+
+        //public static double MouseSkipPosX = 0;
+        //public static double MouseSkipPosY = 0;
+        public static bool SkipNextMouseHook = false; // this will be used to skip the next mouse detection incase you want
+                                                      // to move the mouse through code and dont want it to be detected
+
+        public static int SaftyNet = 100; // if the mouse suddnly goes more than 100 pixles at a time we most likely have an error
+                                             // which we need to correct before we can move forward
 
 
 
-
-        public static bool StartHook(){
-            Hook.MouseMoved += (_, e) =>{
-                DeltaX = (e.Data.X - CurrentPositionX) ?? 0;
-                DeltaY = (e.Data.Y - CurrentPositionY) ?? 0;
-
-                if ((Math.Abs(DeltaX) >= 720 || Math.Abs(DeltaY) >= 720) && !BorderHit) {
-                    DeltaX = 0; DeltaY = 0;
-                    if (CurrentPositionX != null && CurrentPositionY != null)
-                        MoveMouse((double)CurrentPositionX, (double)CurrentPositionY);
-                    return;
-                }
-
-                BorderHit = false;
-                CurrentPositionX = e.Data.X;
-                CurrentPositionY = e.Data.Y;
-                OnMove?.Invoke(e.Data.X, e.Data.Y);
-            };
-
-            Hook.MouseDragged += (_, e) =>{
-                DeltaX = (e.Data.X - CurrentPositionX) ?? 0;
-                DeltaY = (e.Data.Y - CurrentPositionY) ?? 0;
-
-                if ((Math.Abs(DeltaX) >= 720 || Math.Abs(DeltaY) >= 720) && !BorderHit) {
-                    DeltaX = 0; DeltaY = 0;
-                    if (CurrentPositionX != null && CurrentPositionY != null)
-                        MoveMouse((double)CurrentPositionX, (double)CurrentPositionY);
-                    return;
-                }
-
-                BorderHit = false;
-                CurrentPositionX = e.Data.X;
-                CurrentPositionY = e.Data.Y;
-                OnMove?.Invoke(e.Data.X, e.Data.Y);
-            };
+        // this Start function should be ran after the hook is ran
+        public static bool Start() {
+            Hook.MouseMoved += OnMoveAction;
+            Hook.MouseDragged += OnMoveAction;
 
 
 
-            Hook.MousePressed += (_, e) =>{
+            Hook.MousePressed += (_, e) => {
                 OnMousePress?.Invoke((int)e.Data.Button);
             };
 
@@ -99,30 +84,46 @@ namespace InputConnect.Controllers
                 OnMouseRealse?.Invoke((int)e.Data.Button);
             };
 
-            Hook.MouseWheel += (_, e) =>{
+            Hook.MouseWheel += (_, e) => {
                 OnMouseScroll?.Invoke(e.Data.Delta * e.Data.Rotation / 360);
             };
 
 
-            OnMove += TrackMouseVirtualBorders;
-            OnMove += TransmitMouseMovement;
+            OnMove += TrackMouse;
+            //OnMove += TransmitMouseMovement;
 
-            OnMousePress += TransmitMousePressButtons;
-            OnMouseRealse += TransmitMouseReleaseButtons;
-            OnMouseScroll += TransmitMouseScroll;
+            //OnMousePress += TransmitMousePressButtons;
+            //OnMouseRealse += TransmitMouseReleaseButtons;
+            //OnMouseScroll += TransmitMouseScroll;
 
 
             MessageManager.OnCommandMouse += RecieveMouseCommnad;
 
-            new Thread(() =>{
-                Hook.RunAsync();
-            }).Start();
+
 
             return true;
         }
 
 
+        private static void OnMoveAction(object? sender, MouseHookEventArgs e) {
 
+            if (MouseLock) return;
+
+            DeltaX = (e.Data.X - CurrentPositionX) ?? 0;
+            DeltaY = (e.Data.Y - CurrentPositionY) ?? 0;
+
+            CurrentPositionX = e.Data.X;
+            CurrentPositionY = e.Data.Y;
+
+            if (SkipNextMouseHook){
+                return;
+            }
+
+            //TrackMouse(e.Data.X, e.Data.Y);
+
+            //Console.WriteLine($"{DeltaX}, {DeltaY}");
+            OnMove?.Invoke(e.Data.X, e.Data.Y);
+        }
 
         public static void MoveMouse(double x, double y) {
             EventSimulator.SimulateMouseMovement((short)x, (short)y);
@@ -133,7 +134,7 @@ namespace InputConnect.Controllers
             EventSimulator.SimulateMousePress((SharpHook.Data.MouseButton)button);
         }
 
-        public static void ReleaseMouse(int button){
+        public static void ReleaseMouse(int button) {
             // => 0:None -> 1:Left -> 2:Right -> 3:Middle -> 4:Back -> 5:Forward
             EventSimulator.SimulateMouseRelease((SharpHook.Data.MouseButton)button);
         }
@@ -144,118 +145,104 @@ namespace InputConnect.Controllers
 
 
 
-        public static void TrackMouseVirtualBorders(double x, double y) {
-
-            double PosX = x + OffsetPositionX;
-            double PosY = y + OffsetPositionY;
-
-            //Console.WriteLine($"{DeltaX} , {DeltaY}");
-
-            // =============================
-            // Virtual screens
-            // =============================
-            if (!OnVirtualDisplay) { 
-            
-            
-                foreach (var connection in Connections.Devices.ConnectionList)
-                {
-                    if (connection != null &&
-                        connection.Bounds != null &&
-                        connection.MouseState == Connections.Constants.Transmit)
-                    {
-                        var bounds = connection.Bounds;
-
-                        if (bounds == CurrentScreenBounds) continue;
-
-
-
-                        // Entering left
-                        if ((HasCrossedValue(PosX, DeltaX, (bounds.X - CriticalRegionSize), true)) &&
-                            (bounds.Y <= PosY && PosY <= bounds.Y + bounds.Height))
-                        {
-                            //Console.WriteLine("TouchedBorder3");
-                            //Console.WriteLine($" => {PosX} , {PosY}");
-                            OffsetPositionX = bounds.X;
-                            CurrentScreenBounds = bounds;
-                            OnVirtualDisplay = true;
-                            BorderHit = true;
-
-                            if (OnVirtualMointorEnter != null) OnVirtualMointorEnter.Invoke();
-                            MoveMouse(CriticalRegionSize + CursorThrow, y);
-                            return;
-                        }
-
-                        // Entering right
-                        if ((HasCrossedValue(PosX, DeltaX, (bounds.X + bounds.Width + CriticalRegionSize), false)) &&
-                            (bounds.Y <= PosY && PosY <= bounds.Y + bounds.Height))
-                        {
-                            //Console.WriteLine("TouchedBorder4");
-                            //Console.WriteLine($" => {PosX} , {PosY}");
-                            OffsetPositionX = bounds.X + bounds.Width;
-                            CurrentScreenBounds = bounds;
-                            OnVirtualDisplay = true;
-                            BorderHit = true;
-                            if (OnVirtualMointorEnter != null) OnVirtualMointorEnter.Invoke();
-                            MoveMouse(bounds.Width - CriticalRegionSize - CursorThrow, y);
-                            return;
-                        }
-                    }
-                }
+        public static void TrackMouse(double x, double y) {
+            // this function will track the mouse through the virtual boarders and 
+            // through the physical ones as well this will store the values of the
+            // virtual pos
+            bool result = ValidatePos(x, y);
+            if (!result) {
+                //Console.WriteLine($"Wrong Result");
+                return;
             }
 
-            // =============================
-            // Physical screens
-            // =============================
-            if (SharedData.Device.Screens != null && OnVirtualDisplay)
-            {
-                foreach (var screen in SharedData.Device.Screens)
+            if (VirtualPositionX == null || VirtualPositionY == null) {
+                VirtualPositionX = x;
+                VirtualPositionY = y;
+            }
+
+            double oldVritualPosX = (double)VirtualPositionX;
+            double oldVritualPosY = (double)VirtualPositionY;
+
+            // check the crtical regions and send the mouse to the secreen if possible
+            bool touchedBoarder = false;
+            foreach (var connection in Connections.Devices.ConnectionList) {
+                
+                if (connection != null &&
+                    connection.VirtualScreens != null &&
+                    connection.MouseState == Connections.Constants.Transmit)
                 {
-                    var bounds = new Bounds(screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height);
+                    
+                    
+                    foreach (var screen in connection.VirtualScreens) {
+                        if (Math.Abs((decimal)(screen.X - VirtualPositionX)) < (decimal)CriticalRegionSize) {
+                            VirtualPositionX = screen.X + CursorThrow;
+                            touchedBoarder = true;
+                            break;
+                        }
 
-                    if (CurrentScreenBounds != null &&
-                        CurrentScreenBounds.X == bounds.X &&
-                        CurrentScreenBounds.Y == bounds.Y &&
-                        CurrentScreenBounds.Width == bounds.Width &&
-                        CurrentScreenBounds.Height == bounds.Height) 
-                    {
-                        continue;
-                    }
+                        if (Math.Abs((decimal)((screen.X + screen.Width) - VirtualPositionX)) < (decimal)CriticalRegionSize) {
+                            VirtualPositionX = (screen.X + screen.Width) - CursorThrow;
+                            touchedBoarder = true;
+                            break;
+                        }
 
+                        if (Math.Abs((decimal)(screen.Y - VirtualPositionY)) < (decimal)CriticalRegionSize) {
+                            VirtualPositionY = screen.Y + CursorThrow;
+                            touchedBoarder = true;
+                            break;
+                        }
 
-                    // Left edge
-                    if ((HasCrossedValue(PosX, DeltaX, (bounds.X - CriticalRegionSize), true)) &&
-                        (bounds.Y <= PosY && PosY <= bounds.Y + bounds.Height))
-                    {
-                        CurrentScreenBounds = bounds;
-                        OffsetPositionX = 0;
-                        OnVirtualDisplay = false;
-                        BorderHit = true;
-                        if (OnVirtualMointorExit != null) OnVirtualMointorExit.Invoke();
-                        MoveMouse(CriticalRegionSize + CursorThrow, y);
-                        return;
-                    }
+                        if (Math.Abs((decimal)((screen.Y + screen.Height) - VirtualPositionY)) < (decimal)CriticalRegionSize) {
+                            VirtualPositionY = (screen.Y + screen.Height) - CursorThrow;
+                            touchedBoarder = true;
+                            break;
+                        }
 
-                    // Right edge
-                    if ((HasCrossedValue(PosX, DeltaX, (bounds.X + bounds.Width + CriticalRegionSize), false)) &&
-                        (bounds.Y <= PosY && PosY <= bounds.Y + bounds.Height))
-                    {
-                        //Console.WriteLine(bounds.X + bounds.Width + CriticalRegionSize);
-                        CurrentScreenBounds = bounds;
-                        OffsetPositionX = 0;
-                        OnVirtualDisplay = false;
-                        BorderHit = true;
-                        if (OnVirtualMointorExit != null) OnVirtualMointorExit.Invoke();
-                        MoveMouse(bounds.X + bounds.Width - CriticalRegionSize - CursorThrow, y);
-                        return;
+                        if (touchedBoarder) break;
+
                     }
                 }
             }
 
 
+            result = ValidatePos(VirtualPositionX, VirtualPositionY); // this will check our postion if it exist through both
+                                                                      // virtual and physical screens
+            //Console.WriteLine($"VirtualPos => {VirtualPositionX}, {VirtualPositionY}");
+
+            if (result){
+
+                if (IsVirtualCoordinates &&
+                    OnVirtualMointorEnter != null)
+                {
+                    if (SharedData.Device.Screens == null) return;
+
+                    var bounds = SharedData.Device.Screens[0].Bounds;
+
+                    
+
+                    OnVirtualMointorEnter();
+                }
+                else {
+
+                    if (Math.Abs((decimal)(VirtualPositionX - x)) > SaftyNet || 
+                        Math.Abs((decimal)(VirtualPositionY - y)) > SaftyNet) 
+                    { 
+                        MoveMouse((double)VirtualPositionX, (double)VirtualPositionY);
+                        return;
+                    }
 
 
+                    VirtualPositionX = x; 
+                    VirtualPositionY = y;
+                }
 
+            }
+            else {
+                VirtualPositionX  = oldVritualPosX;
+                VirtualPositionY  = oldVritualPosY;
+            }
         }
+
 
 
         private static bool HasCrossedValue(
@@ -284,149 +271,228 @@ namespace InputConnect.Controllers
 
 
 
+        public static bool ValidatePos(double? X, double? Y)
+        {
+
+            if (X == null || Y == null) return false;
+
+            // this is for the virtual display
+            foreach (var connection in Connections.Devices.ConnectionList)
+            {
+                if (connection != null &&
+                    connection.VirtualScreens != null &&
+                    connection.MouseState == Connections.Constants.Transmit)
+                {
+                    foreach (var screen in connection.VirtualScreens)
+                    {
+                        //Console.WriteLine($"{screen.Y}, {screen.Y + screen.Height}, {Y},");
+                        if (screen.X <= X && screen.X + screen.Width >= X &&
+                            screen.Y <= Y && screen.Y + screen.Height >= Y)
+                        {
+                            IsVirtualCoordinates = true; // once this is set to be true the only way to make it false
+                                                         // is through the avalonia fraome work through the ui
+
+                            MouseLock = true; // same with this varable
+
+                            Controllers.Hook.TargetConnection = connection;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (SharedData.Device.Screens == null) return false;
+
+            foreach (var screen in SharedData.Device.Screens){
+                if (screen.Bounds.X <= X && screen.Bounds.X + screen.Bounds.Width >= X &&
+                    screen.Bounds.Y <= Y && screen.Bounds.Y + screen.Bounds.Height >= Y)
+                {
+                    Controllers.Hook.TargetConnection = null;
+                    return true;
+                }
+            }
+
+
+            return false;
+
+        }
+
+
+        public static bool IsPosOnPhysicalOnScreen(double X, double Y) {
+            if (SharedData.Device.Screens == null) return false;
+
+            foreach (var screen in SharedData.Device.Screens){
+                if (screen.Bounds.X <= X && screen.Bounds.X + screen.Bounds.Width >= X &&
+                    screen.Bounds.Y <= Y && screen.Bounds.Y + screen.Bounds.Height >= Y)
+                {
+                    Controllers.Hook.TargetConnection = null;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
         public static void TransmitMouseMovement(double x, double y) {
             // this function will only ransmit the movment if you are at
             // the right cordinates for the screen
 
-            var xPos = x + OffsetPositionX;
-            var yPos = y + OffsetPositionY;
+            var xPos = x;
+            var yPos = y;
 
-            if (OnVirtualDisplay == false) return;
+            if (IsVirtualCoordinates == false) return;
 
             foreach (var connection in Connections.Devices.ConnectionList) {
                 if (connection.MouseState == Connections.Constants.Transmit) {
 
-                    if (connection.Bounds == null) continue;
+                    if (connection.VirtualScreens == null) return;
 
-                    if (connection.Bounds.X <= xPos && (connection.Bounds.X + connection.Bounds.Width) >= xPos &&
-                        connection.Bounds.Y <= yPos && (connection.Bounds.Y + connection.Bounds.Height) >= yPos)
-                    {
-                        var _command = new Commands.Mouse{
-                            X = x,
-                            Y = y,
-                        };
+                    for (int i = 0; i < connection.VirtualScreens.Count; i++){
 
-                        var _commandMessage = new MessageCommand{
-                            Type = Commands.Constants.CommandTypes.Mouse,
-                            SequenceNumber = connection.SequenceNumber + 1,
-                            Command = JsonSerializer.Serialize(_command)
-                        };
-                        connection.SequenceNumber += 1;
+                        var screen = connection.VirtualScreens[i];
 
-                        var messageudp = new MessageUDP{
-                            MessageType = Network.Constants.MessageTypes.Command,
-                            Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
-                            IsEncrypted = true
-                        };
+                        if (connection.Screens == null || connection.Screens[i] == null) continue;
 
-                        if (connection.MacAddress != null){
-                            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                        var physicalScreen = connection.Screens[i]; // this is the other device actual screen which
+                                                                    // contain the coordinates and size
+
+                        if (screen.X <= xPos && (screen.X + screen.Width) >= xPos &&
+                            screen.Y <= yPos && (screen.Y + screen.Height) >= yPos)
+                        {
+
+
+                            double realPosX = (double)(physicalScreen.X + xPos - screen.X);
+                            double realPosY = (double)(physicalScreen.Y + yPos - screen.Y);
+
+                            var _command = new Commands.Mouse{
+                                X = realPosX,
+                                Y = realPosY,
+                            };
+
+                            var _commandMessage = new MessageCommand{
+                                Type = Commands.Constants.CommandTypes.Mouse,
+                                SequenceNumber = connection.SequenceNumber + 1,
+                                Command = JsonSerializer.Serialize(_command)
+                            };
+                            connection.SequenceNumber += 1;
+
+                            var messageudp = new MessageUDP{
+                                MessageType = Network.Constants.MessageTypes.Command,
+                                Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
+                                IsEncrypted = true
+                            };
+
+                            if (connection.MacAddress != null){
+                                ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                            }
+
+                            //Console.WriteLine($"{realPosX}, {realPosY}");
                         }
-
-
                     }
+
                 }
             }
         }
 
 
-        public static void TransmitMousePressButtons(int Button) {
-            // x and y are there to check if you are on the right coordinates
 
-            var xPos = CurrentPositionX + OffsetPositionX;
-            var yPos = CurrentPositionY + OffsetPositionY;
+        public static void TransmitMousePressButtons(double x, double y, int Button){
+            // note that the x and y pos is not used for telling the other device to go to 
+            // the postion it simply there to see which screen it should send the click to
 
-            if (OnVirtualDisplay == false) return;
 
-            foreach (var connection in Connections.Devices.ConnectionList)
-            {
-                if (connection.MouseState == Connections.Constants.Transmit)
-                {
+            var xPos = x;
+            var yPos = y;
 
-                    if (connection.Bounds == null) continue;
 
-                    if (connection.Bounds.X <= xPos && (connection.Bounds.X + connection.Bounds.Width) >= xPos &&
-                        connection.Bounds.Y <= yPos && (connection.Bounds.Y + connection.Bounds.Height) >= yPos)
-                    {
-                        var _command = new Commands.Mouse
+            foreach (var connection in Connections.Devices.ConnectionList){
+                if (connection.MouseState == Connections.Constants.Transmit){
+
+                    if (connection.VirtualScreens == null) return;
+
+                    foreach (var screen in connection.VirtualScreens){
+
+                        if (screen.X <= xPos && (screen.X + screen.Width) >= xPos &&
+                            screen.Y <= yPos && (screen.Y + screen.Height) >= yPos)
                         {
-                            MouseButtonPress = Button,
-                        };
 
-                        var _commandMessage = new MessageCommand
-                        {
-                            Type = Commands.Constants.CommandTypes.Mouse,
-                            SequenceNumber = connection.SequenceNumber + 1,
-                            Command = JsonSerializer.Serialize(_command)
-                        };
-                        connection.SequenceNumber += 1;
 
-                        var messageudp = new MessageUDP
-                        {
-                            MessageType = Network.Constants.MessageTypes.Command,
-                            Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
-                            IsEncrypted = true
-                        };
+                            var _command = new Commands.Mouse{
+                                MouseButtonPress = Button,
+                            };
 
-                        if (connection.MacAddress != null)
-                        {
-                            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                            var _commandMessage = new MessageCommand{
+                                Type = Commands.Constants.CommandTypes.Mouse,
+                                SequenceNumber = connection.SequenceNumber + 1,
+                                Command = JsonSerializer.Serialize(_command)
+                            };
+                            connection.SequenceNumber += 1;
+
+                            var messageudp = new MessageUDP{
+                                MessageType = Network.Constants.MessageTypes.Command,
+                                Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
+                                IsEncrypted = true
+                            };
+
+                            if (connection.MacAddress != null){
+                                ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                            }
+
                         }
-
-
                     }
+
                 }
             }
 
         }
 
 
-        public static void TransmitMouseReleaseButtons(int Button)
+        public static void TransmitMouseReleaseButtons(double x, double y, int Button)
         {
-            // x and y are there to check if you are on the right coordinates
+            // note that the x and y pos is not used for telling the other device to go to
+            // the postion it simply there to see which screen it should send the click to
 
-            var xPos = CurrentPositionX + OffsetPositionX;
-            var yPos = CurrentPositionY + OffsetPositionY;
+            var xPos = x;
+            var yPos = y;
 
-            if (OnVirtualDisplay == false) return;
 
-            foreach (var connection in Connections.Devices.ConnectionList)
-            {
-                if (connection.MouseState == Connections.Constants.Transmit)
-                {
+            foreach (var connection in Connections.Devices.ConnectionList){
+                if (connection.MouseState == Connections.Constants.Transmit){
 
-                    if (connection.Bounds == null) continue;
+                    if (connection.VirtualScreens == null) return;
 
-                    if (connection.Bounds.X <= xPos && (connection.Bounds.X + connection.Bounds.Width) >= xPos &&
-                        connection.Bounds.Y <= yPos && (connection.Bounds.Y + connection.Bounds.Height) >= yPos)
-                    {
-                        var _command = new Commands.Mouse
+                    foreach (var screen in connection.VirtualScreens){
+
+                        if (screen.X <= xPos && (screen.X + screen.Width) >= xPos &&
+                            screen.Y <= yPos && (screen.Y + screen.Height) >= yPos)
                         {
-                            MouseButtonRelease = Button,
-                        };
 
-                        var _commandMessage = new MessageCommand
-                        {
-                            Type = Commands.Constants.CommandTypes.Mouse,
-                            SequenceNumber = connection.SequenceNumber + 1,
-                            Command = JsonSerializer.Serialize(_command)
-                        };
-                        connection.SequenceNumber += 1;
 
-                        var messageudp = new MessageUDP
-                        {
-                            MessageType = Network.Constants.MessageTypes.Command,
-                            Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
-                            IsEncrypted = true
-                        };
+                            var _command = new Commands.Mouse{
+                                MouseButtonRelease = Button,
+                            };
 
-                        if (connection.MacAddress != null)
-                        {
-                            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                            var _commandMessage = new MessageCommand{
+                                Type = Commands.Constants.CommandTypes.Mouse,
+                                SequenceNumber = connection.SequenceNumber + 1,
+                                Command = JsonSerializer.Serialize(_command)
+                            };
+                            connection.SequenceNumber += 1;
+
+                            var messageudp = new MessageUDP{
+                                MessageType = Network.Constants.MessageTypes.Command,
+                                Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
+                                IsEncrypted = true
+                            };
+
+                            if (connection.MacAddress != null){
+                                ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                            }
+
                         }
-
-
                     }
+
                 }
             }
 
@@ -434,67 +500,73 @@ namespace InputConnect.Controllers
 
 
 
-        public static void TransmitMouseScroll(double delta){
+
+        public static void TransmitMouseScroll(double x, double y, double delta){
 
 
             // x and y are there to check if you are on the right coordinates
 
 
-            var xPos = CurrentPositionX + OffsetPositionX;
-            var yPos = CurrentPositionY + OffsetPositionY;
+            var xPos = x;
+            var yPos = y;
 
-            if (OnVirtualDisplay == false) return;
 
             foreach (var connection in Connections.Devices.ConnectionList)
             {
                 if (connection.MouseState == Connections.Constants.Transmit)
                 {
 
-                    if (connection.Bounds == null) continue;
+                    if (connection.VirtualScreens == null) return;
 
-                    if (connection.Bounds.X <= xPos && (connection.Bounds.X + connection.Bounds.Width) >= xPos &&
-                        connection.Bounds.Y <= yPos && (connection.Bounds.Y + connection.Bounds.Height) >= yPos)
+                    foreach (var screen in connection.VirtualScreens)
                     {
-                        var _command = new Commands.Mouse
-                        {
-                            ScrollDelta = delta,
-                        };
 
-                        var _commandMessage = new MessageCommand
+                        if (screen.X <= xPos && (screen.X + screen.Width) >= xPos &&
+                            screen.Y <= yPos && (screen.Y + screen.Height) >= yPos)
                         {
-                            Type = Commands.Constants.CommandTypes.Mouse,
-                            SequenceNumber = connection.SequenceNumber + 1,
-                            Command = JsonSerializer.Serialize(_command)
-                        };
-                        connection.SequenceNumber += 1;
 
-                        var messageudp = new MessageUDP
-                        {
-                            MessageType = Network.Constants.MessageTypes.Command,
-                            Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
-                            IsEncrypted = true
-                        };
 
-                        if (connection.MacAddress != null)
-                        {
-                            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                            var _command = new Commands.Mouse{
+                                ScrollDelta = delta,
+                            };
+
+                            var _commandMessage = new MessageCommand{
+                                Type = Commands.Constants.CommandTypes.Mouse,
+                                SequenceNumber = connection.SequenceNumber + 1,
+                                Command = JsonSerializer.Serialize(_command)
+                            };
+                            connection.SequenceNumber += 1;
+
+                            var messageudp = new MessageUDP{
+                                MessageType = Network.Constants.MessageTypes.Command,
+                                Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
+                                IsEncrypted = true
+                            };
+
+                            if (connection.MacAddress != null){
+                                ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                            }
+
                         }
-
-
                     }
+
                 }
             }
+
         }
 
 
 
 
 
-        public static void RecieveMouseCommnad(Commands.Mouse command) {
+
+
+        public static void RecieveMouseCommnad(Commands.Mouse? command) {
 
             if (command == null) return;
 
             if (command.X != null && command.Y != null){
+                SkipNextMouseHook = true;
                 MoveMouse((double)command.X, (double)command.Y);
             }
 

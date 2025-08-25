@@ -4,6 +4,7 @@ using System.Text.Json;
 using System;
 using InputConnect.Commands;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Tmds.DBus.Protocol;
 
 
 
@@ -79,7 +80,7 @@ namespace InputConnect.Network
             MacToIP[message.MacAddress] = message.IP;
         }
 
-        public static Connection? MessageToConnection(MessageUDP message) {
+        public static Structures.Connection? MessageToConnection(MessageUDP message) {
             foreach (var connection in Connections.Devices.ConnectionList){
                 if (connection.MacAddress == message.MacAddress)
                     return connection;
@@ -169,19 +170,23 @@ namespace InputConnect.Network
 
             if (OnCommand != null) OnCommand.Invoke(message); // this will not ontain a proccessed message
 
+            Structures.Connection? DeviceConnection = null;
 
             if (message.Text != null) {
                 if (message.IsEncrypted == true) {
-                    // loop through the connections and get the password out
-                    foreach (var connection in Connections.Devices.ConnectionList){
-                        connection.MacAddress = message.MacAddress;
-                        var text = Encryptor.Decrypt(message.Text, connection.Token);
-                        message.Text = text;
-                        break;
+                    // loop through the connections and get the password out with the connection
+                    foreach (var connection in Connections.Devices.ConnectionList) {
+                        if (connection.MacAddress == message.MacAddress) {
+                            DeviceConnection = connection;
+                            var text = Encryptor.Decrypt(message.Text, connection.Token);
+                            message.Text = text;
+                            break;
+                        }
+
                     }
                 }
 
-                if (message.Text == null) return;
+                if (message.Text == null || DeviceConnection == null) return;
                 var commandMessage = JsonSerializer.Deserialize<MessageCommand>(message.Text);
 
                 if (commandMessage != null &&
@@ -191,11 +196,32 @@ namespace InputConnect.Network
 
                     var Command = JsonSerializer.Deserialize<Commands.Mouse>(commandMessage.Command);
 
-                    if (OnCommandMouse != null && Command != null)
-                        OnCommandMouse.Invoke(Command);
-
+                    if (OnCommandMouse != null &&
+                        Command != null &&
+                        DeviceConnection.MouseState == Connections.Constants.Receive)
+                    { 
+                        OnCommandMouse.Invoke(Command); 
+                    }
 
                 }
+
+
+                if (commandMessage != null &&
+                    commandMessage.Type == Commands.Constants.CommandTypes.Keyboard &&
+                    commandMessage.Command != null)
+                {
+
+                    var Command = JsonSerializer.Deserialize<Commands.Keyboard>(commandMessage.Command);
+
+                    if (OnCommandKeyboard != null &&
+                        Command != null &&
+                        DeviceConnection.KeyboardState == Connections.Constants.Receive)
+                    {
+                        OnCommandKeyboard.Invoke(Command);
+                    }
+
+                }
+
 
             }
 
@@ -206,7 +232,7 @@ namespace InputConnect.Network
 
         private static void PorccessIntailDataReuqest(MessageUDP message){
             // find the connection
-            Connection? connection = MessageToConnection(message);
+            Structures.Connection? connection = MessageToConnection(message);
             if (connection == null) return;
 
 
@@ -247,7 +273,7 @@ namespace InputConnect.Network
         private static void PorccessIntailData(MessageUDP message)
         {
             if (message.Text == null) return;
-            Connection? connection = MessageToConnection(message);
+            Structures.Connection? connection = MessageToConnection(message);
             if (connection == null) return;
 
 

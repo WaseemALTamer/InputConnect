@@ -1,10 +1,8 @@
 ﻿using InputConnect.UI.Containers.Common;
+using InputConnect.SharedData;
 using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
-using InputConnect.SharedData;
-using System;
-using InputConnect.Structures;
 
 
 
@@ -325,5 +323,3 @@ namespace InputConnect.UI.Containers
 
     }
 }
-
-

@@ -60,5 +60,8 @@ namespace InputConnect.Setting
         public static int TimeOutDuration = 3000; // this will control how long it takes to wait for another
                                                   // device message before timming out and returning nothing
 
+
+        public static int MouseScrollStrength = 120;
+
     }
 }

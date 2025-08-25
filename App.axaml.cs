@@ -27,7 +27,7 @@ namespace InputConnect
             var _ = Assets.AssetsLoaded;
             var __ = Tray.ApplicationTray;
             var ___ = ConnectionUDP.Client;
-            var ____ = Controllers.Mouse.StartHook();
+            var ____ = Controllers.Hook.StartHook();
         }
     }
 }
