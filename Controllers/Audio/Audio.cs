@@ -99,7 +99,7 @@ namespace InputConnect.Controllers.Audio
             }
             //Console.WriteLine(connection.MacAddress);
 
-            Console.WriteLine(command.Buffer.Length);
+            //Console.WriteLine(command.Buffer.Length);
 
             connection.AudioQueue.Write(command.Buffer);
         }
@@ -125,3 +125,4 @@ namespace InputConnect.Controllers.Audio
     }
 
 }
+
