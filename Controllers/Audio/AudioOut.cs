@@ -49,7 +49,7 @@ namespace InputConnect.Controllers.Audio
             };
 
 
-            string device = SDL.SDL_GetAudioDeviceName(1, 0);
+            string device = SDL.SDL_GetAudioDeviceName(0, 0);
 
             //Console.WriteLine($"{device}");
 
@@ -105,3 +105,4 @@ namespace InputConnect.Controllers.Audio
 
     }
 }
+
