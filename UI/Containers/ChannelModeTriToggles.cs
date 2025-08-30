@@ -3,6 +3,9 @@ using InputConnect.SharedData;
 using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
+using System;
+using InputConnect.Network;
+using Avalonia.Threading;
 
 
 
@@ -124,6 +127,8 @@ namespace InputConnect.UI.Containers
 
             OnSizeChanged();
 
+            MessageManager.OnAccept += _ => Update();
+            Connections.Manager.OnConnectedConnectionAdded += Update;
             Events.TargetDeviceConnectionChanged += Update;
 
             if (Master != null){
@@ -201,63 +206,67 @@ namespace InputConnect.UI.Containers
             // this function will update and will set the state postion
             // based on the targed device in the Shared Data
 
-            if (TargetedDevice.Connection != null && 
-                TargetedDevice.Connection.State == Connections.Constants.StateConnected)
-            {
-
-                MouseChannelToggle.SetLock(false);
-                KeyboardChannelToggle.SetLock(false);
-                AudioChannelToggle.SetLock(false);
-
-                if (TargetedDevice.Connection.MouseState == Connections.Constants.Transmit){
-                    MouseChannelToggle.SetState(2);
-                }
-                if (TargetedDevice.Connection.MouseState == Connections.Constants.Receive){
-                    MouseChannelToggle.SetState(0);
-                }
-                if (TargetedDevice.Connection.MouseState == null || 
-                    TargetedDevice.Connection.MouseState == "")
+            Dispatcher.UIThread.Post(() => {
+                if (TargetedDevice.Connection != null && 
+                    TargetedDevice.Connection.State == Connections.Constants.StateConnected)
                 {
+                    MouseChannelToggle.SetLock(false);
+                    KeyboardChannelToggle.SetLock(false);
+                    AudioChannelToggle.SetLock(false);
+
+                    if (TargetedDevice.Connection.MouseState == Connections.Constants.Transmit){
+                        MouseChannelToggle.SetState(2);
+                    }
+                    if (TargetedDevice.Connection.MouseState == Connections.Constants.Receive){
+                        MouseChannelToggle.SetState(0);
+                    }
+                    if (TargetedDevice.Connection.MouseState == null || 
+                        TargetedDevice.Connection.MouseState == "")
+                    {
+                        MouseChannelToggle.SetState(1);
+                    }
+
+
+                    if (TargetedDevice.Connection.KeyboardState == Connections.Constants.Transmit){
+                        KeyboardChannelToggle.SetState(2);
+                    }
+                    if (TargetedDevice.Connection.KeyboardState == Connections.Constants.Receive){
+                        KeyboardChannelToggle.SetState(0);
+                    }
+                    if (TargetedDevice.Connection.KeyboardState == null || 
+                        TargetedDevice.Connection.KeyboardState == "")
+                    {
+                        KeyboardChannelToggle.SetState(1);
+                    }
+
+
+                    if (TargetedDevice.Connection.AudioState == Connections.Constants.Transmit){
+                        AudioChannelToggle.SetState(2);
+                    }
+                    if (TargetedDevice.Connection.AudioState == Connections.Constants.Receive){
+                        AudioChannelToggle.SetState(0);
+                    }
+                    if (TargetedDevice.Connection.AudioState == null || 
+                        TargetedDevice.Connection.AudioState == "")
+                    {
+                        AudioChannelToggle.SetState(1);
+                    }
+
+
+                }
+                else{
+                    MouseChannelToggle.SetLock(true);
+                    KeyboardChannelToggle.SetLock(true);
+                    AudioChannelToggle.SetLock(true);
+
                     MouseChannelToggle.SetState(1);
-                }
-
-
-                if (TargetedDevice.Connection.KeyboardState == Connections.Constants.Transmit){
-                    KeyboardChannelToggle.SetState(2);
-                }
-                if (TargetedDevice.Connection.KeyboardState == Connections.Constants.Receive){
-                    KeyboardChannelToggle.SetState(0);
-                }
-                if (TargetedDevice.Connection.KeyboardState == null || 
-                    TargetedDevice.Connection.KeyboardState == "")
-                {
                     KeyboardChannelToggle.SetState(1);
-                }
-
-
-                if (TargetedDevice.Connection.AudioState == Connections.Constants.Transmit){
-                    AudioChannelToggle.SetState(2);
-                }
-                if (TargetedDevice.Connection.AudioState == Connections.Constants.Receive){
-                    AudioChannelToggle.SetState(0);
-                }
-                if (TargetedDevice.Connection.AudioState == null || 
-                    TargetedDevice.Connection.AudioState == "")
-                {
                     AudioChannelToggle.SetState(1);
                 }
+            });
 
 
-            }
-            else{
-                MouseChannelToggle.SetLock(true);
-                KeyboardChannelToggle.SetLock(true);
-                AudioChannelToggle.SetLock(true);
 
-                MouseChannelToggle.SetState(1);
-                KeyboardChannelToggle.SetState(1);
-                AudioChannelToggle.SetState(1);
-            }
         }
 
         void SetMouseState(int code)

@@ -1,16 +1,18 @@
 ﻿using InputConnect.Structures;
+using System.Threading;
 using SharpHook;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using InputConnect.Controllers.Mouse;
+
+
+
+
+
 
 namespace InputConnect.Controllers
 {
 
-    
+
 
 
     public static class Hook{
@@ -21,6 +23,11 @@ namespace InputConnect.Controllers
 
         public static TaskPoolGlobalHook GlobalHook = new TaskPoolGlobalHook();
         public static EventSimulator GlobalEventSimulator = new EventSimulator();
+
+
+
+        public static Action? OnTargetConnectionChange; // trigger this function to notify other  subscriped parts of
+                                                        // the code
 
         public static Connection? TargetConnection = null; // this can be used to send data to the TargetedConnection
                                                            // TargetConnection is  updated  by  the mouse  Controller
@@ -36,8 +43,17 @@ namespace InputConnect.Controllers
 
 
             // start our Controllers Manually
-            Mouse.Start(); 
+            GlobalMouse.Start(); 
             Keyboard.Start();
+            ClipBoard.Start();
+
+
+            // this is responsiable for the audio controllers and the cross
+            // platform compatiablity it should pick and choose which os it
+            // and which libraries it needs
+
+            Audio.Audio.Start();
+
 
             return true;
         }

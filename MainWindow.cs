@@ -5,6 +5,9 @@ using Avalonia.Threading;
 using Avalonia.Controls;
 using InputConnect.UI;
 using System;
+using System.Collections.Generic;
+using SharpHook.Data;
+using InputConnect.Controllers.Mouse;
 
 
 
@@ -28,7 +31,8 @@ namespace InputConnect
 
 
 
-            
+
+
         }
 
 
@@ -51,6 +55,9 @@ namespace InputConnect
 
             SharedData.Device.Screens = Screens.All; // add the Screens data for the public varables for other
                                                      // parts of the code to use it
+
+
+            SharedData.Device.TopLevel = GetTopLevel(this);
 
 
             MainCanvas = new Canvas{ // now we create the canvase after we load up for preformece
@@ -133,7 +140,7 @@ namespace InputConnect
 
 
         private void OnClickExit(object? sender, object? e) {
-            Controllers.Mouse.Hook.Dispose();
+            GlobalMouse.Hook.Dispose();
             Environment.Exit(0);
         }
     }

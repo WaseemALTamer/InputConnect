@@ -386,3 +386,213 @@ class Program
                 }
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async void TestClipboard()
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel == null) return;
+
+            // Check for text
+            var text = await topLevel.Clipboard.GetTextAsync();
+            if (!string.IsNullOrEmpty(text))
+            {
+                Console.WriteLine("Text copied: " + text);
+            }
+
+            // Check for files
+            var filesObj = await topLevel.Clipboard.GetDataAsync("Files");
+
+            if (filesObj != null){
+                // Try casting to IEnumerable
+                if (filesObj is IEnumerable<object> files){
+                    foreach (var file in files){
+                        // Try casting each file to IStorageItem
+                        if (file is Avalonia.Platform.Storage.IStorageItem storageItem){
+                            Console.WriteLine("Copied file: " + storageItem.Path); // or .Path if available
+                        }
+                    }
+                }
+                else{
+                    Console.WriteLine("Clipboard files data is not enumerable!");
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public static class Audio
+    {
+
+
+        public static WaveOutEvent? WaveOut;
+        public static WaveFormat? WaveFormat;
+        public static MixingSampleProvider? Mixer;
+        public static WasapiLoopbackCapture? Capture;
+
+
+        public static void Start()
+        {
+
+            var enumerator = new NAudio.CoreAudioApi.MMDeviceEnumerator();
+            var defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+
+            WaveFormat = defaultDevice.AudioClient.MixFormat;
+
+            Mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(
+                WaveFormat.SampleRate,
+                WaveFormat.Channels))
+            {
+                ReadFully = true
+            };
+
+            WaveOut = new WaveOutEvent();
+            Capture = new WasapiLoopbackCapture()
+            {
+                ShareMode = AudioClientShareMode.Shared,
+                WaveFormat = WaveFormat,
+            };
+
+
+
+            WaveFormat = Capture.WaveFormat;
+
+
+
+
+
+
+
+
+
+            Capture.DataAvailable += OnDataAvailable;
+
+
+            Capture.StartRecording();
+
+
+            WaveOut.Init(Mixer);
+            WaveOut.Play();
+
+            MessageManager.OnCommandAudio += OnReceiveCommand;
+        }
+
+
+        private static void OnDataAvailable(object? sender, WaveInEventArgs e){
+            int bytesPerSlice = Setting.Config.AudioBufferSize;
+
+            for (int offset = 0; offset < e.BytesRecorded; offset += bytesPerSlice)
+            {
+                int sliceLength = Math.Min(bytesPerSlice, e.BytesRecorded - offset);
+                byte[] slice = new byte[sliceLength];
+                Array.Copy(e.Buffer, offset, slice, 0, sliceLength);
+
+                OnDataSlice(slice, slice.Length);
+            }
+        }
+
+        public static void OnDataSlice(byte[] slice, int length) {
+
+            TransmitAudio(slice, length);
+
+            
+        }
+
+
+        public static void Stop(){
+            if (Capture == null) return;
+
+
+            Capture.StopRecording();
+            Capture.Dispose();
+
+        }
+
+
+
+
+
+        public static void TransmitAudio(byte[] buffer, int bytesRecorded)
+        {
+            // this function is going to transmit a text to the other devices to store it in
+            // the clipboard
+
+            // int offset -> still havent been implemented look through it
+
+            foreach (var connection in Connections.Devices.ConnectionList){
+
+                if (connection.AudioState != Connections.Constants.Transmit) continue;
+
+                var _command = new Commands.Audio{
+                    Buffer = buffer,
+                    BytesRecorded = bytesRecorded,
+                };
+
+                var _commandMessage = new MessageCommand{
+                    Type = Commands.Constants.CommandTypes.Audio,
+                    SequenceNumber = connection.SequenceNumber + 1,
+                    Command = JsonSerializer.Serialize(_command)
+                };
+                connection.SequenceNumber += 1;
+
+                var messageudp = new MessageUDP{
+                    MessageType = Network.Constants.MessageTypes.Command,
+                    Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.Token),
+                    IsEncrypted = true
+                };
+
+                if (connection.MacAddress != null){
+                    ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                }
+            }
+
+        }
+
+
+        public static void OnReceiveCommand(Commands.Audio command, Connection connection){
+
+
+            if (Mixer == null) return;
+
+            if (command.Buffer == null) return;
+            if (command.BytesRecorded == null) return;
+
+
+            if (connection.BufferedWaveProvider == null) {
+                connection.BufferedWaveProvider = new BufferedWaveProvider(WaveFormat);
+                Mixer.AddMixerInput(connection.BufferedWaveProvider.ToSampleProvider());
+            }
+
+
+
+            connection.BufferedWaveProvider.AddSamples(command.Buffer, 0, (int)command.BytesRecorded);
+
+
+        }
+
+
+
+    }

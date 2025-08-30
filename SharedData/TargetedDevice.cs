@@ -29,13 +29,13 @@ namespace InputConnect.SharedData
 
 
 
-        public static string? Token;
+        public static PasswordKey? PasswordKey;
 
         public static void Clear() {
             MacAddress = null; 
             DeviceName = null;
             Connection = null;
-            Token = null;
+            PasswordKey = null;
         }
 
     }

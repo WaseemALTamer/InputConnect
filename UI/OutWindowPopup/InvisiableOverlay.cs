@@ -5,6 +5,9 @@ using Avalonia.Media;
 using System;
 using InputConnect.Structures;
 using Tmds.DBus.Protocol;
+using Avalonia.Rendering.Composition.Animations;
+using System.Threading.Tasks;
+using InputConnect.Controllers.Mouse;
 
 
 
@@ -19,7 +22,6 @@ namespace InputConnect.UI.OutWindowPopup
         // perpose is fo abbsorb keystokes  or mouse clicks, though
 
 
-        private MouseController? mouseController;
 
 
         private Action? _OnShow;
@@ -53,36 +55,40 @@ namespace InputConnect.UI.OutWindowPopup
             Cursor = new Cursor(StandardCursorType.None);
 
 
-            mouseController = new MouseController(this);
+            //mouseController = new MouseController(this);
 
             // now we can attack the functions for the abbsorber
-            Controllers.Mouse.OnVirtualMointorEnter += OnVirtualMointorEnterTrigger;
-            Controllers.Mouse.OnVirtualMointorExit += OnVirtualMointorExitTrigger;
+            GlobalMouse.OnVirtualMointorEnter += OnVirtualMointorEnterTrigger;
+            GlobalMouse.OnVirtualMointorExit += OnVirtualMointorExitTrigger;
         }
 
 
 
         public void OnVirtualMointorEnterTrigger(){
             // ensure that is is on the right thread
-            Dispatcher.UIThread.Post(() => {
+            Dispatcher.UIThread.Post(async () => {
+
+                Show();
+
+                await Task.Delay(1);
 
                 if (OnShow != null) OnShow.Invoke();
 
-                if (mouseController != null)
-                    mouseController.IsHidden = false;
+                //if (mouseController != null)
+                //    mouseController.IsHidden = false;
 
-
-
-                Show();
             });
         }
 
         public void OnVirtualMointorExitTrigger(){
             // ensure that is is on the right thread
-            Dispatcher.UIThread.Post(() => {
-                Hide();
-
+            Dispatcher.UIThread.Post(async () => {
+                
                 if (OnHide != null) OnHide.Invoke();
+                
+                await Task.Delay(1);
+
+                Hide();
             });
         }
 

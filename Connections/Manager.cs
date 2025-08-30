@@ -31,7 +31,7 @@ namespace InputConnect.Connections
 
 
         // this function is to be used to make a connection with another device on the network
-        public static Connection? EstablishConnection(string IP, string Token, string? MacAdress, string? Devicename=null){ 
+        public static Connection? EstablishConnection(string IP, PasswordKey passswordKey, string? MacAdress, string? Devicename=null){ 
             // we only need the ip to make the connections with a device on the network and is listening
             // the token is not shared and is only used to send the  message over  this will  be used to
             // send a connection request nothing more nothing less, it will also  add the  connection to
@@ -39,7 +39,7 @@ namespace InputConnect.Connections
 
             MessageUDP messageUDP = new MessageUDP { 
                 MessageType = Network.Constants.MessageTypes.Connect,
-                Text = Encryptor.Encrypt(Constants.PassPhase, Token), // encreapt the text for the other device to try to decreapt it
+                Text = Encryptor.Encrypt(Constants.PassPhase, passswordKey), // encreapt the text for the other device to try to decreapt it
                 IsEncrypted = true,
             };
 
@@ -49,7 +49,7 @@ namespace InputConnect.Connections
                 DeviceName = Devicename,
                 MacAddress = MacAdress,
                 SequenceNumber = 0,
-                Token = Token,
+                PasswordKey = passswordKey,
             };
 
 
@@ -93,7 +93,7 @@ namespace InputConnect.Connections
 
         // this function only trys one to decreapt it if you want to try more than once then write the code your self
         // I actually did check the UI -> ConnectionReplay.cs file for refrence on how to do so 
-        public static Connection? AcceptIncomingConnection(MessageUDP Message, string Token) {
+        public static Connection? AcceptIncomingConnection(MessageUDP Message, PasswordKey passwordkey) {
             // the token is only there to check if it works no more no less
             // we will also check if the token work with  the  UI, we  will
             // also check it again but this time it is  one time  and if it 
@@ -106,7 +106,7 @@ namespace InputConnect.Connections
             if (Message == null || Message.Text == null) { 
                 return null; 
             }
-            if (Encryptor.Decrypt(Message.Text, Token) != Constants.PassPhase) {
+            if (Encryptor.Decrypt(Message.Text, passwordkey) != Constants.PassPhase) {
                 CloseIncomingConnection(Message, "Token mismatch"); // reject it
                 //SharedData.IncomingConnection.Clear(); // remove the the message
                 return null; // move on
@@ -114,7 +114,7 @@ namespace InputConnect.Connections
 
             MessageUDP messageUDP = new MessageUDP{
                 MessageType = Network.Constants.MessageTypes.Accept,
-                Text = Encryptor.Encrypt(Constants.PassPhase, Token), // replay with the pass phase for absolutely no reason
+                Text = Encryptor.Encrypt(Constants.PassPhase, passwordkey), // replay with the pass phase for absolutely no reason
                 IsEncrypted = true,
             };
 
@@ -128,7 +128,7 @@ namespace InputConnect.Connections
                 DeviceName = Message.DeviceName,
                 MacAddress = Message.MacAddress,
                 SequenceNumber = 0,
-                Token = Token,
+                PasswordKey = passwordkey,
             };
 
             for (int i = 0; i < Devices.ConnectionList.Count; i++){ // check if connection already exists

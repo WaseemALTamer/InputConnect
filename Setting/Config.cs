@@ -29,7 +29,8 @@ namespace InputConnect.Setting
                                         // other devices on the network
 
         public static int Tick = 8;     // this is used for animations  each tick will occure
-                                        // every 8ms apart
+                                        // every 8ms apart this  is  also  is  being used for
+                                        // dispatch timers for varying tasks
 
         public static int AdvertisementInterval = 3000; // this is used to tell  the function that advertise the
                                                         // device to advertise it  every <AdvertisementInterval>
@@ -60,8 +61,26 @@ namespace InputConnect.Setting
         public static int TimeOutDuration = 3000; // this will control how long it takes to wait for another
                                                   // device message before timming out and returning nothing
 
+        // Mouse 
 
         public static int MouseScrollStrength = 120;
+
+
+        public static int MouseUpdateTickRate = 8; // this is the tick rate to update the mouse on the other deivce
+                                                   // this value is only valued when you are  in the absorber mouse
+                                                   // tracker
+
+
+        // audio
+
+        public static ushort AudioFrequency = 48000;
+
+
+        public static ushort AudioBufferSize = 10240;
+
+
+        public static byte AudioChannals = 2;
+        
 
     }
 }

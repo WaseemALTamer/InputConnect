@@ -112,9 +112,10 @@ namespace InputConnect.UI.Containers
         public void Update() {
             if (Entry == null) return; 
 
-            if (TargetedDevice.Connection != null) {
-                Entry.Text = TargetedDevice.Connection.Token;
-
+            if (TargetedDevice.Connection != null && 
+                TargetedDevice.Connection.PasswordKey != null) 
+            {
+                Entry.Text = TargetedDevice.Connection.PasswordKey.Token;
             }
             else{
                 Entry.Text = "";
@@ -230,7 +231,7 @@ namespace InputConnect.UI.Containers
                 // the MacAddress anything but we  wont be  gettinga response  for the  message since the
                 // user is going to resposnd with there own mac address
 
-                if (Entry == null || Entry.Text == null || Entry.Text == "") {
+                if (Entry == null || Entry.Text == null || Entry.Text == "" ) {
                     
                     if (WrongTokenTranstion != null) 
                         WrongTokenTranstion.TranslateForward();
@@ -239,11 +240,13 @@ namespace InputConnect.UI.Containers
                 }
 
 
-                string token = Entry.Text;
+
+
+                PasswordKey passwordKey = new PasswordKey(Entry.Text);
                 var newConnection = Connections.Manager.EstablishConnection(MessageManager.MacToIP[TargetedDevice.MacAddress],
-                                                        token,
-                                                        TargetedDevice.MacAddress,
-                                                        TargetedDevice.DeviceName);
+                                                                            passwordKey,
+                                                                            TargetedDevice.MacAddress,
+                                                                            TargetedDevice.DeviceName);
 
                 TargetedDevice.Connection = newConnection;
 

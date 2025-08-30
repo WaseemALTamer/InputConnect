@@ -6,6 +6,8 @@
 
 using Avalonia;
 using Avalonia.Platform;
+using InputConnect.Controllers.Audio;
+using NAudio.Wave;
 using System.Collections.Generic;
 
 namespace InputConnect.Structures
@@ -36,6 +38,17 @@ namespace InputConnect.Structures
                                                           // are completely imagenery, and need to be converted back to the screen bounds
                                                           // before being sent to the next device
 
+        public AudioQueue? AudioQueue { get; set; } // this will  provide a thread free  Queue system in order
+                                                    // to keep  track of the  audio  comming from  the network
+                                                    // for the  connection which then the audio can be mearged
+                                                    // togather for  Mixing incoming data, after  creating the
+                                                    // save connection freacher for  quick  startup  reconnect
+                                                    // distory the AudioQueue for the connection before saving
+                                                    // there is no need to keep track  of the bytes they  mean
+                                                    // nothing when saving the connection
+
+
+
         public string? Logs { get; set; } // this will hold the logs for certain messages that are sent and
                                           // data on the progress for the connection
 
@@ -45,7 +58,9 @@ namespace InputConnect.Structures
 
         public string? AudioState { get; set; } // this can be either a Reciver, Transmitter or None
 
-        public string? Token { get; set; } // token to dechyper the message
+        public PasswordKey? PasswordKey { get; set; } // this will contain the data to encreapt data effienctly
+                                                      // this methode allows  us to  store the key and the salt
+                                                      // along with it to make it less processing intensive
 
     }
 }

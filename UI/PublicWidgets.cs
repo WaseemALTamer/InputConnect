@@ -31,6 +31,13 @@ namespace InputConnect.UI
         // allows us to access it using its public pointer
 
 
+        private static Canvas? _Master;
+        public static Canvas? Master
+        {
+            get { return _Master; }
+            set { _Master = value; }
+        }
+
 
         // <ASSETS>
         private static BackButton? _BackButton;
@@ -95,8 +102,8 @@ namespace InputConnect.UI
 
 
         // <POPUPS OUTWINDOW>
-        private static InvisiableOverlay? _UIInvisiableOverlayOutPop;
-        public static InvisiableOverlay? UIInvisiableOverlayOutPop{
+        private static InvisiableOverlaySDL? _UIInvisiableOverlayOutPop;
+        public static InvisiableOverlaySDL? UIInvisiableOverlayOutPop{
             get { return _UIInvisiableOverlayOutPop; }
             set { _UIInvisiableOverlayOutPop = value; }
         }
@@ -112,9 +119,9 @@ namespace InputConnect.UI
 
         private static Pages.Base? DisplayedPage;
 
-        public static void Initialize(AvaloniaObject master) {
-            var Master = master as Canvas;
-            if (Master == null) return; // redundency if statment
+        public static void Initialize(Canvas master) {
+            
+            Master = master;
 
 
             // We create all the instances of all our objects here
@@ -181,7 +188,7 @@ namespace InputConnect.UI
             // <OUT_POPUPS START>
 
             // this creates the absorber popup
-            UIInvisiableOverlayOutPop = new InvisiableOverlay();
+            UIInvisiableOverlayOutPop = new InvisiableOverlaySDL();
 
             // <IN_POPUPS END>
 

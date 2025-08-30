@@ -89,9 +89,10 @@ namespace InputConnect.Controllers
             };
             target.SequenceNumber += 1;
 
+
             var messageudp = new MessageUDP{
                 MessageType = Network.Constants.MessageTypes.Command,
-                Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), target.Token),
+                Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), target.PasswordKey),
                 IsEncrypted = true
             };
 
@@ -128,7 +129,7 @@ namespace InputConnect.Controllers
 
             var messageudp = new MessageUDP{
                 MessageType = Network.Constants.MessageTypes.Command,
-                Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), target.Token),
+                Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), target.PasswordKey),
                 IsEncrypted = true
             };
 

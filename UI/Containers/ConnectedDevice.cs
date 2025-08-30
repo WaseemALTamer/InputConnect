@@ -266,7 +266,7 @@ namespace InputConnect.UI.Containers
                     SharedData.TargetedDevice.Connection = Device;
                     SharedData.TargetedDevice.MacAddress = Device.MacAddress;
                     SharedData.TargetedDevice.DeviceName = Device.DeviceName;
-                    SharedData.TargetedDevice.Token = Device.Token;
+                    SharedData.TargetedDevice.PasswordKey = Device.PasswordKey;
                     
 
                     // Transition to the next window

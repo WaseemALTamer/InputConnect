@@ -1,0 +1,80 @@
+﻿using InputConnect.Network;
+using InputConnect.Structures;
+using System;
+using System.Runtime.InteropServices;
+using System.Text.Json;
+
+namespace InputConnect.Controllers.Audio
+{
+    public static class Audio{
+
+
+        public static AudioHookInterface? AudioHook;
+
+
+        public static void Start(){
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)){
+                AudioHook = new AudioHookWindows();
+            }
+
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)){
+                Console.WriteLine("Linux");
+            }
+
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)){
+                Console.WriteLine("macOS");
+            }
+
+            else{
+                Console.WriteLine("Unknown OS");
+            }
+
+
+            AudioOut.Start(); // start the AudioStart to play audio on the run
+                              // this approch needs  to be  changed to fit the
+                              // change of output audio device
+        }
+
+
+        public static void TransmitAudio(byte[] buffer, int bytesRecorded){
+            // this function is going to transmit a text to the other devices to store it in
+            // the clipboard
+
+            // int offset -> still havent been implemented look through it
+
+            // run this function for all the auido that you are trying to transmit this function
+            // will filter out the ones that doent need to be sent and  the ones that need to be
+            // sent
+
+
+            foreach (var connection in Connections.Devices.ConnectionList){
+
+                if (connection.AudioState != Connections.Constants.Transmit) continue;
+
+                var _command = new Commands.Audio{
+                    Buffer = buffer,
+                    BytesRecorded = bytesRecorded,
+                };
+
+                var _commandMessage = new MessageCommand{
+                    Type = Commands.Constants.CommandTypes.Audio,
+                    SequenceNumber = connection.SequenceNumber + 1,
+                    Command = JsonSerializer.Serialize(_command)
+                };
+                connection.SequenceNumber += 1;
+
+                var messageudp = new MessageUDP{
+                    MessageType = Network.Constants.MessageTypes.Command,
+                    Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.PasswordKey),
+                    IsEncrypted = true
+                };
+
+                if (connection.MacAddress != null){
+                    ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                }
+            }
+        }
+
+
+    }
+}

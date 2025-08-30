@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Input;
 using Avalonia;
 using System;
+using InputConnect.Structures;
 
 
 
@@ -263,11 +264,11 @@ namespace InputConnect.UI.InWindowPopup
                 SharedData.IncomingConnection.Message.Text != null) 
             {
                 
-                var DecreaptedMessge = Encryptor.Decrypt(SharedData.IncomingConnection.Message.Text, Entry.Text);
+                var DecreaptedMessge = Encryptor.Decrypt(SharedData.IncomingConnection.Message.Text, new Structures.PasswordKey(Entry.Text));
 
                 if (DecreaptedMessge == Connections.Constants.PassPhase){
 
-                    SharedData.IncomingConnection.Token = Entry.Text;
+                    SharedData.IncomingConnection.PasswordKey = new PasswordKey(Entry.Text);
 
                     if (TimeoutTimer != null)
                         TimeoutTimer.Pause();
@@ -275,7 +276,7 @@ namespace InputConnect.UI.InWindowPopup
                     HideRight();
 
                     var newConnection = Connections.Manager.AcceptIncomingConnection(SharedData.IncomingConnection.Message, // establish the connection
-                                                                                     SharedData.IncomingConnection.Token);
+                                                                                     SharedData.IncomingConnection.PasswordKey);
                     
 
 

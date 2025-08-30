@@ -35,7 +35,9 @@ namespace InputConnect.Network
 
         public static Action<Keyboard>? OnCommandKeyboard;
 
-        public static Action<Audio>? OnCommandAudio;
+        public static Action<Audio, Structures.Connection>? OnCommandAudio;
+
+        public static Action<ClipBoard>? OnCommandClipBoard;
 
         public static Action? OnIntailDataReuqest;
 
@@ -178,7 +180,7 @@ namespace InputConnect.Network
                     foreach (var connection in Connections.Devices.ConnectionList) {
                         if (connection.MacAddress == message.MacAddress) {
                             DeviceConnection = connection;
-                            var text = Encryptor.Decrypt(message.Text, connection.Token);
+                            var text = Encryptor.Decrypt(message.Text, connection.PasswordKey);
                             message.Text = text;
                             break;
                         }
@@ -223,6 +225,40 @@ namespace InputConnect.Network
                 }
 
 
+                if (commandMessage != null &&
+                    commandMessage.Type == Commands.Constants.CommandTypes.ClipBoard &&
+                    commandMessage.Command != null)
+                {
+
+                    var Command = JsonSerializer.Deserialize<Commands.ClipBoard>(commandMessage.Command);
+
+                    if (OnCommandClipBoard != null &&
+                        Command != null)
+                    {
+                        OnCommandClipBoard.Invoke(Command);
+                    }
+
+                }
+
+
+                if (commandMessage != null &&
+                    commandMessage.Type == Commands.Constants.CommandTypes.Audio &&
+                    commandMessage.Command != null)
+                {
+                    var Command = JsonSerializer.Deserialize<Commands.Audio>(commandMessage.Command);
+
+                    if (OnCommandAudio != null &&
+                        Command != null &&
+                        DeviceConnection.AudioState == Connections.Constants.Receive)
+                    {
+                        OnCommandAudio.Invoke(Command, DeviceConnection);
+                    }
+
+                }
+
+
+
+
             }
 
 
@@ -260,7 +296,7 @@ namespace InputConnect.Network
 
 
 
-            var EncryptedData = Encryptor.Encrypt(JsonSerializer.Serialize<IntialData>(data), connection.Token);
+            var EncryptedData = Encryptor.Encrypt(JsonSerializer.Serialize<IntialData>(data), connection.PasswordKey);
             newMessage.Text = EncryptedData;
 
 
@@ -278,7 +314,7 @@ namespace InputConnect.Network
 
 
             if (message.IsEncrypted == true) {
-                message.Text = Encryptor.Decrypt(message.Text, connection.Token);
+                message.Text = Encryptor.Decrypt(message.Text, connection.PasswordKey);
                 if (message.Text == null) return; // we return because token is incorrect
             }
 

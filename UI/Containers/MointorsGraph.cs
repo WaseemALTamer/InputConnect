@@ -51,8 +51,8 @@ namespace InputConnect.UI.Containers
             
             
 
-            MessageManager.OnAccept += _ => Update();
-            Connections.Manager.OnConnectedConnectionAdded += Update;
+
+
             PointerPressed += OnPointerPressed;
 
             OnSizeChage();
@@ -62,6 +62,8 @@ namespace InputConnect.UI.Containers
             }
 
 
+            MessageManager.OnAccept += _ => Update();
+            Connections.Manager.OnConnectedConnectionAdded += Update;
             Events.TargetDeviceConnectionChanged += Update;
 
             UpdateGraph();
@@ -80,10 +82,13 @@ namespace InputConnect.UI.Containers
         public async void UpdateGraph() {
             
             if (MainGraph == null) return;
+
+
             MainGraph.ClearGraphObjects();
             // add my own physical screens
 
-            int mointorNumer = 1; 
+            int mointorNumer = 1;
+            int MaxPosX = 0; // this will control 
 
             if (SharedData.Device.Screens != null){
                 foreach (var screen in SharedData.Device.Screens){
@@ -101,6 +106,10 @@ namespace InputConnect.UI.Containers
                     
                     mointorNumer += 1;
                     MainGraph.AddGraphObject(mointor);
+
+
+                    if (MaxPosX < screen.Bounds.X + screen.Bounds.Width)
+                        MaxPosX = screen.Bounds.X + screen.Bounds.Width;
                 }
             }
 
@@ -121,43 +130,83 @@ namespace InputConnect.UI.Containers
                         }
                     }
 
+
+                    if (device.VirtualScreens != null) {
+                        foreach (var screen in device.VirtualScreens){
+
+                            var mointor = new Monitor(screen.X,
+                                                      screen.Y,
+                                                      screen.Width,
+                                                      screen.Height,
+                                                      mointorNumer,
+                                                      MainGraph);
+
+                            mointor.ScreenBounds = screen;
+
+                            mointor.SetLock(false);
+
+                            mointorNumer += 1;
+                            MainGraph.AddGraphObject(mointor);
+
+                            if (screen.X + screen.Width > MaxPosX)
+                                MaxPosX = screen.X + screen.Width;
+                        }
+
+                        continue;
+                    }
+
+
+
+
                     if (device.VirtualScreens == null){
                         device.VirtualScreens = new List<Bounds>();
 
                         if (device.Screens != null){
-                            foreach (var s in device.Screens){
-                                device.VirtualScreens.Add(new Bounds{
-                                    X = s.X,
+                            foreach (var s in device.Screens)
+                            {
+                                device.VirtualScreens.Add(new Bounds
+                                {
+                                    X = MaxPosX,
                                     Y = s.Y,
                                     Width = s.Width,
                                     Height = s.Height
                                 });
+
+
+                                MaxPosX = s.X + s.Width;
+
                             }
+                        }
+
+                        foreach (var screen in device.VirtualScreens){
+
+                            var mointor = new Monitor(screen.X,
+                                                      screen.Y,
+                                                      screen.Width,
+                                                      screen.Height,
+                                                      mointorNumer,
+                                                      MainGraph);
+
+                            mointor.ScreenBounds = screen;
+
+                            mointor.SetLock(false);
+
+                            mointorNumer += 1;
+                            MainGraph.AddGraphObject(mointor);
+
+
+                            if (screen.X + screen.Width > MaxPosX)
+                                MaxPosX = screen.X + screen.Width;
                         }
                     }
 
-                    foreach (var screen in device.VirtualScreens) {
 
-                        var mointor = new Monitor(screen.X,
-                                                  screen.Y,
-                                                  screen.Width,
-                                                  screen.Height,
-                                                  mointorNumer,
-                                                  MainGraph);
-
-                        mointor.ScreenBounds = screen;
-
-                        mointor.SetLock(false);
-
-                        mointorNumer += 1;
-                        MainGraph.AddGraphObject(mointor);
-                    }
-
-                    
                 }
             }
 
+
         }
+
 
 
         public void OnSizeChage(object? sender = null, object? e = null) {

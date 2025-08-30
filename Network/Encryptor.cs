@@ -3,43 +3,30 @@ using System.Text;
 using System.IO;
 using System;
 using System.Linq;
-
-
-
+using System.Collections.Generic;
+using InputConnect.Structures;
 
 namespace InputConnect.Network
 {
-    public static class Encryptor
-    {
-        private static byte[]? _cachedKey = null;
-        private static byte[]? _cachedSalt = null;
-        private static string? _cachedPassword = null;
-
+    public static class Encryptor{
         private const int KeySize = 32;
         private const int IvSize = 16;
         private const int SaltSize = 16;
         private const int HmacSize = 32;
         private const int Iterations = 100000;
 
-        public static string Encrypt(string plainText, string? password)
+        // Cache multiple passwords
+        private static readonly Dictionary<string, (byte[] Key, byte[] Salt)> _cache = new Dictionary<string, (byte[] Key, byte[] Salt)>();
+
+        public static string Encrypt(string plainText, PasswordKey? pk)
         {
-            if (password == null) return plainText;
+            if (pk == null || pk.Token == null) return plainText;
 
-            byte[] salt;
-            byte[] key;
-
-            if (password == _cachedPassword && _cachedKey != null && _cachedSalt != null)
+            // Only generate salt/key once
+            if (pk.Salt == null || pk.Key == null)
             {
-                salt = _cachedSalt;
-                key = _cachedKey;
-            }
-            else
-            {
-                salt = RandomNumberGenerator.GetBytes(SaltSize);
-                key = DeriveKey(password, salt);
-                _cachedSalt = salt;
-                _cachedKey = key;
-                _cachedPassword = password;
+                pk.Salt = pk.Salt ?? RandomNumberGenerator.GetBytes(SaltSize);
+                pk.Key = pk.Key ?? DeriveKey(pk.Token, pk.Salt);
             }
 
             byte[] iv = RandomNumberGenerator.GetBytes(IvSize);
@@ -47,7 +34,7 @@ namespace InputConnect.Network
 
             using (var aes = Aes.Create())
             {
-                aes.Key = key;
+                aes.Key = pk.Key;
                 aes.IV = iv;
                 aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.PKCS7;
@@ -62,12 +49,10 @@ namespace InputConnect.Network
                 cipherBytes = ms.ToArray();
             }
 
-            // Compute HMAC
-            byte[] hmac = ComputeHmac(key, salt, iv, cipherBytes);
+            byte[] hmac = ComputeHmac(pk.Key, pk.Salt, iv, cipherBytes);
 
-            // Format: [salt][iv][cipher][hmac]
             using var finalStream = new MemoryStream();
-            finalStream.Write(salt);
+            finalStream.Write(pk.Salt);
             finalStream.Write(iv);
             finalStream.Write(cipherBytes);
             finalStream.Write(hmac);
@@ -75,9 +60,9 @@ namespace InputConnect.Network
             return Convert.ToBase64String(finalStream.ToArray());
         }
 
-        public static string? Decrypt(string encryptedBase64, string? password)
+        public static string? Decrypt(string encryptedBase64, PasswordKey? passwordKey)
         {
-            if (password == null) return null;
+            if (passwordKey == null || passwordKey.Token == null) return null;
 
             try
             {
@@ -90,16 +75,13 @@ namespace InputConnect.Network
                 byte[] expectedHmac = encryptedData[^HmacSize..];
 
                 byte[] key;
-                if (password == _cachedPassword && _cachedSalt != null && salt.SequenceEqual(_cachedSalt) && _cachedKey != null)
-                {
-                    key = _cachedKey;
+                if (passwordKey.Key != null && passwordKey.Salt != null && salt.SequenceEqual(passwordKey.Salt) ){
+                    key = passwordKey.Key;
                 }
-                else
-                {
-                    key = DeriveKey(password, salt);
-                    _cachedPassword = password;
-                    _cachedSalt = salt;
-                    _cachedKey = key;
+                else{
+                    key = DeriveKey(passwordKey.Token, salt);
+                    passwordKey.Salt = salt;
+                    passwordKey.Key = key;
                 }
 
                 // Verify HMAC
