@@ -90,7 +90,7 @@ namespace InputConnect.Controllers.Audio
             if (command.Buffer == null) return;
             if (command.BytesRecorded == null) return;
 
-            Console.WriteLine(command.BytesRecorded);
+            //Console.WriteLine(command.BytesRecorded);
 
 
             if (connection.AudioQueue == null)
@@ -123,4 +123,5 @@ namespace InputConnect.Controllers.Audio
 
 
     }
+
 }
