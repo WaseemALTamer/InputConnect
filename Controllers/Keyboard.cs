@@ -1,14 +1,11 @@
-﻿using InputConnect.Network;
-using InputConnect.Structures;
-using SharpHook;
-using SharpHook.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using InputConnect.Structures;
+using InputConnect.Network;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Tmds.DBus.Protocol;
+using SharpHook.Data;
+using SharpHook;
+
+
+
 
 namespace InputConnect.Controllers
 {

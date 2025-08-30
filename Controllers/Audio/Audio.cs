@@ -18,7 +18,7 @@ namespace InputConnect.Controllers.Audio
             }
 
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)){
-                Console.WriteLine("Linux");
+                AudioHook = new AuidoHookLinux();
             }
 
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)){
@@ -51,6 +51,12 @@ namespace InputConnect.Controllers.Audio
 
                 if (connection.AudioState != Connections.Constants.Transmit) continue;
 
+
+                // Skip sending if audio is effectively silent
+                if (IsSilent(buffer, bytesRecorded))
+                    return;
+
+
                 var _command = new Commands.Audio{
                     Buffer = buffer,
                     BytesRecorded = bytesRecorded,
@@ -73,6 +79,23 @@ namespace InputConnect.Controllers.Audio
                     ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
                 }
             }
+        }
+
+
+
+        private static bool IsSilent(byte[] buffer, int bytesRecorded, float threshold = 0.0001f){
+            // this function checks if the buffer is filled with zeros and is silent if so we return true
+            
+            // Each float is 4 bytes
+            int floatCount = bytesRecorded / 4;
+
+            for (int i = 0; i < floatCount; i++){
+                float sample = BitConverter.ToSingle(buffer, i * 4);
+                if (Math.Abs(sample) > threshold)
+                    return false; // Found a non-silent sample
+            }
+
+            return true; // All samples are below threshold → silent
         }
 
 

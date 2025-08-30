@@ -59,7 +59,7 @@ namespace InputConnect.UI.OutWindowPopup
 
 
         public InvisiableOverlaySDL(){
-            if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) < 0)
+            if (SDL.SDL_Init(SDL.SDL_INIT_AUDIO) < 0)
                 throw new Exception("SDL could not initialize! " + SDL.SDL_GetError());
 
             // Create fullscreen, borderless, transparent window

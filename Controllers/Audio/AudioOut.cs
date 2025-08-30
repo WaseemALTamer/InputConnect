@@ -1,8 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using InputConnect.Structures;
 using InputConnect.Network;
-using System.Text.Json;
-using NAudio.Wave;
 using System;
 using SDL2;
 
@@ -53,7 +51,7 @@ namespace InputConnect.Controllers.Audio
 
             string device = SDL.SDL_GetAudioDeviceName(1, 0);
 
-            Console.WriteLine($"{device}");
+            //Console.WriteLine($"{device}");
 
 
             OpenAudioDevice = SDL.SDL_OpenAudioDevice(
@@ -112,7 +110,6 @@ namespace InputConnect.Controllers.Audio
             if (command.Buffer == null) return;
             if (command.BytesRecorded == null) return;
 
-            //Console.WriteLine("Reciving");
 
             if (connection.AudioQueue == null) {
                 connection.AudioQueue = new AudioQueue();
