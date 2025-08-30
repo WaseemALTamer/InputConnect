@@ -49,7 +49,7 @@ namespace InputConnect.Controllers.Audio
             };
 
 
-            string device = SDL.SDL_GetAudioDeviceName(0, 0);
+            string device = SDL.SDL_GetAudioDeviceName(1, 0);
 
             //Console.WriteLine($"{device}");
 
@@ -70,8 +70,6 @@ namespace InputConnect.Controllers.Audio
 
             SDL.SDL_PauseAudioDevice((uint)OpenAudioDevice, 0);
 
-
-            MessageManager.OnCommandAudio += OnReceiveCommand;
         }
 
 
@@ -105,20 +103,5 @@ namespace InputConnect.Controllers.Audio
             Marshal.Copy(mixBuffer, 0, stream, samples);
         }
 
-
-        public static void OnReceiveCommand(Commands.Audio command, Connection connection){
-            if (command.Buffer == null) return;
-            if (command.BytesRecorded == null) return;
-
-
-            if (connection.AudioQueue == null) {
-                connection.AudioQueue = new AudioQueue();
-            }
-            //Console.WriteLine(connection.MacAddress);
-
-            connection.AudioQueue.Write(command.Buffer);
-        }
-
     }
 }
-

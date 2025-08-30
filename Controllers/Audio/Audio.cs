@@ -33,6 +33,9 @@ namespace InputConnect.Controllers.Audio
             AudioOut.Start(); // start the AudioStart to play audio on the run
                               // this approch needs  to be  changed to fit the
                               // change of output audio device
+
+
+            MessageManager.OnCommandAudio += OnReceiveCommand;
         }
 
 
@@ -79,6 +82,26 @@ namespace InputConnect.Controllers.Audio
                     ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
                 }
             }
+        }
+
+
+
+        public static void OnReceiveCommand(Commands.Audio command, Connection connection){
+            if (command.Buffer == null) return;
+            if (command.BytesRecorded == null) return;
+
+            Console.WriteLine(command.BytesRecorded);
+
+
+            if (connection.AudioQueue == null)
+            {
+                connection.AudioQueue = new AudioQueue();
+            }
+            //Console.WriteLine(connection.MacAddress);
+
+            Console.WriteLine(command.Buffer.Length);
+
+            connection.AudioQueue.Write(command.Buffer);
         }
 
 

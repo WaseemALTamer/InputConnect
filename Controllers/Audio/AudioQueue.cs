@@ -21,6 +21,9 @@ namespace InputConnect.Controllers.Audio
     // the error rate is very minimal could arrise later on though 
 
 
+    // the lock is used again interduced
+
+
     public class AudioQueue
     {
         private readonly byte[] buffer;
@@ -30,7 +33,7 @@ namespace InputConnect.Controllers.Audio
         private int writeIndex = 0;
         private int bytesAvailable = 0;
 
-        //private readonly object lockObj = new object();
+        private readonly object lockObj = new object();
 
         /// <summary>
         /// Initializes the AudioQueue with a fixed buffer capacity (default 104000 bytes)
@@ -50,18 +53,18 @@ namespace InputConnect.Controllers.Audio
             if (data == null) return;
             if (count == -1) count = data.Length - offset;
 
-            //lock (lockObj)
-            //{
-            int freeSpace = capacity - bytesAvailable;
-            int toWrite = Math.Min(count, freeSpace);
-
-            for (int i = 0; i < toWrite; i++)
+            lock (lockObj)
             {
-                buffer[writeIndex] = data[offset + i];
-                writeIndex = (writeIndex + 1) % capacity;
+                int freeSpace = capacity - bytesAvailable;
+                int toWrite = Math.Min(count, freeSpace);
+
+                for (int i = 0; i < toWrite; i++)
+                {
+                    buffer[writeIndex] = data[offset + i];
+                    writeIndex = (writeIndex + 1) % capacity;
+                }
+                bytesAvailable += toWrite;
             }
-            bytesAvailable += toWrite;
-            //}
         }
 
         /// <summary>
@@ -74,19 +77,19 @@ namespace InputConnect.Controllers.Audio
 
             int bytesRead = 0;
 
-            //lock (lockObj)
-            //{
-            int toRead = Math.Min(output.Length, bytesAvailable);
-
-            for (int i = 0; i < toRead; i++)
+            lock (lockObj)
             {
-                output[i] = buffer[readIndex];
-                readIndex = (readIndex + 1) % capacity;
-            }
+                int toRead = Math.Min(output.Length, bytesAvailable);
 
-            bytesAvailable -= toRead;
-            bytesRead = toRead;
-            //}
+                for (int i = 0; i < toRead; i++)
+                {
+                    output[i] = buffer[readIndex];
+                    readIndex = (readIndex + 1) % capacity;
+                }
+
+                bytesAvailable -= toRead;
+                bytesRead = toRead;
+            }
 
             // Fill remaining bytes with silence if underflow
             for (int i = bytesRead; i < output.Length; i++)
@@ -100,8 +103,7 @@ namespace InputConnect.Controllers.Audio
         /// </summary>
         public int BytesAvailable
         {
-            get { //lock (lockObj) 
-                    return bytesAvailable; }
+            get { lock (lockObj) return bytesAvailable; }
         }
     }
 

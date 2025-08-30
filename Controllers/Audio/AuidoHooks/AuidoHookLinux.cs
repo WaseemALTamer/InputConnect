@@ -55,7 +55,7 @@ namespace InputConnect.Controllers.Audio
                             $"--format=float32le " +
                             $"--channels={Setting.Config.AudioChannals} " +
                             $"--rate={Setting.Config.AudioFrequency} " +
-                            $"--latency-msec=50",
+                            $"--latency-msec=100",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
@@ -66,22 +66,34 @@ namespace InputConnect.Controllers.Audio
 
             using var stream = process.StandardOutput.BaseStream;
 
-            while (isRunning){
+            byte[] accumulator = new byte[Setting.Config.AudioBufferSize];
+            int accumulatorCount = 0;
+
+            while (isRunning)
+            {
                 int bytesRead = stream.Read(byteBuffer, 0, byteBuffer.Length);
                 if (bytesRead == 0)
                     break;
 
-                int floatsRead = bytesRead / sampleSize;
-                for (int i = 0; i < floatsRead; i++)
+                // Copy read bytes into the accumulator
+                int spaceLeft = Setting.Config.AudioBufferSize - accumulatorCount;
+                int toCopy = Math.Min(bytesRead, spaceLeft);
+                Array.Copy(byteBuffer, 0, accumulator, accumulatorCount, toCopy);
+                accumulatorCount += toCopy;
+
+                // If accumulator is full, transmit
+                if (accumulatorCount == Setting.Config.AudioBufferSize)
                 {
-                    floatBuffer[i] = BitConverter.ToSingle(byteBuffer, i * sampleSize);
+                    Audio.TransmitAudio(accumulator, accumulatorCount);
+                    accumulatorCount = 0; // reset
                 }
 
-                // Convert float array back to byte array
-                byte[] byteBufferToSend = new byte[floatsRead * sampleSize];
-                Buffer.BlockCopy(floatBuffer, 0, byteBufferToSend, 0, byteBufferToSend.Length);
-
-                Audio.TransmitAudio(byteBufferToSend, byteBufferToSend.Length);
+                // If bytesRead was larger than remaining space, keep the leftover for next iteration
+                if (bytesRead > toCopy)
+                {
+                    Array.Copy(byteBuffer, toCopy, accumulator, 0, bytesRead - toCopy);
+                    accumulatorCount = bytesRead - toCopy;
+                }
             }
 
             process.Kill();
