@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -35,8 +35,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Appdata\*" CopyToOutputDirectory="PreserveNewest" />
-		<Content Remove="Appdata\Appdata.cs" />
+		<Content Include="AppData\*" CopyToOutputDirectory="PreserveNewest" />
+		<Content Remove="AppData\AppData.cs" />
 	</ItemGroup>
 
 

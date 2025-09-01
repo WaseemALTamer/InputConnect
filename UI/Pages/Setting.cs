@@ -227,8 +227,8 @@ namespace InputConnect.UI.Pages
                 }
             }
 
-            Appdata.ApplyConfig(NewConfig);
-            Appdata.SaveConfig(NewConfig);
+            AppData.ApplyConfig(NewConfig);
+            AppData.SaveConfig(NewConfig);
         }
 
         private void OnClickApplyButton(object? sender = null, RoutedEventArgs? e = null){

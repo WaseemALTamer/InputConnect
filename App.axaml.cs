@@ -23,7 +23,7 @@ namespace InputConnect
 
 
             // those lines are used to tell the system we need to prepare the static classes
-            Appdata.ApplyConfig(Appdata.Config);
+            AppData.ApplyConfig(AppData.Config);
             var _ = Assets.AssetsLoaded;
             var __ = Tray.ApplicationTray;
             var ___ = ConnectionUDP.Client;

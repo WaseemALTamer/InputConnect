@@ -1,0 +1,14 @@
+{
+  "DeviceName": "Waseem",
+  "ApplicationName": "InputConnect",
+  "BroadCastAddress": "255.255.255.255",
+  "Port": 39393,
+  "Tick": 8,
+  "AdvertisementInterval": 3000,
+  "AdvertiseTimeSpan": 10,
+  "TransitionDuration": 200,
+  "CornerRadius": 10,
+  "TransitionHover": 100,
+  "FontSize": 20,
+  "PopupTimeout": 10000
+}
