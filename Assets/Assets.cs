@@ -34,6 +34,7 @@ namespace InputConnect
         public static Bitmap? AudioBitmap;
         public static Bitmap? LockBitmap;
         public static Bitmap? MiniLockBitmap;
+        public static Bitmap? WarningBitmap;
 
 
 
@@ -71,7 +72,8 @@ namespace InputConnect
             AudioBitmap = new Bitmap("Assets/Images/Audio.png");
             LockBitmap = new Bitmap("Assets/Images/Lock.png");
             MiniLockBitmap = new Bitmap("Assets/Images/MiniLock.png");
-            
+            WarningBitmap = new Bitmap("Assets/Images/Warning.png");
+
 
             // we finnish loading the assests here
             AssetsLoaded = true;
