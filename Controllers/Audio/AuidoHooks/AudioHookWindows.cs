@@ -11,10 +11,7 @@ namespace InputConnect.Controllers.Audio
         public static WaveFormat? WaveFormat;
         public static WasapiLoopbackCapture? Capture;
 
-        public AudioHookWindows()
-        {
-
-
+        public AudioHookWindows(){
             var enumerator = new MMDeviceEnumerator();
             var defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
 

@@ -1,5 +1,7 @@
 ﻿using InputConnect.UI.Containers;
 using Avalonia.Controls;
+using System;
+using System.Xml.Schema;
 
 
 
@@ -24,11 +26,9 @@ namespace InputConnect.UI.Pages
         private Connector? connector;
         private MointorsGraph? mointorsGraph;
         private ChannelModeTriToggles? channelModeTriToggles;
+        private QuickConfig? quickConfig;
 
-
-        public Device(Canvas? master) : base(master)
-        {
-
+        public Device(Canvas? master) : base(master){
             if (MainCanvas == null) return;
 
 
@@ -42,6 +42,9 @@ namespace InputConnect.UI.Pages
             mointorsGraph = new MointorsGraph(MainCanvas);
             MainCanvas.Children.Add(mointorsGraph);
 
+            quickConfig = new QuickConfig(MainCanvas);
+            MainCanvas.Children.Add(quickConfig);
+
 
             OnShow += Update; // this will ensure that it updates evertime we display this page
 
@@ -51,10 +54,6 @@ namespace InputConnect.UI.Pages
             if (Master != null) {
                 Master.SizeChanged += OnResize;
             }
-
-
-
-
         }
 
                    
@@ -68,17 +67,18 @@ namespace InputConnect.UI.Pages
             if (connector != null){
                 connector.Update();
             }
-
-
-
         }
 
 
         public void OnResize(object? sender = null, SizeChangedEventArgs? e = null){
 
             if (MainCanvas != null){
-                MainCanvas.Width = Width; 
-                MainCanvas.Height = Height;
+                MainCanvas.Width = Width;
+
+
+
+                if (Height >= 614)
+                    MainCanvas.Height = Height;
 
 
                 if (connector != null) {
@@ -95,6 +95,12 @@ namespace InputConnect.UI.Pages
                     Canvas.SetLeft(mointorsGraph, MainCanvas.Width - mointorsGraph.Width - 10);
                     Canvas.SetTop(mointorsGraph, 10);
                 }
+
+                if (quickConfig != null) {
+                    Canvas.SetLeft(quickConfig, 10);
+                    Canvas.SetTop(quickConfig, MainCanvas.Height - quickConfig.Height - 10);
+                }
+
             }
         }
 

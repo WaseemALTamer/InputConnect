@@ -53,7 +53,7 @@ namespace InputConnect.UI.Containers
 
 
 
-            PointerPressed += OnPointerPressed;
+            //PointerPressed += OnPointerPressed;
 
             OnSizeChage();
 
@@ -140,6 +140,7 @@ namespace InputConnect.UI.Containers
                                                       screen.Height,
                                                       mointorNumer,
                                                       MainGraph);
+                            mointor.Connection = device;
 
                             mointor.ScreenBounds = screen;
 
@@ -189,6 +190,8 @@ namespace InputConnect.UI.Containers
 
                             mointor.ScreenBounds = screen;
 
+                            mointor.Connection = device;
+
                             mointor.SetLock(false);
 
                             mointorNumer += 1;
@@ -215,7 +218,7 @@ namespace InputConnect.UI.Containers
 
             Width = Master.Width - 425;
             Height = Master.Height - 175;
-
+            //Height = 390; // for static height approch i didnt like it
 
             if (MainCanvas != null){
                 MainCanvas.Width = Width;

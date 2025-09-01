@@ -4,6 +4,9 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Input;
 using Avalonia;
+using InputConnect.UI.Containers.Common;
+using System.Threading.Tasks;
+using System;
 
 
 
@@ -40,6 +43,9 @@ namespace InputConnect.UI.Containers
         }
 
 
+        private Status? StatusDot;
+
+
         public Advertisement(Canvas? master = null, MessageUDP? advertisement = null){
             Master = master;
             Message = advertisement;
@@ -70,11 +76,14 @@ namespace InputConnect.UI.Containers
                 Trigger = ShowHideSetOpeicity,
             };
 
-            if (Master != null) {
-                Update(); // trigger the on resize so we can set the dimention
-                Master.SizeChanged += OnSizeChanged;
-                CornerRadius = new CornerRadius(Config.CornerRadius);
-            }
+
+
+
+
+            StatusDot = new Status();
+            MainCanvas.Children.Add(StatusDot);
+            StatusDot.SetColor(Themes.Online, 200);
+
 
             HoverTranslation = new Animations.Transations.Uniform{
                 StartingValue = 0.5,
@@ -89,6 +98,17 @@ namespace InputConnect.UI.Containers
             PointerReleased += OnClick;
 
             MainCanvas.Children.Add(Data);
+
+
+
+            if (Master != null){
+                Update(); // trigger the on resize so we can set the dimention
+                Master.SizeChanged += OnSizeChanged;
+                CornerRadius = new CornerRadius(Config.CornerRadius);
+            }
+
+
+
             Child = MainCanvas;
 
         }
@@ -113,6 +133,11 @@ namespace InputConnect.UI.Containers
                     Canvas.SetTop(Data, 10);
                 }
 
+                if (StatusDot != null) {
+                    Canvas.SetLeft(StatusDot, 40);
+                    Canvas.SetTop(StatusDot, (Height - StatusDot.Height) /2);
+                }
+
             }
         }
 
@@ -127,11 +152,21 @@ namespace InputConnect.UI.Containers
                             $"MacAddress: {ad.MacAddress ?? "None"}  \n" +
                             $"Time: {ad.Time}";
             }
+
+            if (StatusDot != null) {
+                StatusDot.Pulse(Themes.Online,
+                                Themes.Offline,
+                                Config.TransitionDuration,
+                                //Config.AdvertiseTimeSpan * 1000
+                                Config.AdvertisementInterval
+                                );
+               
+            }
+                
         }
 
         public void Show(){
             if (Opacity == 1) return;
-
             if (ShowHideTransition != null)
                 ShowHideTransition.TranslateForward();
         }

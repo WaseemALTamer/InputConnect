@@ -48,8 +48,7 @@ namespace InputConnect.Controllers.Audio
                 return;
             }
 
-            var startInfo = new ProcessStartInfo
-            {
+            var startInfo = new ProcessStartInfo{
                 FileName = "parec",
                 Arguments = $"-d {monitorSource} " +
                             $"--format=float32le " +

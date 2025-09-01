@@ -31,11 +31,15 @@ namespace InputConnect.Setting{
         public static SolidColorBrush WrongToken = new SolidColorBrush(Color.FromUInt32(0xff990000));
         public static SolidColorBrush Connection = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));
         public static SolidColorBrush Text = new SolidColorBrush(Color.FromUInt32(0xffffffff));
-
         public static SolidColorBrush MonitorEdges = new SolidColorBrush(Color.FromUInt32(0xff000000));
-
-        
         public static SolidColorBrush Timer = new SolidColorBrush(Color.FromUInt32(0xffffffff));
+        public static SolidColorBrush DropDown = new SolidColorBrush(Color.FromUInt32(0xff000000));
+        public static SolidColorBrush WaterMark = new SolidColorBrush(Color.FromUInt32(0xff888888));
+        public static SolidColorBrush Offline = new SolidColorBrush(Color.FromUInt32(0x55ffffff));
+        public static SolidColorBrush Online = new SolidColorBrush(Color.FromUInt32(0xff00ff00));
+
+        public static SolidColorBrush Connected = new SolidColorBrush(Color.FromUInt32(0xff00ff00));
+        public static SolidColorBrush Pending = new SolidColorBrush(Color.FromUInt32(0xffffff00));
 
 
 

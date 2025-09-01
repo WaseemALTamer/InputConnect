@@ -32,8 +32,37 @@ namespace InputConnect.Controllers.Audio
         public static uint? OpenAudioDevice;
 
 
-        public static void Start()
-        {
+
+        public static void DetectAudioOutputDevices(){
+            // this function main perpose is to list all the avaliable device that you can
+            // stream out from and store  the data in the Shared.Device.AudioOutputDevices
+            // which then can be used in other parts of the code
+
+            // consider making this function return the list rather than  just storying it
+            // in a public variable
+
+            if (SharedData.Device.AudioOutputDevices == null)
+                SharedData.Device.AudioOutputDevices = new System.Collections.Generic.List<string>();
+
+            SharedData.Device.AudioOutputDevices.Clear();
+
+            for (int i = 0; i < SDL.SDL_GetNumAudioDevices(0); i++){
+                SharedData.Device.AudioOutputDevices.Add(SDL.SDL_GetAudioDeviceName(i, 0));
+            }
+        }
+
+
+        public static void StartAudioOut(string device){
+            // this needs to be started by you manually for the audio to come out
+
+            if (OpenAudioDevice != null && 
+                OpenAudioDevice != 0) 
+            {
+                SDL.SDL_PauseAudioDevice((uint)OpenAudioDevice, 0);
+                SDL.SDL_CloseAudioDevice((uint)OpenAudioDevice);
+            }
+
+
             if (SDL.SDL_Init(SDL.SDL_INIT_AUDIO) < 0){
                 Console.WriteLine("SDL_Init failed: " + SDL.SDL_GetError());
                 return;
@@ -49,7 +78,7 @@ namespace InputConnect.Controllers.Audio
             };
 
 
-            string device = SDL.SDL_GetAudioDeviceName(0, 0);
+            
 
             //Console.WriteLine($"{device}");
 
@@ -64,7 +93,6 @@ namespace InputConnect.Controllers.Audio
 
             if (OpenAudioDevice == 0){
                 Console.WriteLine("SDL_OpenAudioDevice failed: " + SDL.SDL_GetError());
-                SDL.SDL_Quit();
                 return;
             }
 
@@ -105,4 +133,3 @@ namespace InputConnect.Controllers.Audio
 
     }
 }
-

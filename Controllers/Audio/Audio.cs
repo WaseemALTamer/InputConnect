@@ -22,17 +22,21 @@ namespace InputConnect.Controllers.Audio
             }
 
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)){
-                Console.WriteLine("macOS");
+                Console.WriteLine("Transmiting audio for macOS is not supported but reciving is");
             }
 
             else{
-                Console.WriteLine("Unknown OS");
+                Console.WriteLine("Unknown OS -> featchers may not work");
             }
 
 
-            AudioOut.Start(); // start the AudioStart to play audio on the run
-                              // this approch needs  to be  changed to fit the
-                              // change of output audio device
+
+            // the method below is adapted and should be removed later after testing
+                //AudioOut.Start(); // start the AudioStart to play audio on the run
+                // this approch needs  to be  changed to fit the
+                // change of output audio device
+
+            AudioOut.DetectAudioOutputDevices();
 
 
             MessageManager.OnCommandAudio += OnReceiveCommand;
@@ -87,19 +91,20 @@ namespace InputConnect.Controllers.Audio
 
 
         public static void OnReceiveCommand(Commands.Audio command, Connection connection){
+
+            if(AudioOut.OpenAudioDevice == null || 
+                AudioOut.OpenAudioDevice == 0) return;
+
             if (command.Buffer == null) return;
             if (command.BytesRecorded == null) return;
 
             //Console.WriteLine(command.BytesRecorded);
 
 
-            if (connection.AudioQueue == null)
-            {
+            if (connection.AudioQueue == null){
                 connection.AudioQueue = new AudioQueue();
             }
             //Console.WriteLine(connection.MacAddress);
-
-            //Console.WriteLine(command.Buffer.Length);
 
             connection.AudioQueue.Write(command.Buffer);
         }
@@ -123,6 +128,4 @@ namespace InputConnect.Controllers.Audio
 
 
     }
-
 }
-

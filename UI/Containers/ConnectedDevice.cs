@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Input;
 using Avalonia;
+using InputConnect.UI.Containers.Common;
 
 
 
@@ -39,6 +40,9 @@ namespace InputConnect.UI.Containers
             set { _Device = value; }
         }
 
+
+        private Status? StatusDot;
+
         public ConnectedDevice(Canvas? master = null, Connection? device = null)
         {
             Master = master;
@@ -64,20 +68,18 @@ namespace InputConnect.UI.Containers
                 FontSize = Config.FontSize
             };
 
-            ShowHideTransition = new Animations.Transations.Uniform
-            {
+            ShowHideTransition = new Animations.Transations.Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
                 Duration = Config.TransitionDuration,
                 Trigger = ShowHideSetOpeicity,
             };
 
-            if (Master != null)
-            {
-                Update(); // trigger the on resize so we can set the dimention
-                Master.SizeChanged += OnSizeChanged;
-                CornerRadius = new CornerRadius(Config.CornerRadius);
-            }
+            StatusDot = new Status();
+            MainCanvas.Children.Add(StatusDot);
+
+            StatusDot.SetColor(Themes.Pending, Config.TransitionDuration);
+
 
             HoverTranslation = new Animations.Transations.Uniform
             {
@@ -93,12 +95,19 @@ namespace InputConnect.UI.Containers
             PointerReleased += OnClick;
 
 
+            if (Master != null){
+                Update(); // trigger the on resize so we can set the dimention
+                Master.SizeChanged += OnSizeChanged;
+                CornerRadius = new CornerRadius(Config.CornerRadius);
+            }
+
+            Network.MessageManager.OnAccept += (e) => { Update(); };
+            Connections.Manager.OnConnectedConnectionAdded += Update;
+            Connections.Manager.ActionOnIncomingConnection += Update;
+
+
             MainCanvas.Children.Add(Data);
             Child = MainCanvas;
-
-
-
-
         }
 
 
@@ -116,12 +125,17 @@ namespace InputConnect.UI.Containers
                 
                 
                 
-                if (Data != null)
-                {
+                if (Data != null){
                     Data.Width = Width * 0.85;
                     Data.Height = Height * 0.85;
                     Canvas.SetLeft(Data, 100);
                     Canvas.SetTop(Data, 10);
+                }
+
+
+                if (StatusDot != null){
+                    Canvas.SetLeft(StatusDot, 40);
+                    Canvas.SetTop(StatusDot, (Height - StatusDot.Height) / 2);
                 }
 
 
@@ -139,6 +153,16 @@ namespace InputConnect.UI.Containers
                 Data.Text = $"Name: {Device.DeviceName ?? "None"}  \n\n" +
                             $"State: {Device.State ?? "None"}  \n" +
                             $"MacAddress: {Device.MacAddress ?? "None"}  \n";
+            }
+
+            if (Device != null && StatusDot != null){
+                if (Device.State == Connections.Constants.StatePending) {
+                    StatusDot.SetColor(Themes.Pending, Config.TransitionDuration);
+                }
+
+                if (Device.State == Connections.Constants.StateConnected){
+                    StatusDot.SetColor(Themes.Connected, Config.TransitionDuration);
+                }
             }
         }
 

@@ -41,7 +41,7 @@ namespace InputConnect.Controllers.Mouse
         public static double? DeltaY;
 
 
-        public static double CriticalRegionSize = 1;
+        public static double CriticalRegionSize = 2;
         public static double CursorThrow = CriticalRegionSize + 1;
         public static Bounds? CurrentScreenBounds;
 
@@ -60,7 +60,7 @@ namespace InputConnect.Controllers.Mouse
         public static bool SkipNextMouseHook = false; // this will be used to skip the next mouse detection incase you want
                                                       // to move the mouse through code and dont want it to be detected
 
-        public static int SaftyNet = 100; // if the mouse suddnly goes more than 100 pixles at a time we most likely have an error
+        public static int SaftyNet = 300; // if the mouse suddnly goes more than 100 pixles at a time we most likely have an error
                                           // which we need to correct before we can move forward
 
 

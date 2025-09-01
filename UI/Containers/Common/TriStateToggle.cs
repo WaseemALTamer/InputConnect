@@ -278,6 +278,8 @@ namespace InputConnect.UI.Containers.Common
 
         public void SetLock(bool state) {
 
+            if (IsLocked == state) return;
+
             IsLocked = state;
 
             if (LockShowHideAnimation != null) {

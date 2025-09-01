@@ -4,6 +4,7 @@ using InputConnect.Network;
 using InputConnect.Structures;
 using InputConnect.UI.Containers;
 using InputConnect.UI.Containers.Common;
+using System;
 using System.Collections.Generic;
 
 
@@ -62,30 +63,27 @@ namespace InputConnect.UI.Pages
 
 
         public void Update(object? sender = null, object? e = null){
-            
-            
             for (int i = 0; i < MessageManager.Advertisements.Count; i++) {
-
                 var _found = false; // this will be used to indecated if we found the device responsible for the message
                 var message = MessageManager.Advertisements[i];
                 for (int j = 0; j < Devices.Count; j++) {
                     var device = Devices[j];
                     if (device == null || device.Message == null) continue;
                     if (device.Message != null && message.MacAddress == device.Message.MacAddress) { 
-                        device.Message = message;
-                        device.Update(); // update it for values inside of it
+                        if (message.Time != device.Message.Time) { // only update it if we change the time
+                            device.Message = message;
+                            device.Update(); // update it for values inside of it
+                        }
                         _found = true;
                         break;
                     }
                 }
                 if (_found) continue;
-
                 Add(message);
             }
 
             // now we can check for any devices that we have that are not in the advertisement
             for (int i = Devices.Count - 1; i >= 0; i--){
-                
                 var _found = false;
                 var device = Devices[i];
                 if (device == null || device.Message == null) continue;
@@ -106,7 +104,6 @@ namespace InputConnect.UI.Pages
 
 
         public void Add(MessageUDP advertisement) {
-
             if (Devices != null) {
                 var _ad = new Advertisement(MainCanvas, advertisement);
                 Devices.Add(_ad);
@@ -119,7 +116,6 @@ namespace InputConnect.UI.Pages
 
         private void PlaceAds() {
             if (Devices == null || MainCanvas == null) return;
-
             int _index = 0;
             int _lostindex = 0;
             foreach (var _advertisement in Devices) {
@@ -143,7 +139,6 @@ namespace InputConnect.UI.Pages
         // you should later on make it only show ones that are displayed on screen
         private void ShowOnlyVissibleAds() {
             if (Devices == null) return;
-
             int _index = 0;
             int _lostindex = 0;
             foreach (var _advertisement in Devices){

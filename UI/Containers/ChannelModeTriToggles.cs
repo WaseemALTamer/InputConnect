@@ -130,6 +130,7 @@ namespace InputConnect.UI.Containers
             MessageManager.OnAccept += _ => Update();
             Connections.Manager.OnConnectedConnectionAdded += Update;
             Events.TargetDeviceConnectionChanged += Update;
+            Events.OnMovingVirtualScreens += Update;
 
             if (Master != null){
                 Master.SizeChanged += OnSizeChanged;

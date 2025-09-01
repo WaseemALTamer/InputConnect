@@ -20,6 +20,9 @@ namespace InputConnect.SharedData
         public static TopLevel? TopLevel; // this is going to contain the Toplevel Container for system
                                           // spcific tasks like  clipboard  management  or even screens
                                           // detection
+
+
+        public static List<string>? AudioOutputDevices;
                                                        
 
     }

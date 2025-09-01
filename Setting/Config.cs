@@ -36,7 +36,7 @@ namespace InputConnect.Setting
                                                         // device to advertise it  every <AdvertisementInterval>
                                                         // the number is in milliseconds
         
-        public static int AdvertiseTimeSpan = 3;       // this  is  used  to tell the app that all  the  devices
+        public static int AdvertiseTimeSpan = 10;       // this  is  used  to tell the app that all  the  devices
                                                         // that  had  an  advertisement that is  10s old  is  not
                                                         // relievent and should be removed the time is in seconds
 

@@ -47,10 +47,7 @@ namespace InputConnect.UI.Pages
 
 
 
-        public void Update(object? sender = null, object? e = null)
-        {
-
-
+        public void Update(object? sender = null, object? e = null){
             for (int i = 0; i < InputConnect.Connections.Devices.ConnectionList.Count; i++){
                 var _found = false; // this will be used to indecated if we found the device responsible for the message
                 var device = InputConnect.Connections.Devices.ConnectionList[i];
@@ -58,8 +55,7 @@ namespace InputConnect.UI.Pages
                 {
                     var UIobject = Devices[j];
                     if (UIobject == null || UIobject.Device == null) continue;
-                    if (UIobject.Device.MacAddress == device.MacAddress)
-                    {
+                    if (UIobject.Device.MacAddress == device.MacAddress){
                         UIobject.Device = device;
                         UIobject.Update(); // update it for values inside of it
                         _found = true;

@@ -1,14 +1,9 @@
-﻿
-
-
-
-
-
-using Avalonia;
-using Avalonia.Platform;
-using InputConnect.Controllers.Audio;
-using NAudio.Wave;
+﻿using InputConnect.Controllers.Audio;
 using System.Collections.Generic;
+
+
+
+
 
 namespace InputConnect.Structures
 {

@@ -1,11 +1,8 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
-using InputConnect.Commands;
-using InputConnect.UI.OutWindowPopup;
-using System;
-using System.Diagnostics.Metrics;
-using System.Reflection;
+﻿using InputConnect.UI.OutWindowPopup;
+
+
+
+
 
 
 namespace InputConnect.Controllers.Mouse

@@ -15,8 +15,7 @@ namespace InputConnect.Network
         private const int HmacSize = 32;
         private const int Iterations = 100000;
 
-        // Cache multiple passwords
-        private static readonly Dictionary<string, (byte[] Key, byte[] Salt)> _cache = new Dictionary<string, (byte[] Key, byte[] Salt)>();
+
 
         public static string Encrypt(string plainText, PasswordKey? pk)
         {

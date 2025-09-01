@@ -2,8 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using InputConnect.Structures;
-using System;
-using Avalonia.Remote.Protocol.Input;
+
 
 
 
@@ -38,6 +37,12 @@ namespace InputConnect.UI.Containers.Common
         public Image? LockImage;
 
 
+        private Animations.Transations.EaseInOut? WarningTranstion;
+        public bool WarningState = false;
+        public Border? WarningImageBorder;
+        public Image? WarningImage;
+
+
 
         private int MointorNumber = 0;
         private TextBlock? MointorTextBlock;
@@ -48,6 +53,11 @@ namespace InputConnect.UI.Containers.Common
 
 
         private Animations.Transations.EaseInOut? ClickTrnastion;
+
+        private Animations.Transations.EaseInOut? ShowHideTransition;
+
+
+        public Connection? Connection;
 
         public Monitor(double x, 
                        double y, 
@@ -68,6 +78,8 @@ namespace InputConnect.UI.Containers.Common
 
             Width = graphWidth; 
             Height = graphHeight;
+
+
 
             Background = Themes.MonitorEdges;
 
@@ -91,6 +103,32 @@ namespace InputConnect.UI.Containers.Common
                 LockImage.Source = Assets.LockBitmap;
             });
             MainCanvas.Children.Add(LockImageBorder);
+
+
+            WarningImageBorder = new Border{
+                Width = MainCanvas.Height,
+                Height = MainCanvas.Height,
+                IsVisible = false,
+                Opacity = 0,
+            };
+
+            WarningImage = new Image{
+                Stretch = Avalonia.Media.Stretch.Uniform,
+            };
+            WarningImageBorder.Child = WarningImage;
+            Assets.AddAwaitedAction(() => {
+                WarningImage.Source = Assets.WarningBitmap;
+            });
+            MainCanvas.Children.Add(WarningImageBorder);
+
+
+            WarningTranstion = new Animations.Transations.EaseInOut{
+                StartingValue = 0,
+                EndingValue = 0.9,
+                Duration = Config.TransitionDuration,
+                Trigger = SetWarningOpacity
+            };
+
 
             MointorTextBlock = new TextBlock { 
                 Text = $"{MointorNumber}",
@@ -120,7 +158,17 @@ namespace InputConnect.UI.Containers.Common
             };
 
 
+            ShowHideTransition = new Animations.Transations.EaseInOut
+            {
+                StartingValue = 0,
+                EndingValue = 1,
+                Duration = Config.TransitionDuration,
+                Trigger = SetOpacity
+            };
+
+
             Child = MainCanvas;
+
 
         }
 
@@ -152,6 +200,17 @@ namespace InputConnect.UI.Containers.Common
                 }
 
 
+                if (WarningImageBorder != null)
+                {
+                    WarningImageBorder.Width = MainCanvas.Height;
+                    WarningImageBorder.Height = MainCanvas.Height;
+
+                    Canvas.SetLeft(WarningImageBorder, (MainCanvas.Width - WarningImageBorder.Width) / 2);
+                    Canvas.SetTop(WarningImageBorder, (MainCanvas.Height - WarningImageBorder.Height) / 2);
+
+                }
+
+
                 if (MointorTextBlock != null) {
                     Canvas.SetLeft(MointorTextBlock, (MainCanvas.Width - MointorTextBlock.Width) / 2);
                     Canvas.SetTop(MointorTextBlock, (MainCanvas.Height - MointorTextBlock.Height) / 2);
@@ -174,6 +233,18 @@ namespace InputConnect.UI.Containers.Common
                 return;
 
 
+            // we stop the Mouse connection is errors might arrise when
+            // moving the mointor 
+            if (Connection != null && 
+                Connection.MouseState == Connections.Constants.Transmit) 
+            {
+                Connection.MouseState = null;
+                SharedData.Events.OnMovingVirtualScreens?.Invoke(); // notify the other parts of the code
+            }
+                
+            
+
+
             e.Handled = true;
             IsDraging = true;
             if (ClickTrnastion != null)
@@ -188,7 +259,7 @@ namespace InputConnect.UI.Containers.Common
 
         private void OnPointerReleased(object? sender, PointerEventArgs e) {
             IsDraging = false;
-            if (ClickTrnastion != null)
+            if (ClickTrnastion != null && IsLocked == false)
                 ClickTrnastion.TranslateBackward();
         }
 
@@ -196,6 +267,7 @@ namespace InputConnect.UI.Containers.Common
             if (!IsDraging || ScreenBounds == null) return;
             if (MasterGraph == null || MasterGraph.MainCanvas == null) return;
 
+            ValidatePos();
 
             var MousePos = e.GetPosition(MasterGraph.MainCanvas);
 
@@ -211,11 +283,109 @@ namespace InputConnect.UI.Containers.Common
         }
 
 
+        private void ValidatePos(){
+
+            if (ScreenBounds == null) return;
+            
+            foreach (var connection in Connections.Devices.ConnectionList){
+                if (connection.VirtualScreens == null)
+                    continue;
+
+                
+
+                foreach (var screen in connection.VirtualScreens){
+                    if (screen == ScreenBounds) continue;
+
+                    if (IsIntersecting(ScreenBounds, screen)){
+                        SetWarningOpacity(true);
+                        return;
+                    }
+
+                }
+
+
+
+
+            }
+
+
+            if (SharedData.Device.Screens == null) return;
+
+            foreach (var screen in SharedData.Device.Screens)
+            {
+                
+                if (IsIntersecting(ScreenBounds, new Bounds(screen.Bounds.X,
+                                                            screen.Bounds.Y,
+                                                            screen.Bounds.Width,
+                                                            screen.Bounds.Height))) 
+                {
+                    SetWarningOpacity(true);
+                    return;
+                }   
+            }
+
+            SetWarningOpacity(false);
+        }
+
+
+        private bool IsIntersecting(Bounds a, Bounds b){
+            bool noOverlap =
+                a.X + a.Width <= b.X ||  // a is left of b
+                a.X >= b.X + b.Width ||  // a is right of b
+                a.Y + a.Height <= b.Y || // a is above b
+                a.Y >= b.Y + b.Height;   // a is below b
+
+            return !noOverlap;
+        }
+
 
         private void SetOpacity(double value) {
             Opacity = value;
+            if (value > 0)
+                IsVisible = true;
+            else
+                IsVisible = false;
         }
-        
+
+
+        private void SetWarningOpacity(double value){
+
+            if(WarningImageBorder != null){
+                WarningImageBorder.Opacity = value;
+
+                if (value > 0) 
+                    WarningImageBorder.IsVisible = true;
+                else 
+                    WarningImageBorder.IsVisible = false;
+            }
+        }
+
+
+        public void SetWarningOpacity(bool state) {
+            if (WarningState == state) return;
+            WarningState = state;
+
+            if (state){
+                WarningTranstion?.TranslateForward();
+            }
+            else {
+                WarningTranstion?.TranslateBackward();
+            }
+        }
+
+
+
+        public void Show(){
+            if (Opacity == 1) return;
+            if (ShowHideTransition != null)
+                ShowHideTransition.TranslateForward();
+        }
+
+        public void Hide(){
+            if (Opacity == 0) return;
+            if (ShowHideTransition != null)
+                ShowHideTransition.TranslateBackward();
+        }
 
 
 

@@ -92,8 +92,9 @@ namespace InputConnect.Controllers.Audio
             }
 
             // Fill remaining bytes with silence if underflow
-            for (int i = bytesRead; i < output.Length; i++)
+            for (int i = bytesRead; i < output.Length; i++){
                 output[i] = 0;
+            }
 
             return bytesRead;
         }
