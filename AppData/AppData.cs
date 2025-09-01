@@ -12,7 +12,7 @@ namespace InputConnect
 {
     public static class AppData
     {
-        public static string ConfigPath = $"Appdata/Config.json";
+        public static string ConfigPath = $"AppData/Config.json";
         public static ConfigStruct? Config = LoadConfig();
 
 
