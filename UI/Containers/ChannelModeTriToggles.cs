@@ -1,6 +1,5 @@
 ﻿using InputConnect.UI.Containers.Common;
 using InputConnect.SharedData;
-using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
 using System;
@@ -58,8 +57,8 @@ namespace InputConnect.UI.Containers
 
             Opacity = 1;
             ClipToBounds = true;
-            Background = Themes.Holder;
-            CornerRadius = new CornerRadius(Config.CornerRadius);
+            Background = Setting.Themes.Holder;
+            CornerRadius = new CornerRadius(Setting.Config.CornerRadius);
 
             Width = 400; Height = 390;
 
@@ -77,6 +76,9 @@ namespace InputConnect.UI.Containers
             KeyboardChannelToggle.Trigger += SetKeyboardState;
             AudioChannelToggle.Trigger += SetAudioState;
 
+            MouseChannelToggle.Trigger += (s) => Events.TargetDeviceChannelModeChange?.Invoke();
+            KeyboardChannelToggle.Trigger += (s) => Events.TargetDeviceChannelModeChange?.Invoke();
+            AudioChannelToggle.Trigger += (s) => Events.TargetDeviceChannelModeChange?.Invoke();
 
             SendText = new TextBlock{
                 Text = "Transmit",
@@ -264,6 +266,7 @@ namespace InputConnect.UI.Containers
                     KeyboardChannelToggle.SetState(1);
                     AudioChannelToggle.SetState(1);
                 }
+
             });
 
 

@@ -1,5 +1,4 @@
 ﻿using InputConnect.Network;
-using InputConnect.Setting;
 using Avalonia.Threading;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -45,7 +44,6 @@ namespace InputConnect.UI.InWindowPopup
             if (MainCanvas == null) return;
 
             // CloseButton.Trigger  // attach the trigger on the function
-
             Connections.Manager.ActionOnIncomingConnection += OnIncomingConnection;
             
 
@@ -57,7 +55,7 @@ namespace InputConnect.UI.InWindowPopup
                        "Time: \n",
                 Width = Width - 50,
                 Height = 150,
-                FontSize = Config.FontSize,
+                FontSize = Setting.Config.FontSize,
             };
 
             MainCanvas.Children.Add(DeviceData);
@@ -65,12 +63,12 @@ namespace InputConnect.UI.InWindowPopup
             Entry = new TextBox{
                 Width = 300,
                 Height = 40,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius),
+                FontSize = Setting.Config.FontSize,
+                CornerRadius = new CornerRadius(Setting.Config.CornerRadius),
                 Watermark = "Token",
                 PasswordChar = char.Parse("*"),
-                Background = Themes.Entry,
-                Foreground = Themes.Text
+                Background = Setting.Themes.Entry,
+                Foreground = Setting.Themes.Text
             };
             MainCanvas.Children.Add(Entry);
             Entry.KeyDown += OnEnetryKeyDown;
@@ -81,11 +79,11 @@ namespace InputConnect.UI.InWindowPopup
                 Content = "Accept",
                 Width = 150,
                 Height = 50,
-                Background = Themes.Button,
+                Background = Setting.Themes.Button,
                 HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius)
+                FontSize = Setting.Config.FontSize,
+                CornerRadius = new CornerRadius(Setting.Config.CornerRadius)
             };
             MainCanvas.Children.Add(AcceptButton);
 
@@ -95,7 +93,7 @@ namespace InputConnect.UI.InWindowPopup
             WrongTokenTranstion = new Animations.Transations.Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = TriggerWrongToken,
             };
 
@@ -127,7 +125,7 @@ namespace InputConnect.UI.InWindowPopup
 
         public void OnShow() {
             if (TimeoutTimer != null) {
-                TimeoutTimer.StartTimer(Config.PopupTimeout);
+                TimeoutTimer.StartTimer(Setting.Config.PopupTimeout);
             }
         }
 
@@ -174,8 +172,8 @@ namespace InputConnect.UI.InWindowPopup
 
         private void TriggerWrongToken(double value){
             if (Background is SolidColorBrush solidBrush){
-                var originalColorEntry = Themes.Entry;
-                var targetColor = Themes.WrongToken;
+                var originalColorEntry = Setting.Themes.Entry;
+                var targetColor = Setting.Themes.WrongToken;
 
                 byte Lerp(byte start, byte end) => (byte)(start + (end - start) * value);
 
@@ -186,7 +184,7 @@ namespace InputConnect.UI.InWindowPopup
                 //    Lerp(originalColorEntry.Color.B, targetColor.Color.B)
                 //);
 
-                var originalColorText = Themes.Text;
+                var originalColorText = Setting.Themes.Text;
 
                 var newColorText = Color.FromArgb(
                     Lerp(originalColorText.Color.A, targetColor.Color.A),
@@ -219,9 +217,8 @@ namespace InputConnect.UI.InWindowPopup
         // this will be ran from a very far thread comming from the MessageManager
         // but the rule in the PublicWidgets.cs has not been broken as this is the
         // function that we put in it
-        public void OnIncomingConnection() { 
+        public void OnIncomingConnection() {
             // coming from <MessageMangaer Thread>
-
             if (SharedData.IncomingConnection.Message != null){
                 // ensures that it is on the right thread before
                 // updating the UI
@@ -294,9 +291,12 @@ namespace InputConnect.UI.InWindowPopup
 
                     SharedData.IncomingConnection.Clear();
 
-                    if (Global.Overlay != null){
-                        Global.Overlay.Hide();
-                    }
+
+
+                    // this should already be covered by the <HideRight> function
+                    //if (Global.Overlay != null){
+                    //Global.Overlay.Hide();
+                    //}
 
                 }
                 else {
@@ -314,7 +314,11 @@ namespace InputConnect.UI.InWindowPopup
 
         private void OnCloseButton() {
             // this function is going to be wrapped around and feed into the popup base
-            Hide(); // hide it again for any other function that is trying to simulate the Closing button functionality
+
+            //Hide(); // hide it again for any other function that is trying to simulate the Closing button functionality
+                      // this may cause errors, it clashed with  the base  popup class, because  the overlay function now
+                      // keeps track of how many popups are u p and each hide will decrease the number of popups that are
+                      // on
 
             if (SharedData.IncomingConnection.Message != null){
                 Connections.Manager.CloseIncomingConnection(SharedData.IncomingConnection.Message, "Decline"); // Decline the Connection

@@ -3,7 +3,6 @@ using InputConnect.UI.Containers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using InputConnect.UI.Pages;
-using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
 using InputConnect.UI.OutWindowPopup;
@@ -32,8 +31,7 @@ namespace InputConnect.UI
 
 
         private static Canvas? _Master;
-        public static Canvas? Master
-        {
+        public static Canvas? Master{
             get { return _Master; }
             set { _Master = value; }
         }
@@ -219,7 +217,7 @@ namespace InputConnect.UI
                 
                 DisplayedPage.Hide();
                 DisplayedPage = Page; // redundency
-                await Task.Delay(Config.TransitionDuration / 2); // wait for at bit to give ot a smoother feel
+                await Task.Delay(Setting.Config.TransitionDuration / 2); // wait for at bit to give ot a smoother feel
             }
             DisplayedPage = Page;
             Page.Show();
@@ -240,7 +238,7 @@ namespace InputConnect.UI
 
                 DisplayedPage.Hide();
                 DisplayedPage = lastPage;
-                await Task.Delay(Config.TransitionDuration / 2);
+                await Task.Delay(Setting.Config.TransitionDuration / 2);
                 DisplayedPage.Show();
             }
             _TransitionBackRunning = false;

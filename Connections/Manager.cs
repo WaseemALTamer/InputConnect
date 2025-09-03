@@ -1,8 +1,8 @@
 ﻿using InputConnect.Structures;
+using System.Threading.Tasks;
 using InputConnect.Network;
 using System;
-using Avalonia.Controls;
-using System.Threading.Tasks;
+
 
 
 
@@ -23,9 +23,31 @@ namespace InputConnect.Connections
         public static Action? ActionOnIncomingConnection; // this will be used for the UI to act upone seeing connection
                                                           // incoming
 
+        public static Action? OnConnectionClosed;
+
 
         static Manager() {
+            
+            
             MessageManager.OnConnect += OnIncomingConnection; // map the connect message to our function
+
+
+            
+            // map the the events to save the data for the connections
+
+            MessageManager.OnAccept += (e) => AppData.SaveConnections();
+            MessageManager.OnDecline += (e) => AppData.SaveConnections();
+            //MessageManager.OnCloseConnection += (e) => AppData.SaveConnections();
+            MessageManager.OnIntailData += (e) => AppData.SaveConnections();
+
+
+            SharedData.Events.TargetDeviceChannelModeChange += AppData.SaveConnections; // this will ensure that the last toggle update is saved
+            SharedData.Events.OnConnection += AppData.SaveConnections;
+            SharedData.Events.OnDisconnect += AppData.SaveConnections;
+            
+            SharedData.Events.OnSetVirtualScreensPos += AppData.SaveConnections;
+
+            OnConnectedConnectionAdded += AppData.SaveConnections;
         }
 
 
@@ -74,7 +96,6 @@ namespace InputConnect.Connections
         public static void OnIncomingConnection(MessageUDP Message) {  // this function is to be maped to the Message manager for the Connect messages
 
             // connections that are not 
-            
 
             if (SharedData.IncomingConnection.Message != null) {
                 // this means we already got a conenction to deal with so that connection is rejected for now
@@ -192,7 +213,10 @@ namespace InputConnect.Connections
                 MessageType = Network.Constants.MessageTypes.IntialDataRequest,
             };
 
-            ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], newMessage);
+            if (MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip)) {
+                ConnectionUDP.Send(ip, newMessage);
+            }
+            
 
             var expiryTime = DateTime.Now.AddMilliseconds(3000); // 3 seconds
 
@@ -202,6 +226,30 @@ namespace InputConnect.Connections
             }
 
             return;
+        }
+
+
+
+        public static void CloseConnection(Connection connection) {
+
+
+            
+
+            MessageUDP messageUDP = new MessageUDP{
+                MessageType = Network.Constants.MessageTypes.Decline,
+                Text = "Connection UnWanted",
+            };
+
+
+            if (connection.MacAddress != null &&
+                MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip))
+            {
+                ConnectionUDP.Send(ip, messageUDP);
+            }
+
+            Devices.ConnectionList.Remove(connection);
+
+            OnConnectionClosed?.Invoke();
         }
 
 

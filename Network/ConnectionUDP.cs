@@ -1,7 +1,6 @@
 ﻿using InputConnect.Network.Constants;
 using InputConnect.Structures;
 using System.Threading.Tasks;
-using InputConnect.Setting;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Text;
@@ -39,9 +38,9 @@ namespace InputConnect.Network
                 if (Client != null){
                     
                     message.IP = Device.IP;
-                    message.Port = Config.Port;
+                    message.Port = Setting.Config.Port;
                     message.MacAddress = Device.MacAdress;
-                    message.DeviceName = Config.DeviceName;
+                    message.DeviceName = Setting.Config.DeviceName;
                     message.Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     
                     
@@ -49,7 +48,7 @@ namespace InputConnect.Network
 
                     string _message = JsonSerializer.Serialize(message);
                     byte[] data = Encoding.UTF8.GetBytes(_message);
-                    int _statusCode = Client.Send(data, data.Length, targetIP, Config.Port);
+                    int _statusCode = Client.Send(data, data.Length, targetIP, Setting.Config.Port);
                     if (_statusCode == 117) EstablishConnection(); // 117 means our connection has been denied
                 }
             }
@@ -108,22 +107,22 @@ namespace InputConnect.Network
 
                 MessageUDP AdvertismentMessage = new MessageUDP{
                     MessageType = MessageTypes.Advertisement,
-                    Text = Config.DeviceName, // We use the Config.DeviceName this will be the name of the device
+                    Text = Setting.Config.DeviceName, // We use the Config.DeviceName this will be the name of the device
                                               // if the name hs not been set by the user
                 };
 
 
 
                 try{
-                    Send(Config.BroadCastAddress, AdvertismentMessage);
+                    Send(Setting.Config.BroadCastAddress, AdvertismentMessage);
                 }
                 catch (Exception ex){
-                    Console.WriteLine($"Failed to send to {Config.BroadCastAddress}: {ex.Message}");
+                    Console.WriteLine($"Failed to send to {Setting.Config.BroadCastAddress}: {ex.Message}");
                     break;
                 }
 
                 
-                await Task.Delay(Config.AdvertisementInterval);
+                await Task.Delay(Setting.Config.AdvertisementInterval);
             }
         }
 
@@ -136,7 +135,7 @@ namespace InputConnect.Network
                 }
             }
             if (Device.MacAdress != null && Device.IP != null) {
-                Client = new UdpClient(new IPEndPoint(IPAddress.Any, Config.Port));
+                Client = new UdpClient(new IPEndPoint(IPAddress.Any, Setting.Config.Port));
             }
         }
     }

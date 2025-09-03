@@ -1,5 +1,4 @@
-﻿using InputConnect.Setting;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia;
 
@@ -55,21 +54,21 @@ namespace InputConnect.UI.Containers
             ShowHideTransition = new Animations.Transations.Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = ShowHideSetOpeicity,
             };
 
             if (Master != null){
                 Update(); // trigger the on resize so we can set the dimensions
                 Master.SizeChanged += OnSizeChanged;
-                CornerRadius = new CornerRadius(Config.CornerRadius);
+                CornerRadius = new CornerRadius(Setting.Config.CornerRadius);
             }
 
             HoverTranslation = new Animations.Transations.Uniform{
                 StartingValue = 0.5,
                 EndingValue = 0.3,
                 CurrentValue = 1,
-                Duration = Config.TransitionHover,
+                Duration = Setting.Config.TransitionHover,
                 Trigger = OnHoverSetBackground
             };
 
@@ -81,15 +80,15 @@ namespace InputConnect.UI.Containers
                 Text = $"{Label}",
                 Width = 400,
                 Height = 20,
-                FontSize = Config.FontSize
+                FontSize = Setting.Config.FontSize
             };
 
             Entery = new TextBox{
                 Width = 200,
                 Height = 40,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius),
-                Background = Themes.Entry,
+                FontSize = Setting.Config.FontSize,
+                CornerRadius = new CornerRadius(Setting.Config.CornerRadius),
+                Background = Setting.Themes.Entry,
             };
 
 
@@ -100,7 +99,7 @@ namespace InputConnect.UI.Containers
                 Child = MainCanvas;
             }
 
-            Background = Themes.ConfigProperty;
+            Background = Setting.Themes.ConfigProperty;
         }
 
 
@@ -229,7 +228,7 @@ namespace InputConnect.UI.Containers
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetPostionTrigger
             };
 

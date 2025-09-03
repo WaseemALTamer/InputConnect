@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using InputConnect.UI.Animations;
 using Avalonia.Controls.Shapes;
-using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Input;
@@ -91,7 +90,7 @@ namespace InputConnect.UI.Containers.Common
             if (graphHeight != null) GraphHeight = (double)graphHeight;
 
 
-            Background = Themes.Holder;
+            Background = Setting.Themes.Holder;
             ClipToBounds = true;
 
             MasterCanvas = new Canvas();

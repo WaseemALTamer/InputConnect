@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -41,6 +41,7 @@
 
 
 	<ItemGroup>
+	  <None Remove="AppData\Connections.json" />
 	  <None Remove="KeyCode_Refrences.txt" />
 	  <None Remove="UI\Containers\1i5lavz3.zv4~" />
 	</ItemGroup>

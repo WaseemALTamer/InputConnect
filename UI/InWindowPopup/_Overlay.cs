@@ -1,5 +1,4 @@
-﻿using InputConnect.Setting;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 
 
 namespace InputConnect.UI.InWindowPopup
@@ -32,6 +31,12 @@ namespace InputConnect.UI.InWindowPopup
 
         private Animations.Transations.Uniform? ShowHideTransition;
 
+
+        private int OverlayNumKeep = 0;  // this will track how many popup will need the overlay
+                                         // in such a way if there is  two at  the same time the
+                                         // and you close  one popup  it will stay  until all of 
+                                         // them are closed 
+
         public Overlay(Canvas master)
         {
 
@@ -46,7 +51,7 @@ namespace InputConnect.UI.InWindowPopup
             IsVisible = false;
             ClipToBounds = true;
             IsHitTestVisible = true;
-            Background = Themes.DimOverlay;
+            Background = Setting.Themes.DimOverlay;
             ZIndex = 5;
 
 
@@ -54,7 +59,7 @@ namespace InputConnect.UI.InWindowPopup
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetOpeicity,
             };
 
@@ -79,17 +84,26 @@ namespace InputConnect.UI.InWindowPopup
 
 
         public void Show(){
-            IsDisplayed = true;
-            if (ShowHideTransition != null)
-                ShowHideTransition.TranslateForward();
+            
+            OverlayNumKeep += 1;
+            if (IsDisplayed == false) {
+                IsDisplayed = true;
+                if (ShowHideTransition != null)
+                    ShowHideTransition.TranslateForward();
+
+            }
         }
 
 
-        public void Hide()
-        {
-            IsDisplayed = false;
-            if (ShowHideTransition != null)
-                ShowHideTransition.TranslateBackward();
+        public void Hide(){
+            OverlayNumKeep -= 1;
+            if (OverlayNumKeep == 0) {
+                IsDisplayed = false;
+                if (ShowHideTransition != null)
+                    ShowHideTransition.TranslateBackward();
+
+            }
+
         }
 
 

@@ -1,6 +1,5 @@
 ﻿using InputConnect.UI.Animations;
 using Avalonia.Interactivity;
-using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
 using System;
@@ -71,14 +70,14 @@ namespace InputConnect.UI.Pages
             IsVisible = false;
             ClipToBounds = true;
             IsHitTestVisible = true;
-            CornerRadius = new CornerRadius(Config.CornerRadius);
+            CornerRadius = new CornerRadius(InputConnect.Setting.Config.CornerRadius);
             
 
 
             ShowHideTransition = new Animations.Transations.Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = InputConnect.Setting.Config.TransitionDuration,
                 Trigger = SetOpeicity,
             };
 
@@ -95,7 +94,7 @@ namespace InputConnect.UI.Pages
             MainCanvas = new Canvas{
                 IsHitTestVisible = true,
                 ClipToBounds = true,
-                Background = Themes.Page,
+                Background = InputConnect.Setting.Themes.Page,
             };
 
             ScrollViewer.Content = MainCanvas;

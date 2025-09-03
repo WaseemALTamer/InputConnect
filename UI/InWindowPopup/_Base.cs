@@ -1,5 +1,4 @@
 ﻿using InputConnect.UI.Containers;
-using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia;
@@ -90,8 +89,8 @@ namespace InputConnect.UI.InWindowPopup
             IsVisible = false;
             ClipToBounds = true;
             IsHitTestVisible = false;
-            CornerRadius = new CornerRadius(Config.CornerRadius);
-            Background = Themes.InWindowPopup;
+            CornerRadius = new CornerRadius(Setting.Config.CornerRadius);
+            Background = Setting.Themes.InWindowPopup;
             ZIndex = 6; // this makes sure it sets on top of everything
 
             
@@ -180,7 +179,7 @@ namespace InputConnect.UI.InWindowPopup
             PostionTranslation = new Animations.Transations.EaseInOut{
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration * 2,
+                Duration = InputConnect.Setting.Config.TransitionDuration * 2,
                 Trigger = SetPostionTrigger
             };
 

@@ -5,7 +5,6 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
-using InputConnect.Setting;
 using SkiaSharp;
 using System;
 
@@ -68,7 +67,7 @@ namespace InputConnect.UI.Containers
             {
                 StartingValue = 1,
                 EndingValue = 0.5,
-                Duration = Config.TransitionHover,
+                Duration = Setting.Config.TransitionHover,
                 Trigger = SetOpacity
             };
 
@@ -205,7 +204,7 @@ namespace InputConnect.UI.Containers
 
 
 
-                var arcPen = new Pen(Themes.Timer, Thinkness);
+                var arcPen = new Pen(Setting.Themes.Timer, Thinkness);
 
                 if (SweepAngle >= 360){ 
                     // this ensures effecincy
@@ -213,10 +212,10 @@ namespace InputConnect.UI.Containers
                 }
 
                 var fadedColor = Color.FromArgb((byte)(
-                    Themes.Timer.Color.A * 0.2),
-                    Themes.Timer.Color.R,
-                    Themes.Timer.Color.R,
-                    Themes.Timer.Color.R);
+                    Setting.Themes.Timer.Color.A * 0.2),
+                    Setting.Themes.Timer.Color.R,
+                    Setting.Themes.Timer.Color.R,
+                    Setting.Themes.Timer.Color.R);
 
                 var fadedBrush = new SolidColorBrush(fadedColor);
 

@@ -1,7 +1,6 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using InputConnect.Network;
-using InputConnect.Setting;
 using Avalonia;
 
 
@@ -23,7 +22,7 @@ namespace InputConnect
 
 
             // those lines are used to tell the system we need to prepare the static classes
-            AppData.ApplyConfig(AppData.Config);
+            //AppData.ApplyConfig(AppData.Config);
             var _ = Assets.AssetsLoaded;
             var __ = Tray.ApplicationTray;
             var ___ = ConnectionUDP.Client;

@@ -1,5 +1,4 @@
 ﻿using InputConnect.Structures;
-using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Input;
@@ -50,7 +49,7 @@ namespace InputConnect.UI.Containers
             Master = master;
             Message = advertisement;
 
-            Background = Themes.Advertisement;
+            Background = Setting.Themes.Advertisement;
             IsVisible = false;
             Opacity = 0;
 
@@ -66,13 +65,13 @@ namespace InputConnect.UI.Containers
                        $"Time: None",
                 Width = Width * 0.85,
                 Height = Height * 0.7,
-                FontSize = Config.FontSize
+                FontSize = Setting.Config.FontSize
             };
 
             ShowHideTransition = new Animations.Transations.Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = ShowHideSetOpeicity,
             };
 
@@ -82,14 +81,14 @@ namespace InputConnect.UI.Containers
 
             StatusDot = new Status();
             MainCanvas.Children.Add(StatusDot);
-            StatusDot.SetColor(Themes.Online, 200);
+            StatusDot.SetColor(Setting.Themes.Online, 200);
 
 
             HoverTranslation = new Animations.Transations.Uniform{
                 StartingValue = 0.5,
                 EndingValue = 0.3,
                 CurrentValue = 1,
-                Duration = Config.TransitionHover,
+                Duration = Setting.Config.TransitionHover,
                 Trigger = OnHoverSetBackground
             };
 
@@ -104,7 +103,7 @@ namespace InputConnect.UI.Containers
             if (Master != null){
                 Update(); // trigger the on resize so we can set the dimention
                 Master.SizeChanged += OnSizeChanged;
-                CornerRadius = new CornerRadius(Config.CornerRadius);
+                CornerRadius = new CornerRadius(Setting.Config.CornerRadius);
             }
 
 
@@ -154,11 +153,11 @@ namespace InputConnect.UI.Containers
             }
 
             if (StatusDot != null) {
-                StatusDot.Pulse(Themes.Online,
-                                Themes.Offline,
-                                Config.TransitionDuration,
+                StatusDot.Pulse(Setting.Themes.Online,
+                                Setting.Themes.Offline,
+                                Setting.Config.TransitionDuration,
                                 //Config.AdvertiseTimeSpan * 1000
-                                Config.AdvertisementInterval
+                                Setting.Config.AdvertisementInterval
                                 );
                
             }
@@ -235,7 +234,7 @@ namespace InputConnect.UI.Containers
             PostionTranslation = new Animations.Transations.EaseInOut{
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetPostionTrigger
             };
 

@@ -1,13 +1,12 @@
-﻿using Avalonia.Interactivity;
+﻿using InputConnect.Controllers.Mouse;
+using Avalonia.Interactivity;
 using System.Threading.Tasks;
-using InputConnect.Setting;
 using Avalonia.Threading;
 using Avalonia.Controls;
 using InputConnect.UI;
 using System;
-using System.Collections.Generic;
-using SharpHook.Data;
-using InputConnect.Controllers.Mouse;
+
+
 
 
 
@@ -19,7 +18,7 @@ namespace InputConnect
 
         public MainWindow(){
             Icon = Assets.Icone;
-            Title = Config.ApplicationName;
+            Title = Setting.Config.ApplicationName;
 
 
             MinWidth = 912;
@@ -27,12 +26,6 @@ namespace InputConnect
 
             Loaded += OnLoaded;
             Closing += OnWindowClosing;
-
-
-
-
-
-
         }
 
 
@@ -63,7 +56,7 @@ namespace InputConnect
             MainCanvas = new Canvas{ // now we create the canvase after we load up for preformece
                 Width = Width,
                 Height = Height,
-                Background = Themes.Backgruond,
+                Background = Setting.Themes.Background,
                 Focusable = true,
             };
 
@@ -71,6 +64,10 @@ namespace InputConnect
             // this is the part of the code that handels all the other  Canvasue on screen
             // note that this file is for desktop only but this part can be shared acrross
             // probably based on the Avalonia.Net support for other devices in terms of UI
+
+
+
+            AppData.LoadConnections(); // load previouse connections if we can
 
             PublicWidgets.Initialize(MainCanvas);
 
@@ -88,7 +85,7 @@ namespace InputConnect
 
         private void OnWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e){
             // Prevent window from closing and just hide it
-            if (Tray.TrayEnabled) {
+            if (Tray.TrayEnabled && Connections.Devices.ConnectionList.Count != 0) {
                 e.Cancel = true;
                 WindowState = WindowState.Minimized;
 
@@ -140,6 +137,7 @@ namespace InputConnect
 
 
         private void OnClickExit(object? sender, object? e) {
+            AppData.SaveConnections();
             GlobalMouse.Hook.Dispose();
             Environment.Exit(0);
         }

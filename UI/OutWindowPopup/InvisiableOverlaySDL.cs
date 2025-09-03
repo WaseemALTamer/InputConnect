@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using InputConnect.Controllers.Mouse;
 using SDL2;
@@ -79,9 +80,9 @@ namespace InputConnect.UI.OutWindowPopup
                 throw new Exception("Window could not be created! " + SDL.SDL_GetError());
 
 
-            SDL.SDL_SetWindowOpacity(Window, 0f);
+            //SDL.SDL_SetWindowOpacity(Window, 0f);
             //SDL.SDL_ShowCursor(SDL.SDL_DISABLE);
-            
+            SDL.SDL_HideWindow(Window);
 
             IsVisible = false;
             IsRunning = true;
@@ -101,14 +102,14 @@ namespace InputConnect.UI.OutWindowPopup
         private double _timeStamp = 0;
         private bool FunctionRunning = false;
 
-        private async Task EventLoop(){
+        private void EventLoop(){
             FunctionRunning = true;
             _stopwatch.Restart();
 
             while (IsRunning && FunctionRunning){
                 // tick timing
                 if (_stopwatch.ElapsedMilliseconds - _timeStamp < Setting.Config.MouseUpdateTickRate){
-                    await Task.Delay(Setting.Config.MouseUpdateTickRate / 2);
+                    Thread.Sleep(Setting.Config.MouseUpdateTickRate / 2);
                     continue;
                 }
                 _timeStamp += Setting.Config.MouseUpdateTickRate;
@@ -179,7 +180,8 @@ namespace InputConnect.UI.OutWindowPopup
                 SDL.SDL_ShowWindow(Window);
                 SDL.SDL_RaiseWindow(Window);
                 SDL.SDL_SetWindowInputFocus(Window);
-                SDL.SDL_SetWindowOpacity(Window, 1f);
+                //SDL.SDL_SetWindowOpacity(Window, 1f);
+                SDL.SDL_ShowWindow(Window);
                 SDL.SDL_SetRelativeMouseMode(SDL.SDL_bool.SDL_TRUE);
                 IsVisible = true;
             }
@@ -187,9 +189,8 @@ namespace InputConnect.UI.OutWindowPopup
 
         public void Hide(){
             if (IsVisible){
-                SDL.SDL_SetWindowOpacity(Window, 0f);
+                //SDL.SDL_SetWindowOpacity(Window, 0f);
                 SDL.SDL_HideWindow(Window);
-                //SDL.SDL_MinimizeWindow(Window);
                 SDL.SDL_SetRelativeMouseMode(SDL.SDL_bool.SDL_FALSE);
                 IsVisible = false;
             }

@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using InputConnect.Setting;
 using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -36,7 +35,7 @@ namespace InputConnect.UI.Animations
         public double ScrollingMaxVelocity = 1000;
         public double ScrollingTrusholdVelocity = 1000;
         public double ScrollingDamping = 3; // damping will only be applied after the speed goes behind the trushold velocity
-        public int Tick = Config.Tick; //in ms (7ms is about 125fps)
+        public int Tick = Setting.Config.Tick; //in ms (7ms is about 125fps)
         public int TimeStamp = 0; //in ms
 
         public bool StopCurrentAnimation = false;

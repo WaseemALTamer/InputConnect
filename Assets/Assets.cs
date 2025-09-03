@@ -35,6 +35,7 @@ namespace InputConnect
         public static Bitmap? LockBitmap;
         public static Bitmap? MiniLockBitmap;
         public static Bitmap? WarningBitmap;
+        public static Bitmap? TrashBinBitmap;
 
 
 
@@ -73,6 +74,8 @@ namespace InputConnect
             LockBitmap = new Bitmap("Assets/Images/Lock.png");
             MiniLockBitmap = new Bitmap("Assets/Images/MiniLock.png");
             WarningBitmap = new Bitmap("Assets/Images/Warning.png");
+            TrashBinBitmap = new Bitmap("Assets/Images/TrashBin.png");
+
 
 
             // we finnish loading the assests here

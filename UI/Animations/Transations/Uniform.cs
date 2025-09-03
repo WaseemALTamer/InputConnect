@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using InputConnect.Setting;
 using System.Diagnostics;
 using System;
 
@@ -24,7 +23,7 @@ namespace InputConnect.UI.Animations.Transations
         public double EndingValue;
         public Action<double>? Trigger;
         public double CurrentValue;
-        public int Tick = Config.Tick; //in ms (this is 125fps)
+        public int Tick = Setting.Config.Tick; //in ms (this is 125fps)
         //public bool LinearDeceleration = false;
 
         public bool FunctionRunning = false;

@@ -2,7 +2,6 @@
 using Avalonia.Controls;
 using InputConnect.Commands;
 using InputConnect.Network;
-using InputConnect.Setting;
 using System;
 using System.Diagnostics.Metrics;
 
@@ -38,8 +37,8 @@ namespace InputConnect.UI.Containers
 
             Opacity = 1;
             ClipToBounds = true;
-            Background = Themes.Holder;
-            CornerRadius = new CornerRadius(Config.CornerRadius);
+            Background = Setting.Themes.Holder;
+            CornerRadius = new CornerRadius(Setting.Config.CornerRadius);
 
             Width = 400; Height = 200;
 
@@ -58,7 +57,7 @@ namespace InputConnect.UI.Containers
                 Text = "Quick Config",
                 Width = 155, Height = 50,
                 FontSize = 25,
-                Foreground = Themes.Text,
+                Foreground = Setting.Themes.Text,
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
@@ -70,10 +69,10 @@ namespace InputConnect.UI.Containers
                 Width = 250,
                 Height = 40,
                 PlaceholderText = "Sound Output",
-                Background = Themes.DropDown,
-                PlaceholderForeground = Themes.WaterMark,
-                CornerRadius = new CornerRadius(Config.CornerRadius),
-                FontSize = Config.FontSize,
+                Background = Setting.Themes.DropDown,
+                PlaceholderForeground = Setting.Themes.WaterMark,
+                CornerRadius = new CornerRadius(Setting.Config.CornerRadius),
+                FontSize = Setting.Config.FontSize,
             };
             MainCanvas.Children.Add(AudioOutputMenu);
 
@@ -89,7 +88,7 @@ namespace InputConnect.UI.Containers
 
                 
                 if (AudioOutputMenu != null) {
-                    Canvas.SetLeft(AudioOutputMenu, 20);
+                    Canvas.SetLeft(AudioOutputMenu, (Width - AudioOutputMenu.Width) / 2);
                     Canvas.SetTop(AudioOutputMenu, 80);
                 }
 
@@ -129,7 +128,7 @@ namespace InputConnect.UI.Containers
 
                 AudioOutputMenu.Items.Add(new ComboBoxItem { 
                                                     Content = deviceName, 
-                                                    FontSize = Config.FontSize
+                                                    FontSize = Setting.Config.FontSize
                                                 });
 
             }

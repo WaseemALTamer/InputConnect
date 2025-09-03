@@ -1,9 +1,7 @@
 ﻿using InputConnect.UI.Containers;
 using System.Collections.Generic;
-using InputConnect.Structures;
 using Avalonia.Interactivity;
 using System.Threading.Tasks;
-using InputConnect.Setting;
 using System.Reflection;
 using Avalonia.Controls;
 using Avalonia;
@@ -30,6 +28,7 @@ namespace InputConnect.UI.Pages
         private Button? DefaultButton;
 
 
+        // this approch will be changed and i will proabably make it manual
         private List<ConfigProperty> _Properties = new List<ConfigProperty>();
         public List<ConfigProperty> Properties{
             get { return _Properties; }
@@ -51,11 +50,11 @@ namespace InputConnect.UI.Pages
                 Content = "Apply",
                 Width = 150,
                 Height = 50,
-                Background = Themes.Button,
+                Background = InputConnect.Setting.Themes.Button,
                 HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius)
+                FontSize = InputConnect.Setting.Config.FontSize,
+                CornerRadius = new CornerRadius(InputConnect.Setting.Config.CornerRadius)
             };
             MainCanvas.Children.Add(ApplyButton);
             yPos += 10; // add a padding 
@@ -68,11 +67,11 @@ namespace InputConnect.UI.Pages
                 Content = "Defult",
                 Width = 150,
                 Height = 50,
-                Background = Themes.Button,
+                Background = InputConnect.Setting.Themes.Button,
                 HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius)
+                FontSize = InputConnect.Setting.Config.FontSize,
+                CornerRadius = new CornerRadius(InputConnect.Setting.Config.CornerRadius)
             };
             MainCanvas.Children.Add(DefaultButton);
             //yPos += 10; // padding already added from before
@@ -81,53 +80,6 @@ namespace InputConnect.UI.Pages
             DefaultButton.Click += OnClickDefaultButton;
 
 
-            // note that they have to be in order other wise this will cause many unwanted issues later on
-
-            // CONFIG.PROPERTY <DeviceName>
-            AddConfigProperty("Device Name",ref yPos);
-
-            // CONFIG.PROPERTY <ApplicationName>
-            AddConfigProperty("Application Name -> (Restart)", ref yPos);
-
-            // CONFIG.PROPERTY <BroadCastAddress>
-            AddConfigProperty("Broadcast Address", ref yPos);
-
-            // CONFIG.PROPERTY <Port>
-            AddConfigProperty("Port", ref yPos);
-
-            // CONFIG.PROPERTY <Tick>
-            AddConfigProperty("Tick Interval (ms) -> (Restart)", ref yPos);
-
-            // CONFIG.PROPERTY <AdvertisementInterval>
-            AddConfigProperty("Advertise Interval (ms)", ref yPos);
-
-            // CONFIG.PROPERTY <AdvertiseTimeSpan>
-            AddConfigProperty("Advertise Timeout (s)", ref yPos);
-
-            // CONFIG.PROPERTY <TransitionDuration>
-            AddConfigProperty("Transition Duration (ms) -> (Restart)", ref yPos);
-
-            // CONFIG.PROPERTY <CornerRadius>
-            AddConfigProperty("Corner Radius -> (Restart)", ref yPos);
-
-            // CONFIG.PROPERTY <TransitionHover>
-            AddConfigProperty("Hover Duration (ms) -> (Restart)", ref yPos);
-
-            // CONFIG.PROPERTY <FontSize>
-            AddConfigProperty("Font Size -> (Restart)", ref yPos);
-
-            // CONFIG.PROPERTY <PopupsTimeout>
-            AddConfigProperty("Popups Timeout (ms)", ref yPos);
-
-            // CONFIG.PROPERTY <TransitionReferenceDistance>
-            AddConfigProperty("Transition Reference Distance (ms)", ref yPos);
-
-            // CONFIG.PROPERTY <FontSize>
-            AddConfigProperty("TimeOutDuration (ms)", ref yPos);
-
-
-
-            MainCanvas.Height = yPos + 20; // set the final height
 
 
 
@@ -157,7 +109,6 @@ namespace InputConnect.UI.Pages
         }
 
         private async void LocalOnShow() {
-            AppendSettingProperties();
             foreach (var Propertie in Properties){
                 await Task.Delay(50); // this ensures everything loads up smoothly the first time round
                 if (IsDisplayed == false) return;
@@ -172,63 +123,12 @@ namespace InputConnect.UI.Pages
         }
 
 
-        private ConfigProperty? AddConfigProperty(string label, ref double yPos){
-            if (MainCanvas == null) return null;
-            var prop = new ConfigProperty(MainCanvas, label);
-            yPos += 10;
-            prop.SetPostionTranslate((MainCanvas.Width - prop.Width) / 2, yPos);
-            yPos += prop.Height;
-            Properties.Add(prop);
-            return prop;
-        }
 
-        public void AppendSettingProperties(){
-            var staticConfigType = typeof(Config);
 
-            int _index = 0;
-            foreach (var staticField in staticConfigType.GetFields(BindingFlags.Public | BindingFlags.Static))
-            {
-                if (_index >= Properties.Count)
-                    break;
 
-                var value = staticField.GetValue(null)?.ToString();
-                if (value != null) Properties[_index].SetValue(value);
-
-                _index++;
-            }
-        }
 
         public void ApplySetting(){
-            var NewConfig = new ConfigStruct();
-            var configType = typeof(ConfigStruct);
-            int _index = 0;
 
-            foreach (var property in configType.GetProperties(BindingFlags.Public | BindingFlags.Instance)){
-                if (_index >= Properties.Count)
-                    break;
-
-                var prop = Properties[_index];
-                var value = prop.GetValue();
-
-                try{
-                    // this try to make it int if it is then everything is good so far
-                    try{
-                        property.SetValue(NewConfig, int.Parse(value));
-                    }
-                    catch{ // that means it is string if we couldnt
-                        property.SetValue(NewConfig, value);
-                    }
-
-                    _index++;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to set value for {property.Name}: {ex.Message}");
-                }
-            }
-
-            AppData.ApplyConfig(NewConfig);
-            AppData.SaveConfig(NewConfig);
         }
 
         private void OnClickApplyButton(object? sender = null, RoutedEventArgs? e = null){
@@ -236,19 +136,7 @@ namespace InputConnect.UI.Pages
         }
 
         private void OnClickDefaultButton(object? sender = null, RoutedEventArgs? e = null){
-            var NewConfig = new ConfigStruct(); // creating the configstruct will already have the defult values inside of it 
-            var configType = typeof(ConfigStruct);
-            int _index = 0;
 
-            foreach (var property in configType.GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-                var value = property.GetValue(NewConfig)?.ToString();
-
-                if (value != null) {
-                    Properties[_index].SetValue(value);
-                }
-                _index++;
-            }
-            //Clicking apply is still required after appending the defult values
         }
 
 

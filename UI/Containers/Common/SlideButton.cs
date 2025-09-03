@@ -1,5 +1,4 @@
-﻿using InputConnect.Setting;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia;
@@ -77,7 +76,7 @@ namespace InputConnect.UI.Containers.Common
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetBallPostion
             };
 
@@ -85,7 +84,7 @@ namespace InputConnect.UI.Containers.Common
             {
                 StartingValue = 1,
                 EndingValue = 0.5,
-                Duration = Config.TransitionHover,
+                Duration = Setting.Config.TransitionHover,
                 Trigger = SetBallOpacity
             };
 

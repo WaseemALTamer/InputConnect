@@ -1,5 +1,4 @@
-﻿using InputConnect.Setting;
-using System;
+﻿using System;
 
 
 namespace InputConnect.UI.Animations.Transations
@@ -20,7 +19,7 @@ namespace InputConnect.UI.Animations.Transations
         public double EndingValue;
         public Action<double>? Trigger;
         public double CurrentValue;
-        public int Tick = Config.Tick; //in ms (this is 125fps)
+        public int Tick = Setting.Config.Tick; //in ms (this is 125fps)
 
         public double Damping = 2; // this is the expenatal the higher it is the faster its  going to be
                                    // this value must to be zero and if you make it below 1 then you get
@@ -43,7 +42,7 @@ namespace InputConnect.UI.Animations.Transations
 
 
 
-        public void TranslateForward()
+        public void TranslateForward(object? sender = null, object? e = null)
         {
             if (Transition == null) return;
 
@@ -53,7 +52,7 @@ namespace InputConnect.UI.Animations.Transations
             Transition.TranslateForward();
         }
 
-        public void TranslateBackward()
+        public void TranslateBackward(object? sender = null, object? e = null)
         {
             if (Transition == null) return;
 

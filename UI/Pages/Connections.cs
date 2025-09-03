@@ -28,17 +28,26 @@ namespace InputConnect.UI.Pages
 
 
 
-        public Connections(Canvas? master) : base(master)
-        {
+        public Connections(Canvas? master) : base(master){
             // we ensure that it runs on the main thread because we are working with the ui
-            MessageManager.OnConnect += (message) => { Dispatcher.UIThread.Post(() => Update()); };
-            MessageManager.OnAccept += (message) => { Dispatcher.UIThread.Post(() => Update()); };
-            MessageManager.OnDecline += (message) => { Dispatcher.UIThread.Post(() => Update()); };
+
+            InputConnect.Connections.Manager.OnConnectedConnectionAdded += () => { Update(); };
+            InputConnect.Connections.Manager.OnConnectionClosed += () => { Update(); };
+
+
+            MessageManager.OnConnect += (message) => { Update();};
+            MessageManager.OnAccept += (message) => { Update();};
+            MessageManager.OnDecline += (message) => { Update();};
+
+
+            Update();
+
+            //SizeChanged += (s, e) => PlaceAds(); // uncomment this later for redundency after testing
+            OnShow += PlaceAds;
         }
 
 
-        public void OnResize(object? sender = null, SizeChangedEventArgs? e = null)
-        {
+        public void OnResize(object? sender = null, SizeChangedEventArgs? e = null){
 
 
 
@@ -48,44 +57,46 @@ namespace InputConnect.UI.Pages
 
 
         public void Update(object? sender = null, object? e = null){
-            for (int i = 0; i < InputConnect.Connections.Devices.ConnectionList.Count; i++){
-                var _found = false; // this will be used to indecated if we found the device responsible for the message
-                var device = InputConnect.Connections.Devices.ConnectionList[i];
-                for (int j = 0; j < Devices.Count; j++)
-                {
-                    var UIobject = Devices[j];
-                    if (UIobject == null || UIobject.Device == null) continue;
-                    if (UIobject.Device.MacAddress == device.MacAddress){
-                        UIobject.Device = device;
-                        UIobject.Update(); // update it for values inside of it
-                        _found = true;
-                        break;
+
+            Dispatcher.UIThread.Post(() => { 
+                for (int i = 0; i < InputConnect.Connections.Devices.ConnectionList.Count; i++){
+                    var _found = false; // this will be used to indecated if we found the device responsible for the message
+                    var device = InputConnect.Connections.Devices.ConnectionList[i];
+                    for (int j = 0; j < Devices.Count; j++){
+                        var UIobject = Devices[j];
+                        if (UIobject == null || UIobject.Device == null) continue;
+                        if (UIobject.Device.MacAddress == device.MacAddress){
+                            UIobject.Device = device;
+                            UIobject.Update(); // update it for values inside of it
+                            _found = true;
+                            break;
+                        }
                     }
+                    if (_found) continue;
+
+                    Add(device);
                 }
-                if (_found) continue;
 
-                Add(device);
-            }
-
-            // now we can check for any devices that we have that are not in the advertisement
-            for (int i = Devices.Count - 1; i >= 0; i--)
-            {
-
-                var _found = false;
-                var connection = Devices[i];
-                if (connection == null || connection.Device == null) continue;
-                for (int j = 0; j < InputConnect.Connections.Devices.ConnectionList.Count; j++){
-                    var _device = InputConnect.Connections.Devices.ConnectionList[j];
-                    if (connection.Device == _device){
-                        _found = true;
-                        break;
+                // now we can check for any devices that we have that are not in the advertisement
+                for (int i = Devices.Count - 1; i >= 0; i--){
+                    var _found = false;
+                    var connection = Devices[i];
+                    if (connection == null || connection.Device == null) continue;
+                    for (int j = 0; j < InputConnect.Connections.Devices.ConnectionList.Count; j++){
+                        var _device = InputConnect.Connections.Devices.ConnectionList[j];
+                        if (connection.Device == _device){
+                            _found = true;
+                            break;
+                        }
                     }
+                    if (_found) continue;
+                    connection.Kill();
+                    Devices.Remove(connection);
                 }
-                if (_found) continue;
-                connection.Kill();
-                Devices.Remove(connection);
+
                 PlaceAds();
-            }
+            });
+
 
         }
 

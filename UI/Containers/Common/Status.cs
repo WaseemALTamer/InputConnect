@@ -1,5 +1,4 @@
-﻿using InputConnect.Setting;
-using InputConnect;
+﻿using InputConnect;
 using Avalonia.Controls;
 using Avalonia.Media;
 using System;
@@ -86,7 +85,7 @@ namespace InputConnect.UI.Containers.Common
 
 
         public void Reset() {
-            SetColor(new SolidColorBrush(Color.FromUInt32(0x00000000)), Config.TransitionDuration);
+            SetColor(new SolidColorBrush(Color.FromUInt32(0x00000000)), Setting.Config.TransitionDuration);
         }
 
 

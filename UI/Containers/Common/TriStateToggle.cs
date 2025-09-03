@@ -1,5 +1,4 @@
-﻿using InputConnect.Setting;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia;
@@ -111,7 +110,7 @@ namespace InputConnect.UI.Containers.Common
             OnHover = new Animations.Transations.Uniform{
                 StartingValue = 1,
                 EndingValue = 0.5,
-                Duration = Config.TransitionHover,
+                Duration = Setting.Config.TransitionHover,
                 Trigger = SetBallOpacity
             };
 
@@ -145,7 +144,7 @@ namespace InputConnect.UI.Containers.Common
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetLockOpacity
             };
 
@@ -236,7 +235,7 @@ namespace InputConnect.UI.Containers.Common
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetBallPostionTrigger
             };
 

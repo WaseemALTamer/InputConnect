@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia.Input;
 using System;
@@ -34,7 +33,7 @@ namespace InputConnect.UI.Containers
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Damping = 2,
                 Trigger = ShowHideTrigger
             };
@@ -43,7 +42,7 @@ namespace InputConnect.UI.Containers
             {
                 StartingValue = 1,
                 EndingValue = 0.5,
-                Duration = Config.TransitionHover,
+                Duration = Setting.Config.TransitionHover,
                 Trigger = SetOpacity
             };
 
@@ -138,7 +137,7 @@ namespace InputConnect.UI.Containers
 
         public async void HideShowAnimation(){
             Hide();
-            await Task.Delay(Config.TransitionDuration);
+            await Task.Delay(Setting.Config.TransitionDuration);
             Show();
         }
     }

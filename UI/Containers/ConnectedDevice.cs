@@ -1,10 +1,11 @@
 ﻿using InputConnect.Structures;
-using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Input;
 using Avalonia;
 using InputConnect.UI.Containers.Common;
+using Avalonia.Threading;
+using InputConnect.UI.InWindowPopup;
 
 
 
@@ -21,6 +22,8 @@ namespace InputConnect.UI.Containers
 
         private Canvas? Master;
         private TextBlock? Data;
+        private TrashBinButton? TrashBinButton;
+        private Conformation? RemovealConformation;
 
         private Animations.Transations.EaseInOut? PostionTranslation;
         private Animations.Transations.Uniform? ShowHideTransition;
@@ -40,6 +43,10 @@ namespace InputConnect.UI.Containers
             set { _Device = value; }
         }
 
+        
+
+
+
 
         private Status? StatusDot;
 
@@ -49,7 +56,7 @@ namespace InputConnect.UI.Containers
             Device = device;
 
 
-            Background = Themes.Connection;
+            Background = Setting.Themes.Connection;
             IsVisible = false;
             Opacity = 0;
 
@@ -65,20 +72,26 @@ namespace InputConnect.UI.Containers
                        $"MacAddress: None\n",
                 Width = Width * 0.85,
                 Height = Height * 0.7,
-                FontSize = Config.FontSize
+                FontSize = Setting.Config.FontSize
             };
+
+
+            TrashBinButton = new TrashBinButton();
+            TrashBinButton.Trigger += OnTrashButtonClick;
+            MainCanvas.Children.Add(TrashBinButton);
+            
 
             ShowHideTransition = new Animations.Transations.Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = ShowHideSetOpeicity,
             };
 
             StatusDot = new Status();
             MainCanvas.Children.Add(StatusDot);
 
-            StatusDot.SetColor(Themes.Pending, Config.TransitionDuration);
+            StatusDot.SetColor(Setting.Themes.Pending, Setting.Config.TransitionDuration);
 
 
             HoverTranslation = new Animations.Transations.Uniform
@@ -86,7 +99,7 @@ namespace InputConnect.UI.Containers
                 StartingValue = 0.5,
                 EndingValue = 0.3,
                 CurrentValue = 1,
-                Duration = Config.TransitionHover,
+                Duration = Setting.Config.TransitionHover,
                 Trigger = OnHoverSetBackground
             };
 
@@ -94,11 +107,15 @@ namespace InputConnect.UI.Containers
             PointerExited += HoverTranslation.TranslateBackward;
             PointerReleased += OnClick;
 
+            if (PublicWidgets.Master != null){
+                RemovealConformation = new Conformation(PublicWidgets.Master);
+                RemovealConformation.ConfirmTrigger += OnRemovealConform;
+            }
 
             if (Master != null){
                 Update(); // trigger the on resize so we can set the dimention
                 Master.SizeChanged += OnSizeChanged;
-                CornerRadius = new CornerRadius(Config.CornerRadius);
+                CornerRadius = new CornerRadius(Setting.Config.CornerRadius);
             }
 
             Network.MessageManager.OnAccept += (e) => { Update(); };
@@ -138,32 +155,40 @@ namespace InputConnect.UI.Containers
                     Canvas.SetTop(StatusDot, (Height - StatusDot.Height) / 2);
                 }
 
-
+                if (TrashBinButton != null) {
+                    Canvas.SetLeft(TrashBinButton, Width - TrashBinButton.Width - 50);
+                    Canvas.SetTop(TrashBinButton, (Height - TrashBinButton.Height) / 2);
+                }
 
             }
         }
 
-        public void Update()
-        {
-            OnSizeChanged(); // update the size of it just in case
+        public void Update(){
 
-            if (Data == null) return;
-            if (Device != null)
-            {
-                Data.Text = $"Name: {Device.DeviceName ?? "None"}  \n\n" +
-                            $"State: {Device.State ?? "None"}  \n" +
-                            $"MacAddress: {Device.MacAddress ?? "None"}  \n";
-            }
+            Dispatcher.UIThread.Post(() => {
+                OnSizeChanged(); // update the size of it just in case
 
-            if (Device != null && StatusDot != null){
-                if (Device.State == Connections.Constants.StatePending) {
-                    StatusDot.SetColor(Themes.Pending, Config.TransitionDuration);
+                if (Data == null) return;
+                if (Device != null)
+                {
+                    Data.Text = $"Name: {Device.DeviceName ?? "None"}  \n\n" +
+                                $"State: {Device.State ?? "None"}  \n" +
+                                $"MacAddress: {Device.MacAddress ?? "None"}  \n";
                 }
 
-                if (Device.State == Connections.Constants.StateConnected){
-                    StatusDot.SetColor(Themes.Connected, Config.TransitionDuration);
+                if (Device != null && StatusDot != null)
+                {
+                    if (Device.State == Connections.Constants.StatePending)
+                    {
+                        StatusDot.SetColor(Setting.Themes.Pending, Setting.Config.TransitionDuration);
+                    }
+
+                    if (Device.State == Connections.Constants.StateConnected)
+                    {
+                        StatusDot.SetColor(Setting.Themes.Connected, Setting.Config.TransitionDuration);
+                    }
                 }
-            }
+            });
         }
 
         public void Show()
@@ -247,7 +272,7 @@ namespace InputConnect.UI.Containers
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetPostionTrigger
             };
 
@@ -299,6 +324,26 @@ namespace InputConnect.UI.Containers
                     }
                 }
             }
+        }
+
+
+
+        private void OnTrashButtonClick() {
+            
+            if (Device == null) return;
+
+
+            if (RemovealConformation != null) {
+                RemovealConformation.Note = $"Are you sure you want to close the connection with <{Device.DeviceName}>?";
+                RemovealConformation.Update();
+                RemovealConformation.Show();
+            }
+        }
+
+
+        private void OnRemovealConform() {
+            if (Device == null) return;
+            Connections.Manager.CloseConnection(Device);
         }
     }
 }

@@ -49,7 +49,6 @@ namespace InputConnect.UI.Pages
             MessageManager.OnAdvertisement += () => { Dispatcher.UIThread.Post(() => Update()); };
 
 
-            if (MainCanvas == null) return;
         }
 
 

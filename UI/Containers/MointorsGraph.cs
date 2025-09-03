@@ -64,6 +64,7 @@ namespace InputConnect.UI.Containers
 
             MessageManager.OnAccept += _ => Update();
             Connections.Manager.OnConnectedConnectionAdded += Update;
+            Connections.Manager.OnConnectionClosed += Update;
             Events.TargetDeviceConnectionChanged += Update;
 
             UpdateGraph();

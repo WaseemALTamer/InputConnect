@@ -21,9 +21,16 @@ namespace InputConnect.SharedData
         public static Action? TargetDeviceConnectionChanged; // this triggeres when the connections is closed for the TargetDevice
                                                              // this is used to update the MointorsGraph and ChannelModeTriToggles
 
+        public static Action? TargetDeviceChannelModeChange;
+
 
         public static Action? OnMovingVirtualScreens; // this will be used to tell the ChannelModeTriToggles to update
                                                       // this will also tell  the other  mointors to check if they are
                                                       // in illegal postion
+
+
+        public static Action? OnSetVirtualScreensPos; // this will only get  triggered when you realease  the  pointer
+                                                      // from virtual mointor
+
     }
 }

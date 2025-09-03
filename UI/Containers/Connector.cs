@@ -1,12 +1,13 @@
 ﻿using InputConnect.Structures;
 using InputConnect.SharedData;
 using Avalonia.Interactivity;
-using InputConnect.Setting;
 using Avalonia.Controls;
 using Avalonia;
 using Avalonia.Media;
 using InputConnect.Network;
 using Avalonia.Input;
+using Tmds.DBus.Protocol;
+using System;
 
 
 
@@ -49,8 +50,8 @@ namespace InputConnect.UI.Containers
 
             Opacity = 1;
             ClipToBounds = true;
-            Background = Themes.Holder;
-            CornerRadius = new CornerRadius(Config.CornerRadius);
+            Background = Setting.Themes.Holder;
+            CornerRadius = new CornerRadius(Setting.Config.CornerRadius);
             MinHeight = 150; MinWidth = 350;
             MaxHeight = 150; MaxWidth = 350;
 
@@ -68,11 +69,11 @@ namespace InputConnect.UI.Containers
                 Content = "Connect",
                 Width = 150,
                 Height = 50,
-                Background = Themes.Button,
+                Background = Setting.Themes.Button,
                 HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius)
+                FontSize = Setting.Config.FontSize,
+                CornerRadius = new CornerRadius(Setting.Config.CornerRadius)
             };
             MainCanvas.Children.Add(ConnectButton);
             ConnectButton.Click += OnClickConnectButton;
@@ -81,11 +82,11 @@ namespace InputConnect.UI.Containers
             Entry = new TextBox{
                 Width = 300,
                 Height = 40,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius),
+                FontSize = Setting.Config.FontSize,
+                CornerRadius = new CornerRadius(Setting.Config.CornerRadius),
                 Watermark = "Token",
                 PasswordChar = char.Parse("*"),
-                Background = Themes.Entry,
+                Background = Setting.Themes.Entry,
             };
             MainCanvas.Children.Add(Entry);
             Entry.KeyDown += OnEnetryKeyDown;
@@ -94,7 +95,7 @@ namespace InputConnect.UI.Containers
             WrongTokenTranstion = new Animations.Transations.Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = TriggerWrongToken,
             };
 
@@ -169,8 +170,8 @@ namespace InputConnect.UI.Containers
         {
             if (Background is SolidColorBrush solidBrush)
             {
-                var originalColorEntry = Themes.Entry;
-                var targetColor = Themes.WrongToken;
+                var originalColorEntry = Setting.Themes.Entry;
+                var targetColor = Setting.Themes.WrongToken;
 
                 byte Lerp(byte start, byte end) => (byte)(start + (end - start) * value);
 
@@ -181,7 +182,7 @@ namespace InputConnect.UI.Containers
                 //    Lerp(originalColorEntry.Color.B, targetColor.Color.B)
                 //);
 
-                var originalColorText = Themes.Text;
+                var originalColorText = Setting.Themes.Text;
 
                 var newColorText = Color.FromArgb(
                     Lerp(originalColorText.Color.A, targetColor.Color.A),
@@ -243,12 +244,17 @@ namespace InputConnect.UI.Containers
 
 
                 PasswordKey passwordKey = new PasswordKey(Entry.Text);
-                var newConnection = Connections.Manager.EstablishConnection(MessageManager.MacToIP[TargetedDevice.MacAddress],
-                                                                            passwordKey,
-                                                                            TargetedDevice.MacAddress,
-                                                                            TargetedDevice.DeviceName);
 
-                TargetedDevice.Connection = newConnection;
+                if (TargetedDevice.MacAddress != null &&
+                    MessageManager.MacToIP.TryGetValue(TargetedDevice.MacAddress, out var ip))
+                {
+                    var newConnection = Connections.Manager.EstablishConnection(ip,
+                                                                                passwordKey,
+                                                                                TargetedDevice.MacAddress,
+                                                                                TargetedDevice.DeviceName);
+                    TargetedDevice.Connection = newConnection;
+                }
+
 
                 if(Events.TargetDeviceConnectionChanged != null)
                     Events.TargetDeviceConnectionChanged.Invoke();

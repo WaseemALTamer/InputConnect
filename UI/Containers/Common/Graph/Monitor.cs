@@ -1,5 +1,4 @@
-﻿using InputConnect.Setting;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
 using InputConnect.Structures;
 
@@ -81,10 +80,10 @@ namespace InputConnect.UI.Containers.Common
 
 
 
-            Background = Themes.MonitorEdges;
+            Background = Setting.Themes.MonitorEdges;
 
             MainCanvas = new Canvas{
-                Background = Themes.Backgrounds[MointorNumber - 1],
+                Background = Setting.Themes.Backgrounds[MointorNumber - 1],
                 Width = Width - EdgesSize, Height = Height - EdgesSize,
             };
 
@@ -125,16 +124,16 @@ namespace InputConnect.UI.Containers.Common
             WarningTranstion = new Animations.Transations.EaseInOut{
                 StartingValue = 0,
                 EndingValue = 0.9,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetWarningOpacity
             };
 
 
             MointorTextBlock = new TextBlock { 
                 Text = $"{MointorNumber}",
-                FontSize = Config.FontSize,
-                Width = Config.FontSize,
-                Height = Config.FontSize,
+                FontSize = Setting.Config.FontSize,
+                Width = Setting.Config.FontSize,
+                Height = Setting.Config.FontSize,
                 TextAlignment = Avalonia.Media.TextAlignment.Center,
             };
 
@@ -153,7 +152,7 @@ namespace InputConnect.UI.Containers.Common
             ClickTrnastion = new Animations.Transations.EaseInOut{
                 StartingValue = 1,
                 EndingValue = 0.5,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetOpacity
             };
 
@@ -162,7 +161,7 @@ namespace InputConnect.UI.Containers.Common
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration,
+                Duration = Setting.Config.TransitionDuration,
                 Trigger = SetOpacity
             };
 
@@ -261,6 +260,12 @@ namespace InputConnect.UI.Containers.Common
             IsDraging = false;
             if (ClickTrnastion != null && IsLocked == false)
                 ClickTrnastion.TranslateBackward();
+
+            SharedData.Events.OnSetVirtualScreensPos?.Invoke();
+
+            // AppData.SaveConnections(); // we save the last pos of the mointor postion
+                                          // consider changing this  to trigger an event
+                                          // in the shared event, <COMPLETED>
         }
 
         private void OnPointerMoved(object? sender, PointerEventArgs e) {
