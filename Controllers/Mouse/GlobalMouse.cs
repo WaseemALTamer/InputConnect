@@ -475,9 +475,10 @@ namespace InputConnect.Controllers.Mouse
                                 IsEncrypted = true
                             };
 
-                            if (connection.MacAddress != null)
+                            if (connection.MacAddress != null &&
+                                MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip))
                             {
-                                ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                                ConnectionUDP.Send(ip, messageudp);
                             }
 
                             //Console.WriteLine($"{realPosX}, {realPosY}");
@@ -535,9 +536,10 @@ namespace InputConnect.Controllers.Mouse
                                 IsEncrypted = true
                             };
 
-                            if (connection.MacAddress != null)
+                            if (connection.MacAddress != null &&
+                                MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip))
                             {
-                                ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                                ConnectionUDP.Send(ip, messageudp);
                             }
 
                         }
@@ -593,9 +595,10 @@ namespace InputConnect.Controllers.Mouse
                                 IsEncrypted = true
                             };
 
-                            if (connection.MacAddress != null)
+                            if (connection.MacAddress != null &&
+                                MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip))
                             {
-                                ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                                ConnectionUDP.Send(ip, messageudp);
                             }
 
                         }
@@ -655,9 +658,10 @@ namespace InputConnect.Controllers.Mouse
                                 IsEncrypted = true
                             };
 
-                            if (connection.MacAddress != null)
+                            if (connection.MacAddress != null &&
+                                MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip))
                             {
-                                ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+                                ConnectionUDP.Send(ip, messageudp);
                             }
 
                         }

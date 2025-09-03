@@ -3,6 +3,7 @@ using InputConnect.Network;
 using System.Text.Json;
 using SharpHook.Data;
 using SharpHook;
+using Tmds.DBus.Protocol;
 
 
 
@@ -93,9 +94,12 @@ namespace InputConnect.Controllers
                 IsEncrypted = true
             };
 
-            if (target.MacAddress != null){
-                ConnectionUDP.Send(MessageManager.MacToIP[target.MacAddress], messageudp);
+            if (target.MacAddress != null &&
+                MessageManager.MacToIP.TryGetValue(target.MacAddress, out var ip))
+            {
+                ConnectionUDP.Send(ip, messageudp);
             }
+
         }
 
 
@@ -130,8 +134,10 @@ namespace InputConnect.Controllers
                 IsEncrypted = true
             };
 
-            if (target.MacAddress != null){
-                ConnectionUDP.Send(MessageManager.MacToIP[target.MacAddress], messageudp);
+            if (target.MacAddress != null &&
+                MessageManager.MacToIP.TryGetValue(target.MacAddress, out var ip))
+            {
+                ConnectionUDP.Send(ip, messageudp);
             }
 
 

@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
-using InputConnect.Structures;
-using InputConnect.Network;
+using InputConnect;
 using System;
 using SDL2;
 
@@ -70,7 +69,7 @@ namespace InputConnect.Controllers.Audio
 
             // Desired audio spec
             SDL.SDL_AudioSpec desiredSpec = new SDL.SDL_AudioSpec{
-                freq = Setting.Config.AudioFrequency,
+                freq = InputConnect.Setting.Config.AudioFrequency,
                 format = SDL.AUDIO_F32SYS,
                 channels = Setting.Config.AudioChannals,
                 samples = (ushort)(Setting.Config.AudioBufferSize / 10),

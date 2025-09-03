@@ -82,8 +82,11 @@ namespace InputConnect.Controllers.Audio
                     IsEncrypted = true
                 };
 
-                if (connection.MacAddress != null){
-                    ConnectionUDP.Send(MessageManager.MacToIP[connection.MacAddress], messageudp);
+
+                if (connection.MacAddress != null && 
+                    MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip))
+                {
+                    ConnectionUDP.Send(ip, messageudp);
                 }
             }
         }
