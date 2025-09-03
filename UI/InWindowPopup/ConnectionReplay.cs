@@ -102,7 +102,7 @@ namespace InputConnect.UI.InWindowPopup
                 Width = 40,
                 Height = 40,
                 Thickness = 10,
-                Trigger = OnCloseButton, // this will simulate closing the popup when the time ends
+                Trigger = OnTimeout, // this will simulate closing the popup when the time ends
             };
 
             MainCanvas.Children.Add(TimeoutTimer);
@@ -319,6 +319,22 @@ namespace InputConnect.UI.InWindowPopup
                       // this may cause errors, it clashed with  the base  popup class, because  the overlay function now
                       // keeps track of how many popups are u p and each hide will decrease the number of popups that are
                       // on
+
+            if (SharedData.IncomingConnection.Message != null){
+                Connections.Manager.CloseIncomingConnection(SharedData.IncomingConnection.Message, "Decline"); // Decline the Connection
+                SharedData.IncomingConnection.Clear(); // remove the the message
+            }
+
+            if (PublicWidgets.UIConnections != null)
+                PublicWidgets.UIConnections.Update();
+        }
+
+
+        private void OnTimeout() {
+            // do more logic righth here later on
+            
+            Hide();
+
 
             if (SharedData.IncomingConnection.Message != null){
                 Connections.Manager.CloseIncomingConnection(SharedData.IncomingConnection.Message, "Decline"); // Decline the Connection

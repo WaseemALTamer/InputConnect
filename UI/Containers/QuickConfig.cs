@@ -76,6 +76,16 @@ namespace InputConnect.UI.Containers
             };
             MainCanvas.Children.Add(AudioOutputMenu);
 
+
+            if (Setting.Config.OutputAudioDevice != ""){
+                AudioOutputMenu.Clear(); // clear for redundency
+                AudioOutputMenu.Items.Add(new ComboBoxItem{
+                    Content = Setting.Config.OutputAudioDevice,
+                    FontSize = Setting.Config.FontSize
+                });
+                AudioOutputMenu.SelectedIndex = 0;
+            }
+
             AudioOutputMenu.SelectionChanged += OnSelectionChanged;
             AudioOutputMenu.DropDownOpened += OnPointerReleased;
         }
@@ -110,7 +120,15 @@ namespace InputConnect.UI.Containers
             var item = AudioOutputMenu.SelectedItem as ComboBoxItem;
             if (item != null){
                 string? deviceName = (string?)item.Content;
-                if (deviceName == null) return;
+                if (deviceName == null || deviceName == "") {
+                    Console.WriteLine("Nothing Selected");
+                    return;
+                }
+
+                // we save the last Selected Device
+                Setting.Config.OutputAudioDevice = deviceName;
+                AppData.SaveConfig();
+
                 Controllers.Audio.AudioOut.StartAudioOut(deviceName);
             }
         }

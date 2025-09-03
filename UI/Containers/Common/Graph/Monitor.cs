@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using InputConnect.Structures;
+using System;
 
 
 
@@ -147,7 +148,10 @@ namespace InputConnect.UI.Containers.Common
 
             MasterGraph.PointerMoved += OnPointerMoved;
             PointerReleased += OnPointerReleased;
-
+            PointerWheelChanged += (s, e) => { 
+                if (IsDraging)
+                    e.Handled = true; 
+            };
 
             ClickTrnastion = new Animations.Transations.EaseInOut{
                 StartingValue = 1,
@@ -165,6 +169,8 @@ namespace InputConnect.UI.Containers.Common
                 Trigger = SetOpacity
             };
 
+
+            
 
             Child = MainCanvas;
 
@@ -256,7 +262,12 @@ namespace InputConnect.UI.Containers.Common
         }
 
 
-        private void OnPointerReleased(object? sender, PointerEventArgs e) {
+        private void OnPointerReleased(object? sender, PointerReleasedEventArgs e) {
+
+
+            if (MouseButton.Left != e.InitialPressMouseButton)
+                return;
+
             IsDraging = false;
             if (ClickTrnastion != null && IsLocked == false)
                 ClickTrnastion.TranslateBackward();

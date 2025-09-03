@@ -41,7 +41,7 @@ namespace InputConnect.Structures
         public List<Bounds>? VirtualScreens { get; set; } // this will be the virtual screens created to go to the next device the bounds
                                                           // are completely imagenery, and need to be converted back to the screen bounds
                                                           // before being sent to the next device
-        [JsonPropertyName("AudioQueue")]
+        [JsonIgnore]
         public AudioQueue? AudioQueue { get; set; } // this will  provide a thread free  Queue system in order
                                                     // to keep  track of the  audio  comming from  the network
                                                     // for the  connection which then the audio can be mearged
