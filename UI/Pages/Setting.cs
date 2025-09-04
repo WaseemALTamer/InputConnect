@@ -7,6 +7,7 @@ using Avalonia;
 using InputConnect.SettingStruct;
 using System.Reflection;
 using System;
+using InputConnect.UI.InWindowPopup;
 
 
 
@@ -27,6 +28,8 @@ namespace InputConnect.UI.Pages
 
         private Button? ApplyButton;
         private Button? DefaultButton;
+
+        private Conformation? ConformationPopup;
 
 
         // this approch will be changed and i will proabably make it manual
@@ -80,7 +83,11 @@ namespace InputConnect.UI.Pages
             yPos += DefaultButton.Height;
             DefaultButton.Click += OnClickDefaultButton;
 
-
+            if (PublicWidgets.Master != null) {
+                ConformationPopup = new Conformation(PublicWidgets.Master);
+                ConformationPopup.ConfirmTrigger += OnConformApplySetting;
+            }
+                
 
             AddSettingProperties();
 
@@ -170,11 +177,22 @@ namespace InputConnect.UI.Pages
 
         }
 
+        private ConfigStruct? configStructToSave;
+        private void OnConformApplySetting() {
+            if (configStructToSave == null) return;
+            InputConnect.Setting.Config = configStructToSave;
+            AppData.SaveConfig();
+        }
+
 
 
         public void ApplySetting(ConfigStruct Config){
-            InputConnect.Setting.Config = Config;
-            AppData.SaveConfig();
+            configStructToSave = Config;
+            if (ConformationPopup == null) return;
+
+            ConformationPopup.Note = "Are you sure you want to apply and overwrite the config?";
+            ConformationPopup.Update();
+            ConformationPopup.Show();
         }
 
         private void OnClickApplyButton(object? sender = null, RoutedEventArgs? e = null){
