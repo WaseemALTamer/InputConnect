@@ -96,7 +96,7 @@ namespace InputConnect.UI.Containers
 
 
             MouseImage = new Image { 
-                Stretch = Avalonia.Media.Stretch.Fill,
+                Stretch = Avalonia.Media.Stretch.Uniform,
                 Width = 75, 
                 Height = 75,
             };
@@ -106,7 +106,7 @@ namespace InputConnect.UI.Containers
             });
 
             KeyboardImage = new Image{
-                Stretch = Avalonia.Media.Stretch.Fill,
+                Stretch = Avalonia.Media.Stretch.Uniform,
                 Width = 75,
                 Height = 75,
             };
@@ -116,7 +116,7 @@ namespace InputConnect.UI.Containers
             });
 
             AudioImage = new Image{
-                Stretch = Avalonia.Media.Stretch.Fill,
+                Stretch = Avalonia.Media.Stretch.Uniform,
                 Width = 75,
                 Height = 75,
             };
@@ -177,7 +177,7 @@ namespace InputConnect.UI.Containers
 
                     if (KeyboardImage != null){
                         Canvas.SetLeft(KeyboardImage, (MainCanvas.Width - KeyboardImage.Width) - 25);
-                        Canvas.SetTop(KeyboardImage, spacingImages * 2 - 30);
+                        Canvas.SetTop(KeyboardImage, spacingImages * 2 - 20);
                     }
 
                     if (AudioImage != null){

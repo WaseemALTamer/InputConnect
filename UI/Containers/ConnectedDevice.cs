@@ -344,6 +344,7 @@ namespace InputConnect.UI.Containers
         private void OnRemovealConform() {
             if (Device == null) return;
             Connections.Manager.CloseConnection(Device);
+            SharedData.Events.OnDisconnect?.Invoke();
         }
     }
 }

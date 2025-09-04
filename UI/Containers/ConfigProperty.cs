@@ -43,7 +43,6 @@ namespace InputConnect.UI.Containers
         public ConfigProperty(Canvas? master = null, string? Label = null)
         {
             Master = master;
-            if (Master != null) Master.Children.Add(this);
 
             ClipToBounds = true;
             IsVisible = false;
@@ -79,12 +78,12 @@ namespace InputConnect.UI.Containers
             Text = new TextBlock{
                 Text = $"{Label}",
                 Width = 400,
-                Height = 20,
+                Height = 25,
                 FontSize = Setting.Config.FontSize
             };
 
             Entery = new TextBox{
-                Width = 200,
+                Width = 250,
                 Height = 40,
                 FontSize = Setting.Config.FontSize,
                 CornerRadius = new CornerRadius(Setting.Config.CornerRadius),
@@ -108,7 +107,7 @@ namespace InputConnect.UI.Containers
             return Entery.Text; // this will return the value in a string look at the DataType True being int and change it your self
         }
 
-        public void SetValue(string value) {
+        public void SetValue(string? value) {
             if (Entery == null) return;
             Entery.Text = value;
         }

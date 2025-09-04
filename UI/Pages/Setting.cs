@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using Avalonia.Interactivity;
 using System.Threading.Tasks;
-using System.Reflection;
 using Avalonia.Controls;
 using Avalonia;
+using InputConnect.SettingStruct;
+using System.Reflection;
 using System;
 
 
@@ -81,6 +82,7 @@ namespace InputConnect.UI.Pages
 
 
 
+            AddSettingProperties();
 
 
             OnResize(); // trigger the function to set the sizes
@@ -109,6 +111,22 @@ namespace InputConnect.UI.Pages
         }
 
         private async void LocalOnShow() {
+
+            ConfigStruct configStruct = InputConnect.Setting.Config;
+            PropertyInfo[] properties = typeof(ConfigStruct).GetProperties();
+
+            for (int i = 0; i < properties.Length; i++){
+                PropertyInfo prop = properties[i];
+                var name = prop.Name;
+                var rawValue = prop.GetValue(configStruct);
+                var value = rawValue?.ToString() ?? string.Empty; // always a string now
+
+                Properties[i].SetValue(value);
+
+            }
+
+
+
             foreach (var Propertie in Properties){
                 await Task.Delay(50); // this ensures everything loads up smoothly the first time round
                 if (IsDisplayed == false) return;
@@ -124,19 +142,79 @@ namespace InputConnect.UI.Pages
 
 
 
+        public void AddSettingProperties() {
+
+            if (MainCanvas == null) return;
+
+            double pading = 10;
+            double Ypos = 75 + pading;
+
+
+            foreach (PropertyInfo prop in typeof(ConfigStruct).GetProperties()){
+                var name = prop.Name;
+                var value = prop.GetValue(InputConnect.Setting.Config);
+
+                var UIConfig = new ConfigProperty(MainCanvas, name);
+
+                UIConfig.SetValue(value?.ToString());
+                
+                MainCanvas.Children.Add(UIConfig);
+                Properties.Add(UIConfig);
+                
+                Canvas.SetTop(UIConfig, Ypos);
+                Canvas.SetLeft(UIConfig, (MainCanvas.Width - UIConfig.Width)/ 2);
+                Ypos += UIConfig.Height + pading;
+            }
+
+            MainCanvas.Height = Ypos + pading;
+
+        }
 
 
 
-        public void ApplySetting(){
-
+        public void ApplySetting(ConfigStruct Config){
+            InputConnect.Setting.Config = Config;
+            AppData.SaveConfig();
         }
 
         private void OnClickApplyButton(object? sender = null, RoutedEventArgs? e = null){
-            ApplySetting();
+
+            ConfigStruct configStruct = new ConfigStruct();
+            PropertyInfo[] properties = typeof(ConfigStruct).GetProperties();
+
+            for (int i = 0; i < properties.Length; i++){
+                PropertyInfo prop = properties[i];
+                var name = prop.Name;
+                var value = prop.GetValue(configStruct);
+
+
+                if (prop.PropertyType == typeof(string)){
+                    prop.SetValue(configStruct, Properties[i].GetValue());
+                }
+                else if (prop.PropertyType == typeof(int)){
+                    int intValue = Convert.ToInt32(Properties[i].GetValue());
+                    prop.SetValue(configStruct, intValue);
+                }
+            }
+
+            ApplySetting(configStruct);
+
         }
 
         private void OnClickDefaultButton(object? sender = null, RoutedEventArgs? e = null){
+            ConfigStruct configStruct = new ConfigStruct();
+            PropertyInfo[] properties = typeof(ConfigStruct).GetProperties();
 
+            for (int i = 0; i < properties.Length; i++){
+                PropertyInfo prop = properties[i];
+                var name = prop.Name;
+                var rawValue = prop.GetValue(configStruct);
+                var value = rawValue?.ToString() ?? string.Empty; // always a string now
+
+                Properties[i].SetValue(value);
+
+            }
+            //ApplySetting(configStruct); apply the defult setting by clicking the Aplly button
         }
 
 

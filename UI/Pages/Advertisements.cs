@@ -3,9 +3,9 @@ using Avalonia.Threading;
 using InputConnect.Network;
 using InputConnect.Structures;
 using InputConnect.UI.Containers;
-using InputConnect.UI.Containers.Common;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 
@@ -41,19 +41,36 @@ namespace InputConnect.UI.Pages
 
         private int AdsPaddyY = 10;
 
-
+        private SearchSpinnerMessage? searchSpinner;
 
 
         public Advertisements(Canvas? master) : base(master){
-            // we ensure that it runs on the main thread because we are working with the ui
+            // we ensure that it runs on the main thread because  we are  working with the ui
+            // the will only update on advertisements later on remove the  ablity to see your
+            // self but keep, if you remove  all the trafic  coming from the same device this
+            // will not allow this function to update again and remove the last advertisment
             MessageManager.OnAdvertisement += () => { Dispatcher.UIThread.Post(() => Update()); };
 
+            if (MainCanvas == null) return;
+
+            searchSpinner = new SearchSpinnerMessage(MainCanvas);
+            MainCanvas.Children.Add(searchSpinner);
+            searchSpinner.Show();
+
+            MainCanvas.SizeChanged += OnSizeChanged;
 
         }
 
 
-        public void OnResize(object? sender = null, SizeChangedEventArgs? e = null){
+        public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null){
 
+            if (MainCanvas == null)
+                return;
+
+            if (searchSpinner != null) {
+                Canvas.SetLeft(searchSpinner, (MainCanvas.Width - searchSpinner.Width) / 2);
+                Canvas.SetTop(searchSpinner, ((MainCanvas.Height - searchSpinner.Height) / 2) + 100);
+            }
 
 
         }
@@ -78,7 +95,8 @@ namespace InputConnect.UI.Pages
                     }
                 }
                 if (_found) continue;
-                Add(message);
+                if (message.MacAddress != Network.Device.MacAdress)
+                    Add(message);
             }
 
             // now we can check for any devices that we have that are not in the advertisement
@@ -99,6 +117,15 @@ namespace InputConnect.UI.Pages
                 PlaceAds();
             }
 
+
+            if (searchSpinner != null) {
+                if (Devices.Count == 0){
+                    searchSpinner.Show();
+                }
+                else{
+                    searchSpinner.Hide();
+                }
+            }
         }
 
 
@@ -122,7 +149,15 @@ namespace InputConnect.UI.Pages
                     //Canvas.SetRight(_advertisement, (MainCanvas.Width - _advertisement.Width) / 2);
                     //Canvas.SetTop(_advertisement, AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex));
                     _advertisement.SetPostionTranslate((MainCanvas.Width - _advertisement.Width) / 2, AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex));
-                    MainCanvas.Height = AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex) + (_advertisement.Height + AdsPaddyY);
+                    var height = AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex) + (_advertisement.Height + AdsPaddyY);
+                    if (height >= Height)
+                    {
+                        MainCanvas.Height = height;
+                    }
+                    else { 
+                        MainCanvas.Height = Height;
+                    }
+
                 }
                 else {
                     _lostindex ++;

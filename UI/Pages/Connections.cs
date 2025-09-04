@@ -26,6 +26,7 @@ namespace InputConnect.UI.Pages
         private int AdsPaddyY = 10;
 
 
+        private NoConnectorMessage? noConnectorMessage;
 
 
         public Connections(Canvas? master) : base(master){
@@ -40,6 +41,15 @@ namespace InputConnect.UI.Pages
             MessageManager.OnDecline += (message) => { Update();};
 
 
+
+            if (MainCanvas == null) return;
+
+            MainCanvas.SizeChanged += OnSizeChanged;
+
+            noConnectorMessage = new NoConnectorMessage(MainCanvas);
+            MainCanvas.Children.Add(noConnectorMessage);
+            noConnectorMessage.Show();
+
             Update();
 
             //SizeChanged += (s, e) => PlaceAds(); // uncomment this later for redundency after testing
@@ -47,8 +57,15 @@ namespace InputConnect.UI.Pages
         }
 
 
-        public void OnResize(object? sender = null, SizeChangedEventArgs? e = null){
+        public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null){
 
+            if (MainCanvas == null)
+                return;
+
+            if (noConnectorMessage != null) {
+                Canvas.SetLeft(noConnectorMessage, (MainCanvas.Width - noConnectorMessage.Width) / 2);
+                Canvas.SetTop(noConnectorMessage, ((MainCanvas.Height - noConnectorMessage.Height) / 2) + 150);
+            }
 
 
         }
@@ -95,9 +112,18 @@ namespace InputConnect.UI.Pages
                 }
 
                 PlaceAds();
+
+
+                if (noConnectorMessage != null) {
+                    if (Devices.Count == 0){
+                        noConnectorMessage.Show();
+                    }
+                    else{
+                        noConnectorMessage.Hide();
+                    }
+                }
+
             });
-
-
         }
 
 
@@ -126,7 +152,13 @@ namespace InputConnect.UI.Pages
                     //Canvas.SetRight(_advertisement, (MainCanvas.Width - _advertisement.Width) / 2);
                     //Canvas.SetTop(_advertisement, AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex));
                     _advertisement.SetPostionTranslate((MainCanvas.Width - _advertisement.Width) / 2, AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex));
-                    MainCanvas.Height = AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex) + (_advertisement.Height + AdsPaddyY);
+                    var height = AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex) + (_advertisement.Height + AdsPaddyY);
+                    if (height >= Height){
+                        MainCanvas.Height = height;
+                    }
+                    else{
+                        MainCanvas.Height = Height;
+                    }
                 }
                 else
                 {

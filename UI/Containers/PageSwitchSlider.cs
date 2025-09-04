@@ -56,6 +56,7 @@ namespace InputConnect.UI.Containers
             Search = new Image{
                 Stretch = Avalonia.Media.Stretch.Uniform,
                 Width = 50, Height = 50,
+                Opacity = 0.7
             };
             Assets.AddAwaitedAction(() => {
                 Search.Source = Assets.SearchBitmap;
@@ -66,6 +67,7 @@ namespace InputConnect.UI.Containers
             Chains = new Image{
                 Stretch = Avalonia.Media.Stretch.Uniform,
                 Width = 50, Height = 50,
+                Opacity = 0.7
             };
             Assets.AddAwaitedAction(() => {
                 Chains.Source = Assets.ChainsBitmap;
