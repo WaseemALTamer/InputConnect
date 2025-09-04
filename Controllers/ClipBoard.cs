@@ -97,6 +97,8 @@ namespace InputConnect.Controllers
                 dataObject.Set(DataFormats.Text, text);
                 await SharedData.Device.TopLevel.Clipboard.SetDataObjectAsync(dataObject);
                 LatestClipBoardMessage = text;
+                TransmitClipBoard(text); // transmit the clipboard back to the other devices that can be connected
+                                         // and the device that sent the clipboard will ignore the clipboard
             });
         }
 
@@ -143,6 +145,10 @@ namespace InputConnect.Controllers
 
             if (ActiveReceiving == false) return;
             if (command.Text == null) return;
+
+            if (LatestClipBoardMessage == command.Text)
+                return;
+
             AddToClipBoard(command.Text);
 
         }
