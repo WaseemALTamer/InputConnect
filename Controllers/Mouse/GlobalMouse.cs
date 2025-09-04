@@ -335,6 +335,7 @@ namespace InputConnect.Controllers.Mouse
             foreach (var connection in Connections.Devices.ConnectionList)
             {
                 if (connection.VirtualScreens == null) continue;
+                if (connection.MouseState != Connections.Constants.Transmit) continue;
 
                 foreach (var screen in connection.VirtualScreens)
                 {
