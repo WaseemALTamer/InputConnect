@@ -16,7 +16,7 @@ namespace InputConnect.SettingStruct
         // No IpAdressNeeded as it will be  dinamically graped
         // Grap the ip using the Device.cs file with the class
 
-
+        // Application
         [JsonPropertyName("DeviceName")]
         public string? DeviceName { get; set; } = SharedData.Device.DeviceName;  // this is a Device name  that you set your  self from
                                                                          // setting if there is no Name then we take the device
@@ -31,6 +31,8 @@ namespace InputConnect.SettingStruct
                                                                                  // need to change underneath  any  circumstances  other
                                                                                  // than if the address was changed to something else by
                                                                                  // universally
+        
+        // Network
         [JsonPropertyName("Port")]
         public int Port { get; set; } = 39393;   // the port number should be the same for all devices
                                                         // other wise the  application  wont communicate with
@@ -47,6 +49,10 @@ namespace InputConnect.SettingStruct
         public int AdvertiseTimeSpan { get; set; } = 10;       // this  is  used  to tell the app that all  the  devices
                                                                       // that  had  an  advertisement that is  10s old  is  not
                                                                       // relievent and should be removed the time is in seconds
+
+
+        // UI
+
         [JsonPropertyName("TransitionDuration")]
         public int TransitionDuration { get; set; } = 200;     // this is  used  for  Transitioning for  one  holder to
                                                                       // the value is in ms
@@ -72,8 +78,17 @@ namespace InputConnect.SettingStruct
                                                          // device message before timming out and returning nothing
 
         // Mouse 
+
         [JsonPropertyName("MouseScrollStrength")]
-        public int MouseScrollStrength { get; set; } = 120;
+        public int MouseScrollStrength { get; set; } = 120; // this is the defult mouse scroll stength it is 120 on
+                                                            // windows and some linux distros
+
+        [JsonPropertyName("VirtualScreenCriticalRegionSize")]
+        public int VirtualScreenCriticalRegionSize { get; set; } = 2; // this is the creatical region for each virtual mointor
+                                                                     // which  extend  beyond its  size  and overlabs  with a
+                                                                     // physcal mointor which then the mouse can shift to the
+                                                                     // virtual mointor
+
 
         [JsonPropertyName("MouseUpdateTickRate")]
         public int MouseUpdateTickRate { get; set; } = 8; // this is the tick rate to update the mouse on the other deivce
@@ -81,15 +96,28 @@ namespace InputConnect.SettingStruct
                                                           // tracker
 
 
-        // audio
+        // Audio
+
+        [JsonPropertyName("OutputAudioDevice")]
+        public string OutputAudioDevice { get; set; } = "";
+
         [JsonPropertyName("AudioFrequency")]
-        public ushort AudioFrequency { get; set; } = 48000;
+        public ushort AudioFrequency { get; set; } = 48000; // this is the univsral tageted audio frequency
 
         [JsonPropertyName("AudioBufferSize")]
-        public ushort AudioBufferSize { get; set; } = 10240;
+        public ushort AudioBufferSize { get; set; } = 10240; // this is the buffer size that is sent over the network
+                                                             // the buffer will have as many channels as you need but
+                                                             // keep in mind if your device  can generate  the buffer
+                                                             // size then a smaller one will be taken if a larger one
+                                                             // is generated then it will  be sliced  to achieve this
+                                                             // buffer size
 
         [JsonPropertyName("AudioChannals")]
-        public byte AudioChannals { get; set; } = 2;
+        public byte AudioChannals { get; set; } = 2; // this is the Audio channels that we aim to get 1 left 1 right
+                                                     // desktops audi loopback devices usually  dont use more than 2
+                                                     // and if you sure you have more then you are  free to increase
+                                                     // the number but it may cause errors and the application might
+                                                     // not function as recommended
 
     }
 

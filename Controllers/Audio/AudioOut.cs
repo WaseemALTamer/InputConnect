@@ -51,6 +51,13 @@ namespace InputConnect.Controllers.Audio
         }
 
 
+        public static void TryStart() {
+            if (Setting.Config.OutputAudioDevice != null){
+                StartAudioOut(Setting.Config.OutputAudioDevice);
+            }
+        }
+
+
         public static void StartAudioOut(string device){
             // this needs to be started by you manually for the audio to come out
 

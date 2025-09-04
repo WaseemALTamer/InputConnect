@@ -15,6 +15,7 @@ namespace InputConnect
     {
         public static string ConfigPath = $"AppData/Config.json";
         public static string ConnectionPath = $"AppData/Connections.json";
+        public static string ThemePath = $"AppData/Theme.json";
 
 
 
@@ -40,6 +41,33 @@ namespace InputConnect
             }
         }
 
+
+        // for the saving the theme it doesnt work this is because you cant turn the avalonia
+        // object to pure json and then convert it back to its  object so  you  have to write
+        // a function which takes the theme rgb values of everything  and just pushes them in
+        // by creating the object kina manually for the saved data
+        public static void SaveTheme(){
+
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(Setting.Themes, options);
+            File.WriteAllText(ThemePath, json);
+        }
+
+        public static void LoadTheme(){
+            if (!File.Exists(ThemePath)){
+                SaveConfig();
+                return;
+            }
+
+            try{
+                string json = File.ReadAllText(ThemePath);
+                Setting.Themes = JsonSerializer.Deserialize<ThemesStruct>(json)!;
+            }
+            catch
+            {
+                SaveConfig();
+            }
+        }
 
 
 

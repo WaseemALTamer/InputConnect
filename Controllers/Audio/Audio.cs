@@ -37,7 +37,7 @@ namespace InputConnect.Controllers.Audio
                 // change of output audio device
 
             AudioOut.DetectAudioOutputDevices();
-
+            AudioOut.TryStart();
 
             MessageManager.OnCommandAudio += OnReceiveCommand;
         }

@@ -67,8 +67,7 @@ namespace InputConnect
 
 
 
-            AppData.LoadConnections(); // load previouse connections if we can
-
+           
             PublicWidgets.Initialize(MainCanvas);
 
 
@@ -137,7 +136,6 @@ namespace InputConnect
 
 
         private void OnClickExit(object? sender, object? e) {
-            AppData.SaveConnections();
             GlobalMouse.Hook.Dispose();
             Environment.Exit(0);
         }

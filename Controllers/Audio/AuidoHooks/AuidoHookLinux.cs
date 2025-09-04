@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System.Text.RegularExpressions;
+using System.Diagnostics;
 using System.Threading;
 using System;
-using System.Linq;
-using System.Text.RegularExpressions;
+
 
 
 
@@ -12,8 +12,6 @@ namespace InputConnect.Controllers.Audio
     public class AuidoHookLinux : AudioHookInterface
     {
         // this will only work with PulseAudio
-
-        public static PortAudioSharp.Stream? Stream;
 
         private Thread? audioThread;
         private bool isRunning = false;

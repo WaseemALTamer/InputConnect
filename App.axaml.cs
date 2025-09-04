@@ -13,6 +13,13 @@ namespace InputConnect
         }
 
         public override void OnFrameworkInitializationCompleted(){
+
+
+            AppData.LoadConfig();
+            //AppData.LoadTheme(); // this doesnt work for now
+            AppData.LoadConnections(); // load previouse connections if we can
+
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop){
                 desktop.MainWindow = new MainWindow();
             }
@@ -22,7 +29,8 @@ namespace InputConnect
 
 
             // those lines are used to tell the system we need to prepare the static classes
-            //AppData.ApplyConfig(AppData.Config);
+
+
             var _ = Assets.AssetsLoaded;
             var __ = Tray.ApplicationTray;
             var ___ = ConnectionUDP.Client;

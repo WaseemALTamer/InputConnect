@@ -41,7 +41,7 @@ namespace InputConnect.Controllers.Mouse
         public static double? DeltaY;
 
 
-        public static double CriticalRegionSize = 2;
+        public static double CriticalRegionSize = Setting.Config.VirtualScreenCriticalRegionSize;
         public static double CursorThrow = CriticalRegionSize + 1;
         public static Bounds? CurrentScreenBounds;
 

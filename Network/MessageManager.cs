@@ -3,6 +3,7 @@ using InputConnect.Structures;
 using InputConnect.Commands;
 using System.Text.Json;
 using System;
+using Tmds.DBus.Protocol;
 
 
 
@@ -56,6 +57,9 @@ namespace InputConnect.Network
             MessageUDP? _message = JsonSerializer.Deserialize<MessageUDP>(message);
             if (_message == null) return;
 
+            //if (IsOurMessage(_message)) 
+            //    return; 
+
             UpdateMacToIP(_message);
 
             if (_message.MessageType == Constants.MessageTypes.Advertisement) ProccessAdvertisement(_message);
@@ -70,6 +74,16 @@ namespace InputConnect.Network
             if (_message.MessageType == Constants.MessageTypes.IntialData) PorccessIntailData(_message);
         }
 
+
+        public static bool IsOurMessage(MessageUDP message) {
+            
+            // this function will be used to filter our own advertising messages
+            // we dont discard the messages we simply just 
+
+            if (message.MacAddress == Device.MacAdress) 
+                return true;
+            return false;
+        }
 
         public static void UpdateMacToIP(MessageUDP message) {
             // this function main perpose is to link the macs to there ips
@@ -191,6 +205,14 @@ namespace InputConnect.Network
                 if (message.Text == null || DeviceConnection == null) return;
                 var commandMessage = JsonSerializer.Deserialize<MessageCommand>(message.Text);
 
+
+                if (commandMessage != null){
+                    // you can later on factorise the <commandMessage != null> from the if 
+                    // statment because you are checking for it  each and every time, only
+                    // when you have time since the speed that you will gain is negligible
+                    commandMessage.SequenceNumber += 1;
+                }
+
                 if (commandMessage != null &&
                     commandMessage.Type == Commands.Constants.CommandTypes.Mouse &&
                     commandMessage.Command != null) 
@@ -306,8 +328,7 @@ namespace InputConnect.Network
             if (OnIntailDataReuqest != null) OnIntailDataReuqest.Invoke();
         }
 
-        private static void PorccessIntailData(MessageUDP message)
-        {
+        private static void PorccessIntailData(MessageUDP message){
             if (message.Text == null) return;
             Structures.Connection? connection = MessageToConnection(message);
             if (connection == null) return;
