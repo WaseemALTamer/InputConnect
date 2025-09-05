@@ -74,11 +74,20 @@ namespace InputConnect.Controllers
 
 
 
-            Dispatcher.UIThread.Post(async () => {
-                var text = await SharedData.Device.TopLevel.Clipboard.GetTextAsync();
-                if (text != null && LatestClipBoardMessage != text){
-                    LatestClipBoardMessage = text;
-                    TransmitClipBoard(text);
+            Dispatcher.UIThread.Post(async () =>{
+                try{
+                    var text = await SharedData.Device.TopLevel.Clipboard.GetTextAsync();
+                    if (text != null && LatestClipBoardMessage != text){
+                        LatestClipBoardMessage = text;
+                        TransmitClipBoard(text);
+                    }
+                }
+                catch (System.TimeoutException ex){
+                    Console.WriteLine($"Clipboard timeout: {ex.Message}");
+                }
+                catch (Exception ex){
+                    // Catch-all for any other unexpected errors
+                    Console.WriteLine($"Error accessing clipboard: {ex.Message}");
                 }
             });
 
@@ -156,3 +165,4 @@ namespace InputConnect.Controllers
 
     }
 }
+
