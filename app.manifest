@@ -9,7 +9,7 @@
 		<security>
 			<requestedPrivileges>
 				<!-- Always run the app as Administrator -->
-				<requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
+				<requestedExecutionLevel level="requireAdministrator" uiAccess="true" />
 			</requestedPrivileges>
 		</security>
 	</trustInfo>
@@ -21,3 +21,4 @@
 		</application>
 	</compatibility>
 </assembly>
+
