@@ -1,10 +1,11 @@
-﻿using InputConnect.Structures;
+using InputConnect.Structures;
 using System.Text.Json;
 using SharpHook;
 using System;
 using InputConnect.Network;
 using System.Threading;
 using Avalonia;
+using Tmds.DBus.Protocol;
 
 
 
@@ -271,10 +272,18 @@ namespace InputConnect.Controllers.Mouse
                         if (screen.X <= X && screen.X + screen.Width >= X &&
                             screen.Y <= Y && screen.Y + screen.Height >= Y)
                         {
-                            Controllers.Hook.TargetConnection = connection;
 
-                            if (Controllers.Hook.OnTargetConnectionChange != null)
+                            if (Controllers.Hook.OnTargetConnectionChange != null && 
+                                Controllers.Hook.TargetConnection != connection)
+                            {
+                                Controllers.Hook.TargetConnection = connection;
                                 Controllers.Hook.OnTargetConnectionChange.Invoke();
+                            }
+                                
+
+                            
+
+
 
                             return true;
                         }
@@ -289,7 +298,12 @@ namespace InputConnect.Controllers.Mouse
                 if (screen.Bounds.X <= X && screen.Bounds.X + screen.Bounds.Width >= X &&
                     screen.Bounds.Y <= Y && screen.Bounds.Y + screen.Bounds.Height >= Y)
                 {
-                    Controllers.Hook.TargetConnection = null;
+                    if (Controllers.Hook.OnTargetConnectionChange != null &&
+                        Controllers.Hook.TargetConnection != null)
+                    {
+                        Controllers.Hook.TargetConnection = null;
+                        Controllers.Hook.OnTargetConnectionChange.Invoke();
+                    }
                     return true;
                 }
             }
