@@ -135,12 +135,12 @@ namespace InputConnect.UI.InWindowPopup
             }
 
             if (ConfirmButton != null) {
-                Canvas.SetLeft(ConfirmButton, ((MainCanvas.Width - ConfirmButton.Width) / 2) + ((ConfirmButton.Width / 2) + 5));
+                Canvas.SetLeft(ConfirmButton, ((MainCanvas.Width - ConfirmButton.Width) / 2) - ((ConfirmButton.Width / 2) + 5));
                 Canvas.SetTop(ConfirmButton, MainCanvas.Height - ConfirmButton.Height - 10);
             }
 
             if (ReturnButton != null){
-                Canvas.SetLeft(ReturnButton, ((MainCanvas.Width - ReturnButton.Width) / 2) - ((ReturnButton.Width / 2) + 5));
+                Canvas.SetLeft(ReturnButton, ((MainCanvas.Width - ReturnButton.Width) / 2) + ((ReturnButton.Width / 2) + 5));
                 Canvas.SetTop(ReturnButton, MainCanvas.Height - ReturnButton.Height - 10);
             }
 

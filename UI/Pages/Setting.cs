@@ -68,7 +68,7 @@ namespace InputConnect.UI.Pages
 
 
             DefaultButton = new Button{
-                Content = "Defult",
+                Content = "Default",
                 Width = 150,
                 Height = 50,
                 Background = InputConnect.Setting.Themes.Button,
