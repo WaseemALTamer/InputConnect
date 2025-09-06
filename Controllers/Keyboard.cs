@@ -1,9 +1,11 @@
-﻿using InputConnect.Structures;
+using InputConnect.Structures;
 using InputConnect.Network;
 using System.Text.Json;
 using SharpHook.Data;
 using SharpHook;
 using Tmds.DBus.Protocol;
+using System.Collections.Generic;
+using System.Linq;
 
 
 
@@ -28,6 +30,7 @@ namespace InputConnect.Controllers
 
 
             MessageManager.OnCommandKeyboard += RecieveKeyboardCommnad;
+            Controllers.Hook.OnTargetConnectionChange += TransmitAllKeyRelease;
         }
 
 
@@ -145,21 +148,80 @@ namespace InputConnect.Controllers
 
 
 
-        public static void RecieveKeyboardCommnad(Commands.Keyboard? command)
+        public static void TransmitAllKeyRelease()
         {
 
-            if (command == null) return;
+            if (ActiveTransmition == false) return;
 
-            if (command.KeyPress != null){
-                PressKey((KeyCode)command.KeyPress);
+            foreach (var connection in Connections.Devices.ConnectionList){
+                if (connection.KeyboardState == Connections.Constants.Transmit){
+                    var _command = new Commands.Keyboard{
+                        // we send a message which contain nothing represeting releasing all keys
+                    };
+
+                    var _commandMessage = new MessageCommand{
+                        Type = Commands.Constants.CommandTypes.Keyboard,
+                        SequenceNumber = connection.SequenceNumber + 1,
+                        Command = JsonSerializer.Serialize(_command)
+                    };
+                    connection.SequenceNumber += 1;
+
+                    var messageudp = new MessageUDP{
+                        MessageType = Network.Constants.MessageTypes.Command,
+                        Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.PasswordKey),
+                        IsEncrypted = true
+                    };
+
+                    if (connection.MacAddress != null &&
+                        MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip)){
+                        ConnectionUDP.Send(ip, messageudp);
+                    }
+
+
+                }
             }
-
-            if (command.KeyRelease != null){
-                ReleaseKey((KeyCode)command.KeyRelease);
-            }
-
         }
 
 
+        private static List<KeyCode> pressedKeys = new List<KeyCode>();
+
+        private static void ReleaseAllKeys(){
+            foreach (var key in pressedKeys){
+                ReleaseKey(key);
+            }
+            pressedKeys.Clear();
+        }
+
+        public static void RecieveKeyboardCommnad(Commands.Keyboard? command)
+        {
+            if (command == null) return;
+
+            // If both KeyPress and KeyRelease are null, release all keys
+            if (command.KeyPress == null && command.KeyRelease == null){
+                ReleaseAllKeys();
+                return;
+            }
+
+            // Handle key press
+            if (command.KeyPress != null)
+            {
+                KeyCode key = (KeyCode)command.KeyPress;
+                PressKey(key);
+
+                if (!pressedKeys.Contains(key)){
+                    pressedKeys.Add(key);
+                }
+            }
+
+            // Handle key release
+            if (command.KeyRelease != null)
+            {
+                KeyCode key = (KeyCode)command.KeyRelease;
+                if (pressedKeys.Contains(key)){
+                    pressedKeys.Remove(key);
+                    ReleaseKey(key);
+                }
+            }
+        }
     }
 }
