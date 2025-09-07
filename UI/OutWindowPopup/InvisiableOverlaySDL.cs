@@ -54,6 +54,7 @@ namespace InputConnect.UI.OutWindowPopup
         public Action<int>? OnMouseButtonPress { get; set; }
         public Action<int>? OnMouseButtonRelease { get; set; }
         public Action<int, int>? OnMouseScroll { get; set; } // direction +1, -1 => X axis, Y axis
+        public Action? OnEventLoopUpdate { get; set; }
 
 
         public InWindowMouse? MouseController { get; set; }
@@ -118,6 +119,7 @@ namespace InputConnect.UI.OutWindowPopup
                     SDL.SDL_SetWindowInputFocus(Window);
                     SDL.SDL_RaiseWindow(Window);
                 }
+                
 
                 int totalDx = 0;
                 int totalDy = 0;
@@ -156,6 +158,8 @@ namespace InputConnect.UI.OutWindowPopup
                 if (mouseMoved){
                     OnMouseMove?.Invoke(totalDx, totalDy);
                 }
+
+                OnEventLoopUpdate?.Invoke();
             }
         }
 
