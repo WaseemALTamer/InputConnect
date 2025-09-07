@@ -1,4 +1,4 @@
-using InputConnect.Structures;
+﻿using InputConnect.Structures;
 using System.Text.Json;
 using SharpHook;
 using System;
@@ -98,6 +98,7 @@ namespace InputConnect.Controllers.Mouse
 
 
             OnMove += TrackMouse;
+
 
             MessageManager.OnCommandMouse += RecieveMouseCommnad;
 

@@ -25,6 +25,7 @@ namespace InputConnect.Controllers.Mouse
             MasterWindow.OnMouseButtonPress += OnPointerPressed;
             MasterWindow.OnMouseButtonRelease += OnPointerReleased;
             MasterWindow.OnMouseScroll += OnPointerWheelChanged;
+            MasterWindow.OnEventLoopUpdate += OnInWindowUpdate;
 
 
             MasterWindow.OnHide += () =>
@@ -222,6 +223,16 @@ namespace InputConnect.Controllers.Mouse
                 (double)GlobalMouse.VirtualPositionY,
                 delta);
 
+
+        }
+
+
+        private void OnInWindowUpdate()
+        {
+
+            if (!MasterWindow.IsVisible) {
+                GlobalMouse.IsMouseTracking = true; // make this true to avoid errors for the mouse movement
+            }
 
         }
 

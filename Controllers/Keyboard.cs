@@ -1,4 +1,4 @@
-using InputConnect.Structures;
+﻿using InputConnect.Structures;
 using InputConnect.Network;
 using System.Text.Json;
 using SharpHook.Data;
