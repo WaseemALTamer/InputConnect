@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using System;
 
 
@@ -27,7 +27,7 @@ namespace InputConnect.UI.Containers
         }
 
 
-        private Animations.Transations.Uniform? ShowHideTransition;
+        private Animations.Transations.EaseInOut? ShowHideTransition;
         private Animations.Transations.EaseInOut? SpinTransition;
 
 
@@ -70,7 +70,7 @@ namespace InputConnect.UI.Containers
             MainCanvas.Children.Add(SearchMessage);
 
 
-            ShowHideTransition = new Animations.Transations.Uniform{
+            ShowHideTransition = new Animations.Transations.EaseInOut{
                 StartingValue = 0,
                 EndingValue = 0.7,
                 Duration = Setting.Config.TransitionDuration,
