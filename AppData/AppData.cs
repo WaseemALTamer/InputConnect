@@ -12,12 +12,23 @@ namespace InputConnect
 {
     public static class AppData
     {
-        public static readonly string BaseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\" +  Setting.Config.ApplicationName + "\\";
+        public static readonly string BaseDir =
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                Setting.Config.ApplicationName
+            );
 
+        public static readonly string AppDataDir =
+            Path.Combine(BaseDir, "AppData");
 
-        public static string ConfigPath = BaseDir + $"AppData/Config.json";
-        public static string ConnectionPath = BaseDir + $"AppData/Connections.json";
-        public static string ThemePath = BaseDir + $"AppData/Theme.json";
+        public static readonly string ConfigPath =
+            Path.Combine(AppDataDir, "Config.json");
+
+        public static readonly string ConnectionPath =
+            Path.Combine(AppDataDir, "Connections.json");
+
+        public static readonly string ThemePath =
+            Path.Combine(AppDataDir, "Theme.json");
 
 
 

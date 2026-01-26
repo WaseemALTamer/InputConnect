@@ -2,7 +2,9 @@
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.Controls;
+using System.IO;
 using System;
+
 
 
 
@@ -19,7 +21,7 @@ namespace InputConnect
     public static class Assets
     {
 
-        public static readonly string BaseDir = AppContext.BaseDirectory;
+        public static readonly string ApplicationDirecotry = AppContext.BaseDirectory;
 
 
         public static Action? AwaitedActions;
@@ -66,22 +68,53 @@ namespace InputConnect
             // we load all the assets here
 
 
-            Icone = new WindowIcon(BaseDir + "Assets/Icone/Icone.ico");
-            BackButtonBitmap = new Bitmap(BaseDir + "Assets/Images/BackButton.png");
-            CloseButtonBitmap = new Bitmap(BaseDir + "Assets/Images/CloseButton.png");
-            SettingButtonBitmap = new Bitmap(BaseDir + "Assets/Images/SettingButton.png");
-            WifiBitmap = new Bitmap(BaseDir + "Assets/Images/Wifi.png");
-            SearchBitmap = new Bitmap(BaseDir + "Assets/Images/Search.png");
-            ChainsBitmap = new Bitmap(BaseDir + "Assets/Images/Chains.png");
-            MouseBitmap = new Bitmap(BaseDir + "Assets/Images/Mouse.png");
-            KeyboardBitmap = new Bitmap(BaseDir + "Assets/Images/Keyboard.png");
-            AudioBitmap = new Bitmap(BaseDir + "Assets/Images/Audio.png");
-            LockBitmap = new Bitmap(BaseDir + "Assets/Images/Lock.png");
-            MiniLockBitmap = new Bitmap(BaseDir + "Assets/Images/MiniLock.png");
-            WarningBitmap = new Bitmap(BaseDir + "Assets/Images/Warning.png");
-            TrashBinBitmap = new Bitmap(BaseDir + "Assets/Images/TrashBin.png");
-            ConnectorBitmap = new Bitmap(BaseDir + "Assets/Images/Connector.png");
-            NoConnectorBitmap = new Bitmap(BaseDir + "Assets/Images/NoConnector.png");
+            Icone = new WindowIcon(
+                Path.Combine(ApplicationDirecotry, "Assets", "Icone", "Icone.ico"));
+
+            BackButtonBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "BackButton.png"));
+
+            CloseButtonBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "CloseButton.png"));
+
+            SettingButtonBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "SettingButton.png"));
+
+            WifiBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Wifi.png"));
+
+            SearchBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Search.png"));
+
+            ChainsBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Chains.png"));
+
+            MouseBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Mouse.png"));
+
+            KeyboardBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Keyboard.png"));
+
+            AudioBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Audio.png"));
+
+            LockBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Lock.png"));
+
+            MiniLockBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "MiniLock.png"));
+
+            WarningBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Warning.png"));
+
+            TrashBinBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "TrashBin.png"));
+
+            ConnectorBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Connector.png"));
+
+            NoConnectorBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "NoConnector.png"));
 
 
             // we finnish loading the assests here
