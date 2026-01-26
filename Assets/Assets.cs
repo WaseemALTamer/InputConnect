@@ -19,6 +19,9 @@ namespace InputConnect
     public static class Assets
     {
 
+        public static readonly string BaseDir = AppContext.BaseDirectory;
+
+
         public static Action? AwaitedActions;
 
         // we load all the assents as a public
@@ -63,22 +66,22 @@ namespace InputConnect
             // we load all the assets here
 
 
-            Icone = new WindowIcon("Assets/Icone/Icone.ico");
-            BackButtonBitmap = new Bitmap("Assets/Images/BackButton.png");
-            CloseButtonBitmap = new Bitmap("Assets/Images/CloseButton.png");
-            SettingButtonBitmap = new Bitmap("Assets/Images/SettingButton.png");
-            WifiBitmap = new Bitmap("Assets/Images/Wifi.png");
-            SearchBitmap = new Bitmap("Assets/Images/Search.png");
-            ChainsBitmap = new Bitmap("Assets/Images/Chains.png");
-            MouseBitmap = new Bitmap("Assets/Images/Mouse.png");
-            KeyboardBitmap = new Bitmap("Assets/Images/Keyboard.png");
-            AudioBitmap = new Bitmap("Assets/Images/Audio.png");
-            LockBitmap = new Bitmap("Assets/Images/Lock.png");
-            MiniLockBitmap = new Bitmap("Assets/Images/MiniLock.png");
-            WarningBitmap = new Bitmap("Assets/Images/Warning.png");
-            TrashBinBitmap = new Bitmap("Assets/Images/TrashBin.png");
-            ConnectorBitmap = new Bitmap("Assets/Images/Connector.png");
-            NoConnectorBitmap = new Bitmap("Assets/Images/NoConnector.png");
+            Icone = new WindowIcon(BaseDir + "Assets/Icone/Icone.ico");
+            BackButtonBitmap = new Bitmap(BaseDir + "Assets/Images/BackButton.png");
+            CloseButtonBitmap = new Bitmap(BaseDir + "Assets/Images/CloseButton.png");
+            SettingButtonBitmap = new Bitmap(BaseDir + "Assets/Images/SettingButton.png");
+            WifiBitmap = new Bitmap(BaseDir + "Assets/Images/Wifi.png");
+            SearchBitmap = new Bitmap(BaseDir + "Assets/Images/Search.png");
+            ChainsBitmap = new Bitmap(BaseDir + "Assets/Images/Chains.png");
+            MouseBitmap = new Bitmap(BaseDir + "Assets/Images/Mouse.png");
+            KeyboardBitmap = new Bitmap(BaseDir + "Assets/Images/Keyboard.png");
+            AudioBitmap = new Bitmap(BaseDir + "Assets/Images/Audio.png");
+            LockBitmap = new Bitmap(BaseDir + "Assets/Images/Lock.png");
+            MiniLockBitmap = new Bitmap(BaseDir + "Assets/Images/MiniLock.png");
+            WarningBitmap = new Bitmap(BaseDir + "Assets/Images/Warning.png");
+            TrashBinBitmap = new Bitmap(BaseDir + "Assets/Images/TrashBin.png");
+            ConnectorBitmap = new Bitmap(BaseDir + "Assets/Images/Connector.png");
+            NoConnectorBitmap = new Bitmap(BaseDir + "Assets/Images/NoConnector.png");
 
 
             // we finnish loading the assests here

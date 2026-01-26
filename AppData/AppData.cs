@@ -13,9 +13,11 @@ namespace InputConnect
 {
     public static class AppData
     {
-        public static string ConfigPath = $"AppData/Config.json";
-        public static string ConnectionPath = $"AppData/Connections.json";
-        public static string ThemePath = $"AppData/Theme.json";
+        public static readonly string BaseDir = AppContext.BaseDirectory;
+
+        public static string ConfigPath = BaseDir + $"AppData/Config.json";
+        public static string ConnectionPath = BaseDir + $"AppData/Connections.json";
+        public static string ThemePath = BaseDir + $"AppData/Theme.json";
 
 
 
