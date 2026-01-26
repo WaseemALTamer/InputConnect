@@ -1,5 +1,4 @@
 ﻿using InputConnect.Structures;
-using System.Reflection;
 using System.Text.Json;
 using System.IO;
 using System;
@@ -13,7 +12,8 @@ namespace InputConnect
 {
     public static class AppData
     {
-        public static readonly string BaseDir = AppContext.BaseDirectory;
+        public static readonly string BaseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\" +  Setting.Config.ApplicationName + "\\";
+
 
         public static string ConfigPath = BaseDir + $"AppData/Config.json";
         public static string ConnectionPath = BaseDir + $"AppData/Connections.json";
@@ -23,6 +23,8 @@ namespace InputConnect
 
 
         public static void SaveConfig(){
+            Directory.CreateDirectory(Path.GetDirectoryName(ConfigPath)!);
+
             var options = new JsonSerializerOptions { WriteIndented = true };
             string json = JsonSerializer.Serialize(Setting.Config, options);
             File.WriteAllText(ConfigPath, json);
@@ -77,6 +79,8 @@ namespace InputConnect
 
 
         public static void SaveConnections(){
+            Directory.CreateDirectory(Path.GetDirectoryName(ConnectionPath)!);
+
             for (int i = Connections.Devices.ConnectionList.Count - 1; i >= 0; i--){
                 if (Connections.Devices.ConnectionList[i].State != Connections.Constants.StateConnected) {
                     Connections.Devices.ConnectionList.RemoveAt(i); // this will remove all the connections that are pending
