@@ -205,12 +205,21 @@ namespace InputConnect.Network
                 if (message.Text == null || DeviceConnection == null) return;
                 var commandMessage = JsonSerializer.Deserialize<MessageCommand>(message.Text);
 
+                
 
                 if (commandMessage != null){
                     // you can later on factorise the <commandMessage != null> from the if 
                     // statment because you are checking for it  each and every time, only
                     // when you have time since the speed that you will gain is negligible
-                    commandMessage.SequenceNumber += 1;
+
+
+                    // the part that felters out the sequence number needs to be tested and 
+                    // checked before release
+                    if (commandMessage.SequenceNumber < DeviceConnection.SequenceNumber) {
+                        return;
+                    }
+
+                    DeviceConnection.SequenceNumber = commandMessage.SequenceNumber + 1;
                 }
 
                 if (commandMessage != null &&
