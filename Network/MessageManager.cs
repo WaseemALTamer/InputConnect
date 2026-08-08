@@ -215,12 +215,51 @@ namespace InputConnect.Network
 
                     // the part that felters out the sequence number needs to be tested and 
                     // checked before release
-                    if (commandMessage.SequenceNumber < DeviceConnection.SequenceNumber) {
-                        return;
+
+                    //Console.WriteLine(commandMessage.SequenceNumber);
+
+                    if ((commandMessage.SequenceNumber + 20) < DeviceConnection.SequenceNumber) {
+                        // dont just return send a command request to whoever for them
+                        // to know the current sequence number
+
+                        // also keep the +20 this means we are allowed 20 messages before the sequence
+                        // number is filtered out this will help greatly with audio quality
+
+                        // we return empty keyboard command so they can go back in sync
+
+
+                        // building the command
+                        var _command = new Commands.Keyboard{}; // empty keyboard command
+
+                        var _commandMessage = new MessageCommand
+                        {
+                            Type = Commands.Constants.CommandTypes.Keyboard,
+                            SequenceNumber = DeviceConnection.SequenceNumber + 1,
+                            Command = JsonSerializer.Serialize(_command)
+                        };
+
+                        DeviceConnection.SequenceNumber += 1;
+
+                        // building the udp message
+                        var messageudp = new MessageUDP{
+                            MessageType = Network.Constants.MessageTypes.Command,
+                            Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), DeviceConnection.PasswordKey),
+                            IsEncrypted = true
+                        };
+
+                        // sending the udp message
+                        if (DeviceConnection.MacAddress != null &&
+                            MacToIP.TryGetValue(DeviceConnection.MacAddress, out var ip))
+                        {
+                            ConnectionUDP.Send(ip, messageudp);
+                        }
+
+                        return; // return and wait for the next command the other devices should sync now
                     }
 
                     DeviceConnection.SequenceNumber = commandMessage.SequenceNumber + 1;
                 }
+
 
                 if (commandMessage != null &&
                     commandMessage.Type == Commands.Constants.CommandTypes.Mouse &&
