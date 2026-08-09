@@ -60,7 +60,7 @@ dotnet run
 - **Device Discovery** - devices on the same network can discover each other
 
 
-- **Secure Connections** – All data transferred over secure connections with ASE-256 Encryption.
+- **Secure Connections** – All data transferred over secure connections with AES-256 Encryption.
 
 
 -  **Keyboard & Mouse Sharing** – Move between devices as if it was a second mointor and use your keybaord.
