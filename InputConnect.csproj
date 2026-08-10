@@ -47,12 +47,12 @@
 
 
 	<ItemGroup>
-	  <Compile Include="KeyCode_Refrences.txt" />
+	  
 	</ItemGroup>
 
 
 	<PropertyGroup>
-		<ApplicationIcon>Assets/Icone/Icone.ico</ApplicationIcon>
+		
 	</PropertyGroup>
 	
 </Project>
