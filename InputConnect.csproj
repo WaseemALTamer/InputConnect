@@ -41,8 +41,7 @@
 
 	<ItemGroup>
 	  <None Remove="AppData\Connections.json" />
-	  <None Remove="KeyCode_Refrences.txt" />
-	  <None Remove="UI\Containers\1i5lavz3.zv4~" />
+
 	</ItemGroup>
 
 
@@ -52,7 +51,7 @@
 
 
 	<PropertyGroup>
-		
+    <ApplicationIcon>Assets/Icone/Icone.ico</ApplicationIcon>
 	</PropertyGroup>
 	
 </Project>
