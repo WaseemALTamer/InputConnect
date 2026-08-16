@@ -6,8 +6,7 @@ using Avalonia;
 using InputConnect.UI.Containers.Common;
 using Avalonia.Threading;
 using InputConnect.UI.InWindowPopup;
-
-
+using System;
 
 
 
@@ -28,6 +27,8 @@ namespace InputConnect.UI.Containers
         private Animations.Transations.EaseInOut? PostionTranslation;
         private Animations.Transations.Uniform? ShowHideTransition;
         private Animations.Transations.Uniform? HoverTranslation;
+
+
 
         private Canvas? _MainCanvas;
 
@@ -282,6 +283,8 @@ namespace InputConnect.UI.Containers
                 Canvas.SetTop(this, Ypos);
                 return;
             }
+
+
 
             InitialPos = new Vector(Canvas.GetRight(this), Canvas.GetTop(this));
             FinalPos = new Vector(Xpos, Ypos);

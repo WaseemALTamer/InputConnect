@@ -100,6 +100,9 @@ namespace InputConnect.UI.InWindowPopup
             MaxWidth = 715;
             MaxHeight = 250;
 
+            Width = 715;
+            Height = 250;
+
 
 
             PointerPressed += OnPointerPressed;
@@ -133,18 +136,18 @@ namespace InputConnect.UI.InWindowPopup
         private void OnResize(object? sender = null, SizeChangedEventArgs? e = null)
         {
             if (Master != null){
-                Width = Master.Width * 0.50;
-                Height = Master.Height * 0.35;
+                //Width = Master.Width * 0.50;
+                //Height = Master.Height * 0.35;
 
                 // also the ui will stop at the given min width our Width and height will still be
                 // assigned and it wont correct it self this if  statment  will attempt to correct
                 // it maually
 
-                if (Width < MinWidth) Width = MinWidth; // width corrected for Min
-                if (Height < MinHeight) Height = MinHeight; // height corrected for Min
+                //if (Width < MinWidth) Width = MinWidth; // width corrected for Min
+                //if (Height < MinHeight) Height = MinHeight; // height corrected for Min
 
-                if (Width > MaxWidth) Width = MaxWidth; // width corrected for Max
-                if (Height > MaxHeight) Height = MaxHeight; // height corrected for Max
+                //if (Width > MaxWidth) Width = MaxWidth; // width corrected for Max
+                //if (Height > MaxHeight) Height = MaxHeight; // height corrected for Max
 
 
                 Canvas.SetTop(this, Master.Height * YPos); // we can set the Ypos because it is not effected by the animation
@@ -225,6 +228,9 @@ namespace InputConnect.UI.InWindowPopup
 
         public void Show(){
             if (Master == null) return;
+
+
+
             Canvas.SetLeft(this, -Width); // just incase it is not already set
 
             _IsDisplayed = true;
@@ -240,6 +246,12 @@ namespace InputConnect.UI.InWindowPopup
 
         public void Hide(){
             if (Master == null) return;
+
+
+
+            IsHitTestVisible = false;
+            OnPointerReleased(null, null);
+
             _IsDisplayed = false;
             SetPostionTranslate(-Width, Canvas.GetTop(this));
             if (Global.Overlay != null){
@@ -295,15 +307,15 @@ namespace InputConnect.UI.InWindowPopup
             }
         }
 
-        private void OnPointerReleased(object? sender, PointerEventArgs e)
+        private void OnPointerReleased(object? sender, PointerEventArgs? e)
         {
             IsDraging = false;
         }
 
 
-        private void OnPointerMoved(object? sender, PointerEventArgs e)
+        private void OnPointerMoved(object? sender, PointerEventArgs? e)
         {
-            if (Master == null) return;
+            if (Master == null || e == null) return;
             if (!IsDraging) return;
 
 

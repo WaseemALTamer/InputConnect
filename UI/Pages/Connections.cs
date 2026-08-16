@@ -1,10 +1,12 @@
-﻿using InputConnect.UI.Containers;
-using Avalonia.Controls;
-using InputConnect.Network;
+﻿using InputConnect.UI.InWindowPopup;
+using InputConnect.UI.Containers;
 using System.Collections.Generic;
-using Avalonia.Threading;
 using InputConnect.Structures;
-using System;
+using Avalonia.Interactivity;
+using InputConnect.Network;
+using Avalonia.Threading;
+using Avalonia.Controls;
+using Avalonia;
 
 
 
@@ -24,9 +26,14 @@ namespace InputConnect.UI.Pages
         }
 
         private int AdsPaddyY = 10;
+        private int YPosOffset = 80;
 
 
         private NoConnectorMessage? noConnectorMessage;
+
+
+        private Button? AddConnectionButton;
+        private AddConnection? AddConnectionPopUP;
 
 
         public Connections(Canvas? master) : base(master){
@@ -44,16 +51,46 @@ namespace InputConnect.UI.Pages
 
             if (MainCanvas == null) return;
 
+            AddConnectionButton = new Button{
+                Content = "Add Connection",
+                Width = 200,
+                Height = 50,
+                Background = InputConnect.Setting.Themes.Button,
+                HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                FontSize = InputConnect.Setting.Config.FontSize,
+                CornerRadius = new CornerRadius(InputConnect.Setting.Config.CornerRadius)
+            };
+            MainCanvas.Children.Add(AddConnectionButton);
+            AddConnectionButton.Click += OnClickAddConnectionButton;
+
+
+            if (PublicWidgets.Master != null)
+            {
+                AddConnectionPopUP = new AddConnection(PublicWidgets.Master);
+            }
+
+            
+
+
+
             MainCanvas.SizeChanged += OnSizeChanged;
 
             noConnectorMessage = new NoConnectorMessage(MainCanvas);
             MainCanvas.Children.Add(noConnectorMessage);
             noConnectorMessage.Show();
 
+
             Update();
 
-            //SizeChanged += (s, e) => PlaceAds(); // uncomment this later for redundency after testing
-            OnShow += PlaceAds;
+            //SizeChanged += (s, e) => PlaceConnections(); // uncomment this later for redundency after testing
+            OnShow += () => {Update(null, null);}; // update the size first
+            OnShow += PlaceConnections; // then update the placement
+
+            if (Master == null) return;
+
+            
+
         }
 
 
@@ -65,6 +102,25 @@ namespace InputConnect.UI.Pages
             if (noConnectorMessage != null) {
                 Canvas.SetLeft(noConnectorMessage, (MainCanvas.Width - noConnectorMessage.Width) / 2);
                 Canvas.SetTop(noConnectorMessage, ((MainCanvas.Height - noConnectorMessage.Height) / 2) + 150);
+            }
+
+            if (AddConnectionButton != null)
+            {
+                Canvas.SetLeft(AddConnectionButton, (MainCanvas.Width - AddConnectionButton.Width) / 2);
+                Canvas.SetTop(AddConnectionButton, 20);
+            }
+
+
+            // this is a fix for a bug, when switching to a different page  changing the  size of the window and then
+            // going back to this window we find that the connection containers are offseted, note that when resizing
+            // it is not as smooth as the advertisement resize not instant, come back to  this  issue but  it is none
+            // critical 
+            foreach (var _connection in Devices)
+            {
+                if (_connection != null)
+                {
+                    Canvas.SetLeft(_connection, (MainCanvas.Width - _connection.Width) / 2);
+                }
             }
 
 
@@ -111,7 +167,7 @@ namespace InputConnect.UI.Pages
                     Devices.Remove(connection);
                 }
 
-                PlaceAds();
+                PlaceConnections();
 
 
                 if (noConnectorMessage != null) {
@@ -135,24 +191,27 @@ namespace InputConnect.UI.Pages
                 {
                     MainCanvas.Children.Add(_ad);
                 }
-                PlaceAds();
+                PlaceConnections();
             }
         }
 
-        private void PlaceAds()
+        private void PlaceConnections()
         {
             if (Devices == null || MainCanvas == null) return;
 
             int _index = 0;
             int _lostindex = 0;
-            foreach (var _advertisement in Devices)
+            foreach (var _connection in Devices)
             {
-                if (_advertisement != null)
+                if (_connection != null)
                 {
-                    //Canvas.SetRight(_advertisement, (MainCanvas.Width - _advertisement.Width) / 2);
-                    //Canvas.SetTop(_advertisement, AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex));
-                    _advertisement.SetPostionTranslate((MainCanvas.Width - _advertisement.Width) / 2, AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex));
-                    var height = AdsPaddyY + (_advertisement.Height + AdsPaddyY) * (_index - _lostindex) + (_advertisement.Height + AdsPaddyY);
+                    //Canvas.SetRight(_connection, (MainCanvas.Width - _connection.Width) / 2);
+                    //Canvas.SetTop(_connection, AdsPaddyY + (_connection.Height + AdsPaddyY) * (_index - _lostindex));
+
+                    _connection.SetPostionTranslate((MainCanvas.Width - _connection.Width) / 2, 
+                                                        (AdsPaddyY + (_connection.Height + AdsPaddyY) * (_index - _lostindex)) + YPosOffset);
+
+                    var height = AdsPaddyY + (_connection.Height + AdsPaddyY) * (_index - _lostindex) + (_connection.Height + AdsPaddyY);
                     if (height >= Height){
                         MainCanvas.Height = height;
                     }
@@ -166,14 +225,14 @@ namespace InputConnect.UI.Pages
                 }
                 _index++;
             }
-            ShowOnlyVissibleAds();
+            ShowOnlyVissibleConnections();
         }
 
 
 
         // this function sill needs more work as of now it shows everything that is in the array
         // you should later on make it only show ones that are displayed on screen
-        private void ShowOnlyVissibleAds()
+        private void ShowOnlyVissibleConnections()
         {
             if (Devices == null) return;
 
@@ -191,6 +250,15 @@ namespace InputConnect.UI.Pages
                 }
                 _index++;
             }
+        }
+
+
+        private void OnClickAddConnectionButton(object? sender = null, RoutedEventArgs? e = null)
+        {
+            if (AddConnectionPopUP == null) return;
+
+            AddConnectionPopUP.Show();
+
         }
 
     }

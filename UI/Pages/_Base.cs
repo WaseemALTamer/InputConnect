@@ -149,9 +149,13 @@ namespace InputConnect.UI.Pages
 
         public void Show(){
             IsDisplayed = true;
+            
+            // we trigger a resize, this will ensure that the window will be on the correct
+            // size when it is visiable
+            OnResize(null, null); 
+
             if (ShowHideTransition != null)
                 ShowHideTransition.TranslateForward();
-
             if (OnShow != null) OnShow.Invoke();
         }
 

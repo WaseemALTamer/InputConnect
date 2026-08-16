@@ -112,6 +112,30 @@ namespace InputConnect.Connections
         }
 
 
+        public static void AddConnection(Connection newConnection){
+
+            // note that this function will not send any message to the other devices telling them
+            // to connect back  to us  you this function  will just  set  up a  connection for you
+            // you will still need to go to the other device and do the same thing but target this
+            // device
+
+            // now we can Check the message and add the connection to the list
+
+            for (int i = 0; i < Devices.ConnectionList.Count; i++){ // check if connection already exists
+                if (Devices.ConnectionList[i].MacAddress == newConnection.MacAddress){ // if it does then we will overwrite it with the new connection
+                    Devices.ConnectionList[i] = newConnection;
+                    return;
+                }
+            }
+
+
+            Devices.ConnectionList.Add(newConnection); // added the new connection
+            if (OnConnectedConnectionAdded != null) OnConnectedConnectionAdded.Invoke();
+            return;
+
+        }
+
+
         // this function only trys one to decreapt it if you want to try more than once then write the code your self
         // I actually did check the UI -> ConnectionReplay.cs file for refrence on how to do so 
         public static Connection? AcceptIncomingConnection(MessageUDP Message, PasswordKey passwordkey) {
@@ -152,20 +176,14 @@ namespace InputConnect.Connections
                 PasswordKey = passwordkey,
             };
 
-            for (int i = 0; i < Devices.ConnectionList.Count; i++){ // check if connection already exists
-                if (Devices.ConnectionList[i].MacAddress == Message.MacAddress){ // if it does then we will overwrite it with the new connection
-                    Devices.ConnectionList[i] = newConnection;
-                    //SharedData.IncomingConnection.Clear(); // remove the message
-                    return newConnection;
-                }
-            }
+            AddConnection(newConnection);
 
-
-            Devices.ConnectionList.Add(newConnection); // added the new connection
-            if (OnConnectedConnectionAdded != null) OnConnectedConnectionAdded.Invoke();
             //SharedData.IncomingConnection.Clear();
             return newConnection;
         }
+
+
+
 
 
         public static void CloseIncomingConnection(MessageUDP Message, string? Reason = null) {
