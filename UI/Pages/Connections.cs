@@ -7,6 +7,8 @@ using InputConnect.Network;
 using Avalonia.Threading;
 using Avalonia.Controls;
 using Avalonia;
+using System;
+using System.Threading.Tasks;
 
 
 
@@ -46,6 +48,7 @@ namespace InputConnect.UI.Pages
             MessageManager.OnConnect += (message) => { Update();};
             MessageManager.OnAccept += (message) => { Update();};
             MessageManager.OnDecline += (message) => { Update();};
+            
 
 
 
@@ -64,10 +67,12 @@ namespace InputConnect.UI.Pages
             MainCanvas.Children.Add(AddConnectionButton);
             AddConnectionButton.Click += OnClickAddConnectionButton;
 
+            
 
             if (PublicWidgets.Master != null)
             {
                 AddConnectionPopUP = new AddConnection(PublicWidgets.Master);
+                AddConnectionPopUP.OnAddButtonTrigger += async () => {await OnManualButtonClick();};
             }
 
             
@@ -131,6 +136,7 @@ namespace InputConnect.UI.Pages
 
         public void Update(object? sender = null, object? e = null){
 
+
             Dispatcher.UIThread.Post(() => { 
                 for (int i = 0; i < InputConnect.Connections.Devices.ConnectionList.Count; i++){
                     var _found = false; // this will be used to indecated if we found the device responsible for the message
@@ -169,7 +175,6 @@ namespace InputConnect.UI.Pages
 
                 PlaceConnections();
 
-
                 if (noConnectorMessage != null) {
                     if (Devices.Count == 0){
                         noConnectorMessage.Show();
@@ -190,6 +195,7 @@ namespace InputConnect.UI.Pages
                 if (MainCanvas != null)
                 {
                     MainCanvas.Children.Add(_ad);
+                    _ad.Show();
                 }
                 PlaceConnections();
             }
@@ -198,6 +204,8 @@ namespace InputConnect.UI.Pages
         private void PlaceConnections()
         {
             if (Devices == null || MainCanvas == null) return;
+
+            
 
             int _index = 0;
             int _lostindex = 0;
@@ -211,7 +219,10 @@ namespace InputConnect.UI.Pages
                     _connection.SetPostionTranslate((MainCanvas.Width - _connection.Width) / 2, 
                                                         (AdsPaddyY + (_connection.Height + AdsPaddyY) * (_index - _lostindex)) + YPosOffset);
 
-                    var height = AdsPaddyY + (_connection.Height + AdsPaddyY) * (_index - _lostindex) + (_connection.Height + AdsPaddyY);
+
+
+
+                    var height = AdsPaddyY + (_connection.Height + AdsPaddyY) * (_index - _lostindex) + (_connection.Height + AdsPaddyY) + YPosOffset;
                     if (height >= Height){
                         MainCanvas.Height = height;
                     }
@@ -258,7 +269,19 @@ namespace InputConnect.UI.Pages
             if (AddConnectionPopUP == null) return;
 
             AddConnectionPopUP.Show();
+        }
 
+
+        private async Task OnManualButtonClick()
+        {
+            // this fixes the issue where avaliona is not updating the width height and other
+            // key elements before  i  can position  the wegits,  note  that this needs to be
+            // investigated further consider updating to  a newer  version of avaliona or fix
+            // this specific avaliona version and compile it
+
+            Update();
+            await Task.Delay(InputConnect.Setting.Config.Tick);
+            PlaceConnections();
         }
 
     }

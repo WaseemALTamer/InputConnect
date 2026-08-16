@@ -225,6 +225,15 @@ namespace InputConnect.Connections
             // works as follows:
             // request_data -> wait_for_data -> get_data -> return
 
+
+
+            // this architecture  needs to change, if you edit the list  in the time you
+            // are waiting for the data  then the whole application will crash note that
+            // you either copy the list fetch  the data and they  past  it back in palce
+            // or you need to make it based out of events, either way you need to change
+            // this here otherwise it is only going to crumple later on 
+
+
             if (connection.MacAddress == null) return;
 
             MessageUDP newMessage = new MessageUDP{
@@ -236,7 +245,8 @@ namespace InputConnect.Connections
             }
             
 
-            var expiryTime = DateTime.Now.AddMilliseconds(3000); // 3 seconds
+            var expiryTime = DateTime.Now.AddMilliseconds(100); // 0.1 seconds am chaning this like this to apply a
+                                                                // quick dirty fix this needs to change later on
 
             while (DateTime.Now < expiryTime){
                 if (connection.Screens != null) return;

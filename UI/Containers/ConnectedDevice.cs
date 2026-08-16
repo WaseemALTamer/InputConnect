@@ -277,16 +277,18 @@ namespace InputConnect.UI.Containers
                 Trigger = SetPostionTrigger
             };
 
-            if (double.IsNaN(Canvas.GetRight(this)))
+            if (double.IsNaN(Canvas.GetLeft(this)))
             { // this will only occures on start up
-                Canvas.SetRight(this, Xpos);
+                
+                Canvas.SetLeft(this, Xpos);
                 Canvas.SetTop(this, Ypos);
+
                 return;
             }
 
 
 
-            InitialPos = new Vector(Canvas.GetRight(this), Canvas.GetTop(this));
+            InitialPos = new Vector(Canvas.GetLeft(this), Canvas.GetTop(this));
             FinalPos = new Vector(Xpos, Ypos);
 
             PostionTranslation.TranslateForward();

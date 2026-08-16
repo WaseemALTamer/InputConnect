@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Input;
 using Avalonia;
 using InputConnect.UI.Containers;
+using System;
 
 
 
@@ -27,6 +28,9 @@ namespace InputConnect.UI.InWindowPopup
         private TextBox? UsernameEntry;
         private TextBox? MacEntry;
         private TextBox? TokenEntry;
+
+
+        public Action? OnAddButtonTrigger;
 
 
         public AddConnection(Canvas master) : base(master)
@@ -186,6 +190,11 @@ namespace InputConnect.UI.InWindowPopup
 
 
             HideRight();
+
+
+            if (OnAddButtonTrigger != null){
+                OnAddButtonTrigger.Invoke();
+            }
         }
 
 

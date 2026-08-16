@@ -44,6 +44,8 @@ namespace InputConnect
         public static Bitmap? ConnectorBitmap;
         public static Bitmap? NoConnectorBitmap;
 
+        public static Bitmap? RefreshBitmap;
+
 
 
         public static bool AssetsLoaded = false;
@@ -115,6 +117,9 @@ namespace InputConnect
 
             NoConnectorBitmap = new Bitmap(
                 Path.Combine(ApplicationDirecotry, "Assets", "Images", "NoConnector.png"));
+
+            RefreshBitmap = new Bitmap(
+                Path.Combine(ApplicationDirecotry, "Assets", "Images", "Refresh.png"));
 
 
             // we finnish loading the assests here

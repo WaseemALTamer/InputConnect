@@ -34,6 +34,10 @@ namespace InputConnect.UI.Containers
             set { _MainGraph = value; }
         }
 
+
+        private RefreshButton? refreshButton;
+
+
         public MointorsGraph(Canvas? master = null) {
 
             Master = master;
@@ -50,7 +54,8 @@ namespace InputConnect.UI.Containers
 
             
             
-
+            refreshButton = new RefreshButton(MainCanvas);
+            MainCanvas.Children.Add(refreshButton);
 
 
             //PointerPressed += OnPointerPressed;
@@ -125,6 +130,18 @@ namespace InputConnect.UI.Containers
 
                         // we need to request the data of the other device if we 
                         // dont already have it
+
+
+
+                        // this architecture  needs to change, if you edit the list  in the time you
+                        // are waiting for the data  then the whole application will crash note that
+                        // you either copy the list fetch  the data and they  past  it back in palce
+                        // or you need to make it based out of events, either way you need to change
+                        // this here otherwise it is only going to crumple later on 
+
+
+
+
                         await Connections.Manager.RequestInitialData(device);
                         if (device.Screens == null) {
                             continue;
