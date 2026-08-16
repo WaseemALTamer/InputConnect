@@ -72,6 +72,8 @@ namespace InputConnect.UI.Containers
             Connections.Manager.OnConnectionClosed += Update;
             Events.TargetDeviceConnectionChanged += Update;
 
+            refreshButton.Trigger += UpdateGraph;
+
             UpdateGraph();
             Child = MainCanvas;
         }

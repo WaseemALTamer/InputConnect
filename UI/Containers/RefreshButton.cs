@@ -61,7 +61,7 @@ namespace InputConnect.UI.Containers
             });
 
             Child = ButtonImage;
-            Width = 60; Height = 45; // the Size is static
+            Width = 75; Height = 75; // the Size is static
 
 
 
@@ -80,23 +80,14 @@ namespace InputConnect.UI.Containers
 
         public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null){
             if (Master != null){
-                if (ShowHideTransation != null &&
-                    ShowHideTransation.FunctionRunning == false){
-                    if (IsShowing){
-                        Canvas.SetLeft(this, Master.Width - Width);
-                        Canvas.SetTop(this, Master.Height - Height - 15);
-                    }
-                    else{
-                        Canvas.SetLeft(this, Master.Width - Width);
-                        Canvas.SetTop(this, Master.Height - Height - 15);
-                    }
-                }
+                Canvas.SetLeft(this, Master.Width - Width);
+                Canvas.SetTop(this, 0);
             }
         }
 
 
 
-        bool IsShowing = false;
+        public bool IsShowing = false;
         public void Show(){
             if (ShowHideTransation == null) return;
             IsShowing = true;
