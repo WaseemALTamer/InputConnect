@@ -194,7 +194,7 @@ namespace InputConnect.UI.Containers
                                 });
 
 
-                                MaxPosX = s.X + s.Width;
+                                MaxPosX = MaxPosX + s.Width;
 
                             }
                         }
