@@ -46,11 +46,11 @@ namespace InputConnect
             while (double.IsNaN(Width) || double.IsNaN(Height)) await Task.Delay(1);
 
 
-            SharedData.Device.Screens = Screens.All; // add the Screens data for the public varables for other
+            //SharedData.Device.Screens = Screens.All; // add the Screens data for the public varables for other
                                                      // parts of the code to use it
 
 
-            SharedData.Device.TopLevel = GetTopLevel(this);
+            //SharedData.Device.TopLevel = GetTopLevel(this);
 
 
             MainCanvas = new Canvas{ // now we create the canvase after we load up for preformece

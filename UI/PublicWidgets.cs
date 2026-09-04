@@ -99,12 +99,7 @@ namespace InputConnect.UI
         }
 
 
-        // <POPUPS OUTWINDOW>
-        private static InvisiableOverlaySDL? _UIInvisiableOverlayOutPop;
-        public static InvisiableOverlaySDL? UIInvisiableOverlayOutPop{
-            get { return _UIInvisiableOverlayOutPop; }
-            set { _UIInvisiableOverlayOutPop = value; }
-        }
+
 
 
 
@@ -185,8 +180,8 @@ namespace InputConnect.UI
 
             // <OUT_POPUPS START>
 
-            // this creates the absorber popup
-            UIInvisiableOverlayOutPop = new InvisiableOverlaySDL();
+            // out windows popus are not handled inside the public widgets rather it is handedled
+            // inside the app.axaml.cs file where it host intiating the windows that you need
 
             // <IN_POPUPS END>
 
