@@ -125,6 +125,11 @@ namespace InputConnect.Network
                     return;
                 }
             }
+
+            message.Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"); // override the sent  time incase  of  the  two devices have 
+                                                                         // two different time so we keep when we recived the message
+                                                                         // rather than when the message was sent
+
             Advertisements.Add(message);
             if (OnAdvertisement != null) OnAdvertisement.Invoke();
         }
