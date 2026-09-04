@@ -48,8 +48,10 @@ namespace InputConnect.Network
 
                     string _message = JsonSerializer.Serialize(message);
                     byte[] data = Encoding.UTF8.GetBytes(_message);
-                    int _statusCode = Client.Send(data, data.Length, targetIP, Setting.Config.Port);
-                    if (_statusCode == 117) EstablishConnection(); // 117 means our connection has been denied
+                    int _num_bytes = Client.Send(data, data.Length, targetIP, Setting.Config.Port);
+
+                    // double check the line below assumption is 117 is a error code though reading the function it is the bytes returned
+                    //if (_statusCode == 117) EstablishConnection(); // 117 means our connection has been denied
                 }
             }
             catch (Exception ex){
