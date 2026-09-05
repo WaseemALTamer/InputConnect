@@ -4,6 +4,7 @@ using System.Net;
 using System;
 
 
+
 namespace InputConnect.Network
 {
 
@@ -17,24 +18,22 @@ namespace InputConnect.Network
 
 
 
-        public static string? GetMyIP()
-        {
-            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces()){
-                if (ni.OperationalStatus != OperationalStatus.Up ||
-                    ni.NetworkInterfaceType == NetworkInterfaceType.Loopback)
-                    continue;
+        public static string? GetMyIP(){
 
-                var ipProps = ni.GetIPProperties();
-                foreach (UnicastIPAddressInformation addr in ipProps.UnicastAddresses){
-                    if (addr.Address.AddressFamily == AddressFamily.InterNetwork &&
-                        !IPAddress.IsLoopback(addr.Address))
-                    {
-                        return addr.Address.ToString();
-                    }
-                }
+            try{
+                using var socket = new Socket(
+                    AddressFamily.InterNetwork,
+                    SocketType.Dgram,
+                    ProtocolType.Udp);
+
+                socket.Connect("8.8.8.8", 53);
+
+                //Console.WriteLine(((IPEndPoint)socket.LocalEndPoint!).Address.ToString());
+                return ((IPEndPoint)socket.LocalEndPoint!).Address.ToString();
             }
-
-            return null;
+            catch{
+                return null;
+            }
         }
 
         public static string? GetPublicSubnet(){
@@ -67,6 +66,9 @@ namespace InputConnect.Network
             Subnet = GetPublicSubnet();
             MacAdress = GetMyMacAdress();
             DeviceName = Environment.UserName;
+
+
+            NetworkChange.NetworkAddressChanged += (_, _) =>{ IP = GetMyIP(); };
         }
     }
 }
