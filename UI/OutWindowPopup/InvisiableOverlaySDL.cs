@@ -3,7 +3,13 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using InputConnect.Controllers.Mouse;
+using System.Collections.Generic;
 using SDL2;
+using InputConnect.Structures;
+using InputConnect.Controllers;
+
+
+
 
 namespace InputConnect.UI.OutWindowPopup
 {
@@ -96,8 +102,11 @@ namespace InputConnect.UI.OutWindowPopup
             GlobalMouse.OnVirtualMointorExit += OnVirtualMointorExitTrigger;
 
 
+
             MouseController = new InWindowMouse(this);
         }
+
+        private readonly HashSet<byte> _pressedButtons = new();
 
         private Stopwatch _stopwatch = new Stopwatch();
         private double _timeStamp = 0;
@@ -139,10 +148,12 @@ namespace InputConnect.UI.OutWindowPopup
                             break;
 
                         case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
+                            _pressedButtons.Add(e.button.button);
                             OnMouseButtonPress?.Invoke(e.button.button);
                             break;
 
                         case SDL.SDL_EventType.SDL_MOUSEBUTTONUP:
+                            _pressedButtons.Remove(e.button.button);
                             OnMouseButtonRelease?.Invoke(e.button.button);
                             break;
 
@@ -165,8 +176,39 @@ namespace InputConnect.UI.OutWindowPopup
 
 
 
+        private void ReleaseAllMouseButtons(){
 
+            // interduce a map later that maps sdl keys to the sharphook one
+            // am not happy about this fix you may need to fix it later down
+            // the line
 
+            foreach (var button in _pressedButtons){
+                // => 0:None -> 1:Left -> 2:Right -> 3:Middle -> 4:Back -> 5:Forward
+                int mappedButton = 0;
+
+                if (button == SDL.SDL_BUTTON_LEFT){
+                    mappedButton = 1;
+                }
+                else if (button == SDL.SDL_BUTTON_RIGHT){
+                    mappedButton = 2;
+                }
+                else if (button == SDL.SDL_BUTTON_MIDDLE){
+                    mappedButton = 3;
+                }
+                else if (button == SDL.SDL_BUTTON_X1){
+                    mappedButton = 4; // Back
+                }
+                else if (button == SDL.SDL_BUTTON_X2){
+                    mappedButton = 5; // Forward
+                }
+
+                if (mappedButton != 0){
+                    GlobalMouse.ReleaseMouse(mappedButton); 
+                }
+            }
+
+            _pressedButtons.Clear();
+        }
 
 
         public void OnVirtualMointorEnterTrigger(){
@@ -179,11 +221,13 @@ namespace InputConnect.UI.OutWindowPopup
             OnHide?.Invoke();
         }
 
+
         public void Show(){
             if (!IsVisible){
                 SDL.SDL_ShowWindow(Window);
                 SDL.SDL_RaiseWindow(Window);
                 SDL.SDL_SetWindowInputFocus(Window);
+                
                 //SDL.SDL_SetWindowOpacity(Window, 1f);
                 SDL.SDL_ShowWindow(Window);
                 SDL.SDL_SetRelativeMouseMode(SDL.SDL_bool.SDL_TRUE);
@@ -194,6 +238,9 @@ namespace InputConnect.UI.OutWindowPopup
         public void Hide(){
             if (IsVisible){
                 //SDL.SDL_SetWindowOpacity(Window, 0f);
+
+                ReleaseAllMouseButtons();
+
                 SDL.SDL_HideWindow(Window);
                 SDL.SDL_SetRelativeMouseMode(SDL.SDL_bool.SDL_FALSE);
                 IsVisible = false;

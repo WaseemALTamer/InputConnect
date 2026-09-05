@@ -5,6 +5,7 @@ using System.Text.Json;
 using SharpHook;
 using Avalonia;
 using System;
+using System.Runtime.InteropServices;
 
 
 
@@ -556,6 +557,7 @@ namespace InputConnect.Controllers.Mouse
                             if (connection.MacAddress != null &&
                                 MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip))
                             {
+                                //Console.WriteLine($"{_command.X}, {_command.Y}, {_command.MouseButtonPress}, {_command.MouseButtonRelease}");
                                 ConnectionUDP.Send(ip, messageudp);
                             }
 
@@ -692,7 +694,6 @@ namespace InputConnect.Controllers.Mouse
 
 
         private static List<int> pressedButtons = new List<int>();
-
         private static void ReleaseAllKeys(){
             foreach (var key in pressedButtons){
                 ReleaseMouse(key);
@@ -702,15 +703,16 @@ namespace InputConnect.Controllers.Mouse
 
 
         public static void TransmitAllButtonsRelease(){
-
+            
             foreach (var connection in Connections.Devices.ConnectionList){
                 if (connection.MouseState == Connections.Constants.Transmit){
+         
                     var _command = new Commands.Mouse{
                         // we send a message which contain nothing represeting releasing all keys
                     };
 
                     var _commandMessage = new MessageCommand{
-                        Type = Commands.Constants.CommandTypes.Keyboard,
+                        Type = Commands.Constants.CommandTypes.Mouse,
                         SequenceNumber = connection.SequenceNumber + 1,
                         Command = JsonSerializer.Serialize(_command)
                     };
@@ -742,17 +744,18 @@ namespace InputConnect.Controllers.Mouse
             if(command.X == null && 
                 command.Y == null && 
                 command.MouseButtonPress == null && 
-                command.MouseButtonRelease == null) ReleaseAllKeys();
+                command.MouseButtonRelease == null) {
+                    ReleaseAllKeys();
+                }
 
+            //Console.WriteLine($"{command.X}, {command.Y}, {command.MouseButtonPress}, {command.MouseButtonRelease}");
 
-            if (command.X != null && command.Y != null)
-            {
+            if (command.X != null && command.Y != null){
                 SkipNextExecutions(500);
                 MoveMouse((double)command.X, (double)command.Y);
             }
 
-            if (command.MouseButtonPress != null)
-            {
+            if (command.MouseButtonPress != null){
                 PressMouse((int)command.MouseButtonPress);
                 pressedButtons.Add((int)command.MouseButtonPress);
             }
