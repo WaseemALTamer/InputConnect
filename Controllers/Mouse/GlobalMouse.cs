@@ -1,11 +1,12 @@
-﻿using InputConnect.Structures;
+﻿using System.Collections.Generic;
+using InputConnect.Structures;
+using InputConnect.Network;
 using System.Text.Json;
 using SharpHook;
-using System;
-using InputConnect.Network;
-using System.Threading;
 using Avalonia;
-using Tmds.DBus.Protocol;
+using System;
+
+
 
 
 
@@ -99,7 +100,7 @@ namespace InputConnect.Controllers.Mouse
 
             OnMove += TrackMouse;
 
-
+            Controllers.Hook.OnTargetConnectionChange += TransmitAllButtonsRelease;
             MessageManager.OnCommandMouse += RecieveMouseCommnad;
 
 
@@ -690,6 +691,45 @@ namespace InputConnect.Controllers.Mouse
 
 
 
+        private static List<int> pressedButtons = new List<int>();
+
+        private static void ReleaseAllKeys(){
+            foreach (var key in pressedButtons){
+                ReleaseMouse(key);
+            }
+            pressedButtons.Clear();
+        }
+
+
+        public static void TransmitAllButtonsRelease(){
+
+            foreach (var connection in Connections.Devices.ConnectionList){
+                if (connection.MouseState == Connections.Constants.Transmit){
+                    var _command = new Commands.Mouse{
+                        // we send a message which contain nothing represeting releasing all keys
+                    };
+
+                    var _commandMessage = new MessageCommand{
+                        Type = Commands.Constants.CommandTypes.Keyboard,
+                        SequenceNumber = connection.SequenceNumber + 1,
+                        Command = JsonSerializer.Serialize(_command)
+                    };
+                    connection.SequenceNumber += 1;
+
+                    var messageudp = new MessageUDP{
+                        MessageType = Network.Constants.MessageTypes.Command,
+                        Text = Encryptor.Encrypt(JsonSerializer.Serialize(_commandMessage), connection.PasswordKey),
+                        IsEncrypted = true
+                    };
+
+                    if (connection.MacAddress != null &&
+                        MessageManager.MacToIP.TryGetValue(connection.MacAddress, out var ip)){
+                        ConnectionUDP.Send(ip, messageudp);
+                    }
+
+                }
+            }
+        }
 
 
 
@@ -697,6 +737,13 @@ namespace InputConnect.Controllers.Mouse
         public static void RecieveMouseCommnad(Commands.Mouse? command)
         {
             if (command == null) return;
+
+
+            if(command.X == null && 
+                command.Y == null && 
+                command.MouseButtonPress == null && 
+                command.MouseButtonRelease == null) ReleaseAllKeys();
+
 
             if (command.X != null && command.Y != null)
             {
@@ -707,11 +754,13 @@ namespace InputConnect.Controllers.Mouse
             if (command.MouseButtonPress != null)
             {
                 PressMouse((int)command.MouseButtonPress);
+                pressedButtons.Add((int)command.MouseButtonPress);
             }
 
             if (command.MouseButtonRelease != null)
             {
                 ReleaseMouse((int)command.MouseButtonRelease);
+                pressedButtons.Remove((int)command.MouseButtonRelease);
             }
 
             if (command.ScrollDelta != null)
