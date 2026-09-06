@@ -136,7 +136,7 @@ namespace InputConnect
 
 
         private void OnClickExit(object? sender, object? e) {
-            GlobalMouse.Hook.Dispose();
+            Controllers.Hook.GlobalHook.Dispose();
             Environment.Exit(0);
         }
     }

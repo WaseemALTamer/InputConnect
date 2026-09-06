@@ -58,6 +58,7 @@ namespace InputConnect
                     desktop.MainWindow = new MainWindow();
             }
 
+
             
             base.OnFrameworkInitializationCompleted();
 
@@ -74,6 +75,11 @@ namespace InputConnect
 
             // this creates the absorber popup
             UIInvisiableOverlayOutPop = new InvisiableOverlaySDL(); // we start this after the hooks since this will attach to the hooks
+
+
+            if (SharedData.SystemArguments.TestType != null){
+                Tests.TestManager.Run(SharedData.SystemArguments.TestType);
+            }
 
 
 

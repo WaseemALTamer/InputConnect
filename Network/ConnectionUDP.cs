@@ -66,7 +66,7 @@ namespace InputConnect.Network
             while (true){
                 if (Client == null){
                     EstablishConnection();
-                    await Task.Delay(3000);
+                    //await Task.Delay(3000); // do not wait for 3000ms this cases the application to only work after 3 second when you launch it
                     continue;
                 }
                 if (!IsListening) {
