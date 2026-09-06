@@ -1,0 +1,3 @@
+do not highjack the ConnectionUDP layer rather simply just trigger the events in the MessageMnager
+for the most part, the IP address detection test isn't really nessasry  and  changing networks can
+be simulated by simply changing up address

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
@@ -24,6 +24,7 @@
     <PackageReference Include="ppy.SDL2-CS" Version="1.0.82" />
     <PackageReference Include="sdl2" Version="2.0.5" />
     <PackageReference Include="SharpHook" Version="6.1.2" />
+    <PackageReference Include="System.CommandLine" Version="2.0.11" />
   </ItemGroup>
 
 

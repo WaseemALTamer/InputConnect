@@ -3,6 +3,7 @@ using InputConnect.UI.OutWindowPopup;
 using Avalonia.Markup.Xaml;
 using InputConnect.Network;
 using Avalonia.Controls;
+using System.Linq;
 using Avalonia;
 
 
@@ -52,7 +53,9 @@ namespace InputConnect
 
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop){
-                desktop.MainWindow = new MainWindow();
+
+                if (!SharedData.SystemArguments.IsHeadless) // check if the headless pramaater have been passed if so skip running the UI
+                    desktop.MainWindow = new MainWindow();
             }
 
             
