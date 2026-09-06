@@ -110,7 +110,11 @@ dotnet run
 
     ![](READMEIMAGES/Connecting.gif)
 
-5. On the device you want to share a specific input from, set its mode to **Transmit**. On the other devices that will use that input, set the mode to **Receive**.
+5. On both devices, the monitor graph displays virtual monitors representing the physical monitors connected to the other device. You can freely rearrange the monitors to match your preferred layout.
+
+    <img src="READMEIMAGES/RearngingMointers_2.gif" width="800">
+
+6. On the device you want to share a specific input from, set its mode to **Transmit**. On the other devices that will use that input, set the mode to **Receive**.
 
     <img src="READMEIMAGES/Send.gif" width="385"></img><img src="READMEIMAGES/Receive.gif" width="385"></img>
 
