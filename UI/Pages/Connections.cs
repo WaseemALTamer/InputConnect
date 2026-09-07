@@ -120,13 +120,11 @@ namespace InputConnect.UI.Pages
             // going back to this window we find that the connection containers are offseted, note that when resizing
             // it is not as smooth as the advertisement resize not instant, come back to  this  issue but  it is none
             // critical 
-            foreach (var _connection in Devices)
-            {
-                if (_connection != null)
-                {
-                    Canvas.SetLeft(_connection, (MainCanvas.Width - _connection.Width) / 2);
-                }
-            }
+            // foreach (var _connection in Devices){
+            //     if (_connection != null){
+            //         //Canvas.SetLeft(_connection, (MainCanvas.Width - _connection.Width) / 2);
+            //     }
+            // }
 
 
         }
