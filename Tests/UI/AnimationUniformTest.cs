@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System;
 using System.Threading;
 using System.Diagnostics;
+using System.ComponentModel.DataAnnotations;
 
 
 
@@ -26,18 +27,22 @@ namespace InputConnect.Tests
         private int transition_forward_ticks = 0;
         private void TransitionForwardTest(double value){
             transition_forward_ticks += 1;
-            if (value == 1){
-                transition_running = false;
-            }
+            if (animation?.FunctionRunning == false) transition_running = false;
         }
 
 
         private int transition_backward_ticks = 0;
         private void TransitionBackwardTest(double value){
             transition_backward_ticks += 1;
-            if (value == 0){
-                transition_running = false;
-            }
+            if (animation?.FunctionRunning == false) transition_running = false;
+        }
+
+        
+        private int transition_halfway_ticks = 0;
+        private void TransitionHalfTest(double value){
+            if (animation?.FunctionRunning == false) transition_running = false;
+            transition_halfway_ticks += 1;
+            if (value > 0.5) animation?.TranslateBackward();
         }
 
 
@@ -95,6 +100,30 @@ namespace InputConnect.Tests
             animation.Trigger -= TransitionBackwardTest;
             Console.WriteLine(
                 $"Passed transitioning backward total ticks = {transition_backward_ticks}"
+            );
+
+
+            // halfway transition test
+            animation.Trigger += TransitionHalfTest;
+
+            transition_running = true;
+            animation.TranslateForward();
+
+            stopwatch.Restart();
+
+            while (transition_running){
+                if (stopwatch.Elapsed >= TimeSpan.FromSeconds(1)){
+                    animation.Trigger -= TransitionHalfTest;
+                    Console.WriteLine("Failed Trnaisition backward Test");
+                    return -1;
+                }
+
+                await Task.Delay(10);
+            }
+
+            animation.Trigger -= TransitionHalfTest;
+            Console.WriteLine(
+                $"Passed transitioning halfway total ticks = {transition_backward_ticks}"
             );
 
             return 1;
