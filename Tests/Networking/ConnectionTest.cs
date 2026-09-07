@@ -32,7 +32,7 @@ namespace InputConnect.Tests
         }
 
 
-        public int Initialize(){
+        public async Task<int> Initialize(){
 
             // clear all the connections first
 
@@ -50,7 +50,7 @@ namespace InputConnect.Tests
             Manager.ActionOnIncomingConnection += AcceptConnection; // sub to the function to catch the incoming connection with our selfs
             
 
-            Thread.Sleep(500); // wait for the network reciver to boot up
+            await Task.Delay(500); // wait for the network reciver to boot up
 
             
 
@@ -74,7 +74,7 @@ namespace InputConnect.Tests
                 if (DateTime.UtcNow - startTime >= timeout){
                     break;
                 }
-                Thread.Sleep(100);
+                await Task.Delay(100);
             }
 
             if (newConnection?.State == Connections.Constants.StateConnected){

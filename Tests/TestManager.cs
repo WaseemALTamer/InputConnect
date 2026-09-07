@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
 
 
 
@@ -18,7 +19,8 @@ namespace InputConnect.Tests
         // its own class 
         private static readonly Dictionary<string, ITest> Tests =
             new(StringComparer.OrdinalIgnoreCase){
-                { "connect", new ConnectionTest() }
+                { "connect", new ConnectionTest() },
+                { "uniform_animation", new AnimationUniformTest()}
             };
 
 
@@ -30,7 +32,7 @@ namespace InputConnect.Tests
 
 
 
-        public static void Run(string testName){
+        public static async Task Run(string testName){
             if (!Tests.TryGetValue(testName, out var test)){
                 Console.WriteLine($"Unknown test: {testName}");
                 Console.WriteLine("Available tests:");
@@ -42,7 +44,7 @@ namespace InputConnect.Tests
                 return;
             }
             
-            int status_code = test.Initialize();
+            int status_code = await test.Initialize();
             Console.WriteLine($"Test: {test.Name} returned code {status_code}");
 
 

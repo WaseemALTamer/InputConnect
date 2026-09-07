@@ -5,6 +5,7 @@ using InputConnect.Network;
 using Avalonia.Controls;
 using System.Linq;
 using Avalonia;
+using System.Threading.Tasks;
 
 
 
@@ -78,12 +79,11 @@ namespace InputConnect
 
 
             if (SharedData.SystemArguments.TestType != null){
-                Tests.TestManager.Run(SharedData.SystemArguments.TestType);
+                var _____ = Tests.TestManager.Run(SharedData.SystemArguments.TestType);
             }
 
-
-
         }
+
     }
 }
 
