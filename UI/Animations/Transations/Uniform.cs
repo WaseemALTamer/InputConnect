@@ -84,7 +84,7 @@ namespace InputConnect.UI.Animations.Transations
             FunctionRunning = false;
         }
 
-        public async void Resume() {
+        public void Resume() {
             _paused = false;
         }
 
