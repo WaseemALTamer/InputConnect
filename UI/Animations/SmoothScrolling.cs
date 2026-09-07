@@ -20,8 +20,15 @@ namespace InputConnect.UI.Animations
     // this allows the scrollbar to be smooth
 
 
+    // scrolling down  with touchscreen  is not yet supported though the logic is
+    // the exact same track the hold track the movment  of the  finger then track
+    // when the finger leaves the display calcualte the speed of the fingure then
+    // simply apply the speed to the as impulse and start the function though you
+    // may want to multiply the impulse relative to the speed they are going
 
-    class SmoothScrolling
+
+
+    class SmoothScrolling : IAnimation
     {
 
 
@@ -49,82 +56,101 @@ namespace InputConnect.UI.Animations
         private Stopwatch stopWatch = new Stopwatch();
 
 
+        public SmoothScrolling()
+        {
+            AnimationManager.Add(this);
+        }
+
+        ~SmoothScrolling()
+        {
+            AnimationManager.Remove(this);
+        }
 
 
         //Over ride the event handler with this function
-        public async void OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
-        {
-            e.Handled = true; //OverRiding the scrolling function
-            if (-(e.Delta.Y / Math.Abs(e.Delta.Y)) != CurrentDirection)
-            {
+        public void OnPointerWheelChanged(object? sender, PointerWheelEventArgs e){
+            e.Handled = true; // overriding the scrolling function
+
+            double direction = -(e.Delta.Y / Math.Abs(e.Delta.Y));
+
+            // if direction changed, stop the existing momentum
+            if (direction != CurrentDirection){
                 CurrentVelocity = 0;
             }
 
+            CurrentDirection = direction;
 
-            CurrentDirection = -(e.Delta.Y / Math.Abs(e.Delta.Y));
-            CurrentVelocity += Math.Abs(ScrollingImpulseSpeed * e.Delta.Y);
+            CurrentVelocity += Math.Abs(
+                ScrollingImpulseSpeed * e.Delta.Y
+            );
 
-            if (!FunctionRunning){
-                await ApplySmoothScrolling();
-            }
+            FunctionRunning = true;
         }
 
         // this is only used for debugging for erros, either adapt this function or remove it
-        public void OnScrollChanged(object? sender, ScrollChangedEventArgs e)
-        {
-            e.Handled = true; //OverRiding the scrolling function
+        public void OnScrollChanged(object? sender, ScrollChangedEventArgs e){
+            e.Handled = true; // overriding the scrolling function
             Console.WriteLine(e.OffsetDelta.Y);
         }
 
 
 
 
-        private async Task ApplySmoothScrolling()
+        public void Update(double dt)
         {
-            FunctionRunning = true;
-            stopWatch.Start();
-            stopWatch.Restart();
+            if (!FunctionRunning)
+                return;
 
-
-            while (CurrentVelocity > 0)
+            if (StopCurrentAnimation)
             {
-                if (stopWatch.ElapsedMilliseconds - TimeStamp < Tick)
-                {
-                    await Task.Delay(Tick / 2); //this was "Tick / 2" but was changed to "1" for prformence reasons
-                    continue;
-                }
-                if (StopCurrentAnimation)
-                {
-                    StopCurrentAnimation = false;
-                    break;
-                }
-
-                TimeStamp += Tick;
-
-                double _progress = CurrentVelocity * Tick / 1000;
-
-
-                if (Trigger != null) Trigger(_progress * CurrentDirection);
-
-                if (ScrollingMaxVelocity < CurrentVelocity)
-                {
-                    CurrentVelocity -= ScrollingConstantDeacceleration * 2 * CurrentVelocity / ScrollingTrusholdVelocity * Tick / 1000;
-                    continue;
-                }
-
-                if (CurrentVelocity < ScrollingTrusholdVelocity)
-                {
-                    CurrentVelocity -= ScrollingConstantDeacceleration * ScrollingDamping * Tick / 1000;
-                    continue;
-                }
-
-                CurrentVelocity -= ScrollingConstantDeacceleration * Tick / 1000; // apply deacceleration
+                StopCurrentAnimation = false;
+                CurrentVelocity = 0;
+                FunctionRunning = false;
+                return;
             }
 
-            CurrentVelocity = 0;
-            FunctionRunning = false;
-            stopWatch.Stop();
-            TimeStamp = 0;
+
+            // convert milliseconds to seconds
+            double dtSeconds = dt / 1000.0;
+
+
+            // calculate how far we should scroll this frame
+            double progress =
+                CurrentVelocity *
+                dtSeconds *
+                CurrentDirection;
+
+
+            Trigger?.Invoke(progress);
+
+
+            // apply deceleration
+            if (ScrollingMaxVelocity < CurrentVelocity){
+                CurrentVelocity -=
+                    ScrollingConstantDeacceleration *
+                    2 *
+                    CurrentVelocity /
+                    ScrollingTrusholdVelocity *
+                    dtSeconds;
+            }
+            else if (CurrentVelocity < ScrollingTrusholdVelocity){
+                CurrentVelocity -=
+                    ScrollingConstantDeacceleration *
+                    ScrollingDamping *
+                    dtSeconds;
+            }
+            else{
+                CurrentVelocity -=
+                    ScrollingConstantDeacceleration *
+                    dtSeconds;
+            }
+
+
+            // Prevent velocity going negative
+            if (CurrentVelocity <= 0){
+                CurrentVelocity = 0;
+                FunctionRunning = false;
+            }
         }
     }
 }
