@@ -83,7 +83,7 @@ namespace InputConnect.UI.Pages
 
             noConnectorMessage = new NoConnectorMessage(MainCanvas);
             MainCanvas.Children.Add(noConnectorMessage);
-            noConnectorMessage.Show();
+            //noConnectorMessage.Show();
 
 
             Update();

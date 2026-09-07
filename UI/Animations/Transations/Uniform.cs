@@ -16,12 +16,12 @@ namespace InputConnect.UI.Animations.Transations
     // classes so this file is really important to have working
 
 
-    class Uniform
+    class Uniform : IAnimation
     {
         public double Duration; //in ms
         public double StartingValue;
         public double EndingValue;
-        public Action<double>? Trigger;
+        public Action<double>? Trigger; // you didnt invoke the trigger you just excauted it as it is why?
         public double CurrentValue;
         public int Tick = Setting.Config.Tick; //in ms (this is 125fps)
         //public bool LinearDeceleration = false;
@@ -29,138 +29,98 @@ namespace InputConnect.UI.Animations.Transations
         public bool FunctionRunning = false;
 
 
-        public async void TranslateForward(object? sender = null, object? e = null)
-        {
-
-            if (!FunctionRunning)
-            {
-                if (CurrentValue == EndingValue) return;
-                _startingValue = StartingValue;
-                _endingValue = EndingValue;
-                _duration = Duration;
-                _timeStamp = 0;
-                _stopwatch.Reset();
-                _stopwatch.Start();
-                await Transation();
-            }
-            else
-            {
-                if (CurrentValue == EndingValue) return;
-                _stopwatch.Stop();
-                _startingValue = CurrentValue;
-                _endingValue = EndingValue;
-                _duration = Duration * ((_endingValue - CurrentValue) / (_endingValue - _startingValue));
-                _timeStamp = 0;
-                _stopwatch.Reset();
-                _stopwatch.Start();
-            }
+        public Uniform(){
+            AnimationManager.Add(this); // add it to the manager so the manger excautes updates it for you
         }
 
-        public async void TranslateBackward(object? sender = null, object? e = null)
-        {
-            if (!FunctionRunning)
-            {
-                if (CurrentValue == StartingValue) return;
-                _startingValue = EndingValue;
-                _endingValue = StartingValue;
-                _duration = Duration;
-                _timeStamp = 0;
-                _stopwatch.Reset();
-                _stopwatch.Start();
-                await Transation();
-            }
-            else
-            {
-                if (CurrentValue == StartingValue) return;
-                _stopwatch.Stop();
-                _startingValue = CurrentValue;
-                _endingValue = StartingValue;
-                _duration = Duration * ((_endingValue - CurrentValue) / (_endingValue - _startingValue));
-                _timeStamp = 0;
-                _stopwatch.Reset();
-                _stopwatch.Start();
-            }
+        ~Uniform(){
+            AnimationManager.Remove(this); // upon desposing the class remove it from the List
         }
 
-        bool _reset = false;
+
+
+        public void TranslateForward(object? sender = null, object? e = null)
+        {
+            // leave these commented out this is because if you transition forward
+            // and backward really really  fast then  the opposite transition wont
+            // work leaving the next few lines commented out makes it work
+
+            //if (CurrentValue == EndingValue)
+            //    return;
+
+            _startingValue = StartingValue;
+            _endingValue = EndingValue;
+
+            FunctionRunning = true;
+        }
+
+        public void TranslateBackward(object? sender = null, object? e = null)
+        {
+            // leave these commented out this is because if you transition forward
+            // and backward really really  fast then  the opposite transition wont
+            // work leaving the next few lines commented out makes it work
+
+            //if (CurrentValue == StartingValue)
+            //    return;
+
+            _startingValue = EndingValue;
+            _endingValue = StartingValue;
+
+            FunctionRunning = true;
+        }
+
+
         public void Reset(object? sender = null, object? e = null){ 
             // does not need to be async function 
             FunctionRunning = false;
-            _reset = true;
+            CurrentValue = StartingValue;
         }
 
 
-        bool _paused = false;
+        private bool _paused = false;
         public void Pause() {
             // does not need to be an async function
-            _stopwatch.Stop();
             _paused = true;
             FunctionRunning = false;
         }
 
         public async void Resume() {
-            _stopwatch.Start();
             _paused = false;
-            await Transation();
         }
 
 
-
-
-        private Stopwatch _stopwatch = new Stopwatch();
         private double _startingValue;
         private double _endingValue;
-        private double _duration;
-        private double _timeStamp = 0;
 
-        async private Task Transation()
-        {
-            FunctionRunning = true;
-            while (_stopwatch.ElapsedMilliseconds < Duration && FunctionRunning)
+
+        public void Update(double dt){
+            if (!FunctionRunning)
+                return;
+
+            if (_paused)
+                return;
+
+            double speed = (_endingValue - _startingValue) / Duration;
+
+            CurrentValue += speed * dt;
+
+            // Check if we reached the destination
+            if (speed > 0 && CurrentValue >= _endingValue)
             {
-                if (FunctionRunning == false) break;
-                if (_stopwatch.ElapsedMilliseconds - _timeStamp < Tick)
-                {
-                    await Task.Delay(Tick / 2);
-                    continue;
-                }
-                _timeStamp += Tick;
-                double _delta = _timeStamp / _duration * (_endingValue - _startingValue);
-                //if (LinearDeceleration) _delta = _delta * (2 - (_timeStamp / _duration));
-
-
-                CurrentValue = _delta + _startingValue;
-
-                // this if statement is a for redundency for NaN values and also 
-                if (Trigger != null && !double.IsNaN(CurrentValue) &&
-                    CurrentValue <= Math.Max(StartingValue, EndingValue) &&
-                    CurrentValue >= Math.Min(StartingValue, EndingValue))
-                    Trigger(CurrentValue);
+                CurrentValue = _endingValue;
+                FunctionRunning = false;
+            }
+            else if (speed < 0 && CurrentValue <= _endingValue){
+                CurrentValue = _endingValue;
+                FunctionRunning = false;
             }
 
-
-            if (_paused) {
-                // we break out so we dong trigger the function when it is paused
-                return;
+            // Trigger current value
+            if (Trigger != null &&
+                !double.IsNaN(CurrentValue))
+            {
+                Trigger.Invoke(CurrentValue);
             }
-
-            if (FunctionRunning == false && _reset){ 
-                // this means we reseted note that the trigger function is not
-                // triggered you can trigger it your self as  you already know
-                // when to run this function
-                CurrentValue = StartingValue;
-                _reset = false;
-                return;
-            }
-
-            if (Trigger != null && !double.IsNaN(_endingValue) &&
-                CurrentValue <= Math.Max(StartingValue, EndingValue) &&
-                CurrentValue >= Math.Min(StartingValue, EndingValue))
-                Trigger(_endingValue);
-
-            FunctionRunning = false;
-            if (Trigger != null) Trigger(_endingValue); // run the function one last time after the FunctionRunning has been ran
-                                                        // so my fellow developer can make a good use of it 
         }
     }
 }

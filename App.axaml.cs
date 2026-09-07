@@ -52,6 +52,9 @@ namespace InputConnect
 
 
 
+            UI.Animations.AnimationManager.Initialize(); // intilise the animation manager before running the UI
+                                                         // and no even  in headless  mode am  going to keep the
+                                                         // animation manager running so we can test them with 
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop){
 
@@ -71,7 +74,7 @@ namespace InputConnect
             var __ = Tray.ApplicationTray;
             var ___ = ConnectionUDP.Client;
             var ____ = Controllers.Hook.StartHook();
-
+            
 
 
             // this creates the absorber popup

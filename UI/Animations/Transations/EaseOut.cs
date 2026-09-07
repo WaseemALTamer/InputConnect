@@ -33,7 +33,7 @@ namespace InputConnect.UI.Animations.Transations
             Transition = new Uniform{
                 StartingValue = 0,
                 EndingValue = 1,
-                CurrentValue = CurrentValue / (EndingValue + StartingValue),
+                CurrentValue = 0,
                 Duration = Duration,
                 Trigger = _Trigger,
             };

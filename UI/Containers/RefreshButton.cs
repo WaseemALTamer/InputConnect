@@ -135,7 +135,7 @@ namespace InputConnect.UI.Containers
 
             if (RotationAnimation.FunctionRunning) return;
 
-            RotationAnimation.CurrentValue = 0;
+            RotationAnimation.Reset();
             RotationAnimation.TranslateForward();
         }
 

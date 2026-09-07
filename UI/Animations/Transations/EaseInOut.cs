@@ -34,7 +34,7 @@ namespace InputConnect.UI.Animations.Transations
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                CurrentValue = CurrentValue / (EndingValue + StartingValue),
+                CurrentValue = 0,
                 Duration = Duration,
                 Trigger = _Trigger,
             };
@@ -47,7 +47,6 @@ namespace InputConnect.UI.Animations.Transations
             if (Transition == null) return;
 
             Transition.Duration = Duration;
-
 
             Transition.TranslateForward();
         }
@@ -78,8 +77,10 @@ namespace InputConnect.UI.Animations.Transations
             Transition.Resume();
         }
 
-        private void _Trigger(double Value)
-        {
+        private void _Trigger(double Value){
+
+            
+
             if (Transition == null) return;
             FunctionRunning = Transition.FunctionRunning;
 
@@ -93,6 +94,8 @@ namespace InputConnect.UI.Animations.Transations
             double _delta = t * (EndingValue - StartingValue);
 
             CurrentValue = StartingValue + _delta;
+
+
             if (Trigger != null) Trigger(CurrentValue);
         }
 
